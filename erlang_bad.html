@@ -1,0 +1,995 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="jquery_plantuml.js"></script>
+<!-- rawdeflate.js is implicity used by jquery_plantuml.js -->
+</head>
+
+<body>
+<p>Stuff goes bad. Erlang in anger</p>
+<p>Contents</p>
+<p>Introduction</p>
+<p>Writing Applications</p>
+<ol>
+	<li>
+	How to Dive into a Code Base
+		<ol>
+		<li>Raw Erlang </li>
+		<li>
+		OTP Applications
+		<ol>
+			<li>Library Applications</li>
+			<li>Regular Applications</li>
+			<li>Dependencies</li>
+			</ol>
+		</li>
+		<li>OTP Releases</li>
+		<li>Exercises</li>
+		</ol>
+	</li>
+	<li>
+	Building Open Source Erlang Software
+		<ol>
+		<li>Project Structure </li>
+			<ol>
+			<li>OTP Applications</li>
+			<li>OTP Releases</li>
+			</ol>
+		<li>Supervisors and start_link Semantics</li>
+			<ol>
+			<li>It’s About the Guarantees</li>
+			<li>Side Effects</li>
+			<li>Example: Initializing without guaranteeing connections</li>
+			<li>In a nutshell</li>
+			<li>Application Strategies</li>
+			</ol>
+		<li> Exercises</li>
+		</ol>
+	</li>
+	<li>
+	Planning for Overload
+	<ol>
+		<li>
+			Common Overload Sources
+			<ol>
+			<li>error_logger Explodes</li>
+			<li>Locks and Blocking Operations</li>
+			<li>Unexpected Messages</li>
+			</ol>
+			</li>
+			
+		</li>
+	
+		<li>
+		Restricting Input
+		<ol>
+			<li>How Long Should a Time Out Be</li>
+			<li>Asking For Permission</li>
+			<li>What Users See</li>
+			</ol>
+		</li>
+		<li>
+		Discarding Data
+			<ol>
+			<li>Random Drop</li>
+			<li>Queue Buffers</li>
+			<li>Stack Buffers</li>
+			<li>Time-Sensitive Buffers</li>
+			<li>Dealing With Constant Overload</li>
+			<li>How Do You Drop</li>
+			</ol>
+		</li>
+		<li>Exercises</li>
+		
+		</ol>
+	</ol>
+
+	<p>II Diagnosing Applications</p>
+<ol>
+	<li>
+	Connecting to Remote Nodes
+	<ol>
+		<li>Job Control Mode</li>
+		<li>Remsh</li>
+		<li>SSH Daemon</li>
+		<li>Named Pipes</li>
+		<li>Exercises</li>
+	</ol>
+	</li>
+	<li>
+	Runtime Metrics
+	<ol>
+		<li>Global View</li>
+			<ol>
+			<li>Memory</li>
+			<li>CPU</li>
+			<li>Processes</li>
+			<li>Ports</li>
+			</ol>
+		<li>Digging In</li>
+		<ol>
+			<li>Processes</li>
+			<li>OTP Processes</li>
+			<li>Ports</li>
+			</ol>
+		<li>Exercises</li>
+		</ol>
+		</li>
+
+		<li>
+
+	Reading Crash Dumps
+		<ol>
+		<li>General View</li>
+		<li>Full Mailboxes</li>
+		<li>Too Many (or too few) Processes</li>
+		<li>Too Many Ports</li>
+		<li>Can’t Allocate Memory</li>
+		<li>Exercises</li>
+		</ol>
+		</li>
+		<li>
+
+	Memory Leaks
+	<ol>
+		<li>Common Sources of Leaks
+			<ol>
+			<li>Atom</li>
+			<li>Binary</li>
+			<li>Code</li>
+			<li>ETS</li>
+			<li>Processes</li>
+			<li>Nothing in Particular</li>
+			</ol>
+		<li>Binaries</li>
+		<ol>
+			<li>Detecting Leaks</li>
+			<li>Fixing Leaks</li>
+			</ol>
+		<li>Memory Fragmentation</li>
+		<ol>
+			<li>Finding Fragmentation</li>
+			<li>Erlang’s Memory Model</li>
+			<li>Fixing Memory Fragmentation with a Different Allocation Strategy</li>
+			</ol>
+		<li>Exercises</li>
+		</ol>
+		</li>
+		
+		<li>
+	CPU and Scheduler Hogs
+		<ol>
+		<li>Profiling and Reduction Counts</li>
+		<li>System Monitors</li>
+			<ol>
+			<li>Suspended Ports</li>
+			</ol>
+		<li>Exercises</li>
+		</ol>
+		</li>
+		<li>
+	Tracing
+	<ol>
+		<li>Tracing Principles</li>
+		<li>Tracing with Recon</li>
+		<li>Example Sessions</li>
+		<li>Exercises</li>
+		</ol>
+		</li>
+		<li>
+	Conclusion
+	</li>
+
+	</ol>
+
+	<hr>
+<h2>Introduction</h2>
+<h3>On Running Software</h3>
+
+<p>
+There’s something rather unique in Erlang in how it approaches failure compared to most
+other programming languages. There’s this common way of thinking where the language,
+programming environment, and methodology do everything possible to prevent errors.
+Something going wrong at run-time is something that needs to be prevented, and if it
+cannot be prevented, then it’s out of scope for whatever solution people have been thinking
+about.
+</p>
+
+<p>
+The program is written once, and after that, it’s off to production, whatever may happen
+there. If there are errors, new versions will need to be shipped.
+</p>
+
+<p>Erlang, on the other hand, takes the approach that failures will happen no matter what,
+whether they’re developer-, operator-, or hardware-related. It is rarely practical or even
+possible to get rid of all errors in a program or a system.1 If you can deal with some errors
+rather than preventing them at all cost, then most undefined behaviours of a program can
+go in that "deal with it" approach.</p>
+
+<p>This is where the "Let it Crash"2 idea comes from: Because you can now deal with
+failure, and because the cost of weeding out all of the complex bugs from a system before
+it hits production is often prohibitive, programmers should only deal with the errors they
+know how to handle, and leave the rest for another process (a supervisor) or the virtual
+machine to deal with.
+</p>
+<p>
+Given that most bugs are transient3, simply restarting processes back to a state known
+to be stable when encountering an error can be a surprisingly good strategy.
+</p>
+
+<p>Erlang is a programming environment where the approach taken is equivalent to the
+human body’s immune system, whereas most other languages only care about hygiene to
+make sure no germ enters the body. Both forms appear extremely important to me. Almost
+every environment offers varying degrees of hygiene. Nearly no other environment offers
+the immune system where errors at run time can be dealt with and seen as survivable.
+</p>
+
+<p>
+Because the system doesn’t collapse the first time something bad touches it, Erlang/OTP
+also allows you to be a doctor. You can go in the system, pry it open right there in production,
+carefully observe everything inside as it runs, and even try to fix it interactively.
+To continue with the analogy, Erlang allows you to perform extensive tests to diagnose the
+problem and various degrees of surgery (even very invasive surgery), without the patients
+needing to sit down or interrupt their daily activities.
+</p>
+
+
+<p>
+This book intends to be a little guide about how to be the Erlang medic in a time of
+war. It is first and foremost a collection of tips and tricks to help understand where failures
+come from, and a dictionary of different code snippets and practices that helped developers
+debug production systems that were built in Erlang.
+</p>
+
+<sub>
+
+<br/>1life-critical systems are usually excluded from this category
+<br/>2Erlang people now seem to favour "let it fail", given it makes people far less nervous.
+<br/>3131 out of 132 bugs are transient bugs (they’re non-deterministic and go away when you look at them,
+and trying again may solve the problem entirely), according to Jim Gray in Why Do Computers Stop and
+What Can Be Done About It?
+</sub>
+<h3>Who is this for?</h3>
+
+<p>This book is not for beginners. There is a gap left between most tutorials, books, training
+sessions, and actually being able to operate, diagnose, and debug running systems once
+they’ve made it to production. There’s a fumbling phase implicit to a programmer’s learning
+of a new language and environment where they just have to figure how to get out of the
+guidelines and step into the real world, with the community that goes with it.
+</p>
+
+<p>
+This book assumes that the reader is proficient in basic Erlang and the OTP framework.
+Erlang/OTP features are explained as I see fit — usually when I consider them tricky —
+and it is expected that a reader who feels confused by usual Erlang/OTP material will have
+an idea of where to look for explanations if necessary4.
+</p>
+
+<p>
+	What is not necessarily assumed is that the reader knows how to debug Erlang software,
+dive into an existing code base, diagnose issues, or has an idea of the best practices about
+deploying Erlang in a production environment5
+</p>
+
+<h3>How To Read This Book</h3>
+
+<p>This book is divided in two parts.</p>
+<p>Part I focuses on how to write applications. It includes how to dive into a code base
+(Chapter 1), general tips on writing open source Erlang software (Chapter 2), and how to
+plan for overload in your system design (Chapter 3).</p>
+<p>Part II focuses on being an Erlang medic and concerns existing, living systems. It
+contains instructions on how to connect to a running node (Chapter 4), and the basic
+runtime metrics available (Chapter 5). It also explains how to perform a system autopsy
+using a crash dump (Chapter 6), how to identify and fix memory leaks (Chapter 7), and how to find runaway CPU usage (Chapter 8). The final chapter contains instructions on
+how to trace Erlang function calls in production using recon6 to understand issues before
+they bring the system down (Chapter 9).</p>
+<sub>
+<br/>4I do recommend visiting Learn You Some Erlang or the regular Erlang Documentation if a free resource
+is required
+<br/>5Running Erlang in a screen or tmux session is not a deployment strategy.
+</sub>
+<p>Each chapter is followed up by a few optional exercises in the form of questions or
+hands-on things to try if you feel like making sure you understood everything, or if you
+want to push things further.</p>
+<sub>
+	6http://ferd.github.io/recon/ — a library used to make the text lighter, and with generally productionsafe
+functions.
+</sub>
+<hr/>
+<h1> Part I </h1>
+<h1> Writing Applications </h1>
+
+<h2> Chapter 1 </h2>
+ <h3> How to Dive into a Code Base </h3>
+
+ <p>"Read the source" is one of the most annoying things to be told, but dealing with Erlang
+programmers, you’ll have to do it often. Either the documentation for a library will be
+incomplete, outdated, or just not there. In other cases, Erlang programmers are a bit
+similar to Lispers in that they will tend to write libraries that will solve their problems and
+not really test or try them in other circumstances, leaving it to you to extend or fix issues
+that arise in new contexts.</p>
+<p>It’s thus pretty much guaranteed you’ll have to go dive in some code base you know
+nothing about, either because you inherited it at work, or because you need to fix it or
+understand it to be able to move forward with your own system. This is in fact true of
+most languages whenever the project you work on is not one you designed yourself.</p>
+
+<p>There are three main types of Erlang code bases you’ll encounter in the wild: raw Erlang
+code bases, OTP applications, and OTP releases. In this chapter, we’ll look at each of these
+and try to provide helpful tips on navigating them.</p>
+
+<h4>Raw Erlang</h4>
+<p>If you encounter a raw Erlang code base, you’re pretty much on your own. These rarely
+follow any specific standard, and you have to dive in the old way to figure out whatever
+happens in there.</p>
+<p>This means hoping for a <b>README.md</b> file or something similar that can point to an entry
+point in the application, and going from there, or hoping for some contact information that
+can be used to ask questions to the author(s) of the library.</p>
+
+<p>Fortunately, you should rarely encounter raw Erlang in the wild, and they are often
+beginner projects, or awesome projects that were once built by Erlang beginners and now
+need a serious rewrite. In general, the advent of tools such as rebar1 made it so most
+people use OTP Applications.</p>
+
+<sub>
+	1https://github.com/rebar/rebar/ — a build tool briefly introduced in Chapter 2
+</sub>
+
+<h4>OTP Applications</h4>
+<p>Figuring out OTP applications is usually rather simple. They usually all share a directory
+structure that looks like:</p>
+
+<div class="code">
+doc/
+ebin/
+src/
+test/
+LICENSE.txt
+README.md
+rebar.config
+</div>
+
+<p>There might be slight differences, but the general structure will be the same.</p>
+
+<p>Each OTP application should contain an app file, either ebin/<AppName>.app or more
+often, src/<AppName>.app.src2. There are two main varieties of app files:</p>
+
+<div style="code"> 
+{application, useragent, [
+{description, "Identify browsers & OSes from useragent strings"},
+{vsn, "0.1.2"},
+{registered, []},
+{applications, [kernel, stdlib]},
+{modules, [useragent]}
+]}.
+</div>
+<p>And.
+</p>
+<div style="code" >
+	{application, dispcount, [
+{description, "A dispatching library for resources and task "
+"limiting based on shared counters"},
+{vsn, "1.0.0"},
+{applications, [kernel, stdlib]},
+{registered, []},
+{mod, {dispcount, []}},
+{modules, [dispcount, dispcount_serv, dispcount_sup,
+dispcount_supersup, dispcount_watcher, watchers_sup]}
+]}.
+
+</div>
+
+<p>This first case is called a <i>library application</i>, while the second case is a regular <i>application</i>.</p>
+
+<sub>
+2A build system generates the final file that goes in ebin. Note that in these cases, many
+src/<AppName>.app.src files do not specify modules and let the build system take care of it.
+</sub>
+
+<h5>Library Applications</h5>
+<p>Library applications will usually have modules named appname _something, and one module
+named appname . This will usually be the interface module that’s central to the library and
+contains a quick way into most of the functionality provided.</p>
+<p>
+	By looking at the source of the module, you can figure out how it works with little
+effort: If the module adheres to any given behaviour (gen_server, gen_fsm, etc.), you’re
+most likely expected to start a process under one of your own supervisors and call it that
+way. If no behaviour is included, then you probably have a functional, stateless library on
+your hands. For this case, the module’s exported functions should give you a quick way to
+understand its purpose.
+</p>
+
+<h5>Regular Applications</h5>
+<p>For a regular OTP application, there are two potential modules that act as the entry point:</p>
+<ol>
+	<li>appname</li>
+	<li>appname _app</li>
+</ol>
+<p>The first file should be similar in use to what we had in a library application (an entry
+point), while the second one will implement the application behaviour, and will represent
+the top of the application’s process hierarchy. In some cases the first file will play both
+roles at once.</p>
+
+<p>If you plan on simply adding the application as a dependency to your own app, then
+look inside appname for details and information. If you need to maintain and/or fix the
+application, go for appname _app instead.</p>
+
+<p>The application will start a top-level supervisor and return its pid. This top-level
+supervisor will then contain the specifications of all the child processes it will start on its
+own3.</p>
+
+<p>The higher a process resides in the tree, the more likely it is to be vital to the survival of
+the application. You can also estimate how important a process is by the order it is started
+(all children in the supervision tree are started in order, depth-first). If a process is started
+later in the supervision tree, it probably depends on processes that were started earlier.</p>
+
+<p>Moreover, worker processes that depend on each other within the same application (say,
+a process that buffers socket communications and relays them to a finite-state machine in
+charge of understanding the protocol) are likely to be regrouped under the same supervisor
+and to fail together when something goes wrong. This is a deliberate choice, as it is usually
+simpler to start from a blank slate, restarting both processes, rather than trying to figure
+out how to recuperate when one or the other loses or corrupts its state.</p>
+
+<sub>
+	3In some cases, the supervisor specifies no children: they will either be started dynamically by some
+function of the API or in a start phase of the application, or the supervisor is only there to allow OTP
+environment variables (in the env tuple of the app file) to be loaded.
+</sub>
+
+<p>The supervisor restart strategy reflects the relationship between processes under a supervisor:</p>
+<ul>
+<li>
+<b>one_for_one</b> and <b>simple_one_for_one</b> are used for processes that are not dependent
+upon each other directly, although their failures will collectively be counted towards
+total application shutdown4.
+</li>
+<li><b>rest_for_one</b> will be used to represent processes that depend on each other in a
+linear manner.</li>
+<li><b>one_for_all</b> is used for processes that entirely depend on each other.</li>
+</ul>
+
+<p>This structure means it is easiest to navigate OTP applications in a top-down manner
+by exploring supervision subtrees.</p>
+
+<p>For each worker process supervised, the behaviour it implements will give a good clue
+about its purpose:</p>
+
+<ul>
+	<li>a <b>gen_server</b> holds resources and tends to follow client/server patterns (or more
+generally, request/response patterns)</li>
+	<li>a <b>gen_fsm</b> will deal with a sequence of events or inputs and react depending on them,
+as a Finite State Machine. It will often be used to implement protocols.</li>
+	<li>a <b>gen_event</b> will act as an event hub for callbacks, or as a way to deal with notifications
+of some sort.</li>
+</ul>
+<p>All of these modules will contain the same kind of structure: exported functions that
+represent the user-facing interface, exported functions for the callback module, and private
+functions, usually in that order.</p>
+
+<p>Based on their supervision relationship and the typical role of each behaviour, looking
+at the interface to be used by other modules and the behaviours implemented should reveal
+a lot of information about the program you’re diving into.</p>
+
+<h5>Dependencies</h5>
+
+<p>All applications have dependencies5, and these dependencies will have their own dependencies.
+OTP applications usually share no state between them, so it’s possible to know what
+bits of code depend on what other bits of code by looking at the app file only, assuming the
+developer wrote them in a mostly correct manner. Figure 1.1 shows a diagram that can be
+generated from looking at app files to help understand the structure of OTP applications.</p>
+
+<p>Using such a hierarchy and looking at each application’s short description might be
+helpful to draw a rough, general map of where everything is located. To generate a similar
+diagram, find recon’s script directory and call escript script/app_deps.erl6. Similar hierarchies can be found using the observer7 application, but for individual supervision
+trees. Put together, you may get an easy way to find out what does what in the code base.</p>
+<sub>
+<br/>4Some developers will use one_for_one supervisors when rest_for_one is more appropriate. They
+require strict ordering to boot correctly, but forget about said order when restarting or if a predecessor
+dies.
+<br/>5At the very least on the kernel and stdlib applications	
+<br/>6This script depends on graphviz
+</sub>
+<p></p>
+<img src="images/riak_arc.png">
+<p>Figure 1.1: Dependency graph of riak_cs, Basho’s open source cloud library. The graph
+ignores dependencies on common applications like kernel and stdlib. Ovals are applications,
+rectangles are library applications.</p>
+
+<h3>OTP Releases</h3>
+<p>OTP releases are not a lot harder to understand than most OTP applications you’ll encounter
+in the wild. A release is a set of OTP applications packaged in a production-ready
+manner so it boots and shuts down without needing to manually call application:start/2
+for any app. Of course there’s a bit more to releases than that, but generally, the same
+discovery process used for individual OTP applications will be applicable here.</p>
+
+<p>You’ll usually have a file similar to the configuration files used by systools or reltool,
+which will state all applications part of the release and a few8 options regarding their
+packaging. To understand them, I recommend reading existing documentation on them. If
+you’re lucky, the project may be using relx9, an easier tool that was officially released in
+early 2014.</p>
+
+<h3>1.4 Exercises</h3>
+<h4>Review Questions</h4>
+<ol>
+	<li>How do you know if a code base is an application? A release?</li>
+	<li>What differentiates an application from a library application?</li>
+	<li>What can be said of processes under a one_for_all scheme for supervision?</li>
+	<li>Why would someone use a gen_fsm behaviour over a gen_server?</li>
+</ol>
+<h4>Hands-on</h4>
+<p>Download the code at https://github.com/ferd/recon_demo. This will be used as a test
+bed for exercises throughout the book. Given you are not familiar with the code base yet,
+let’s see if you can use the tips and tricks mentioned in this chapter to get an understanding
+of it.</p>
+
+<ol>
+	<li>Is this application meant to be used as a library? A standalone system?</li>
+	<li>What does it do?</li>
+	<li>Does it have any dependencies? What are they?</li>
+	<li>The app’s README mentions being non-deterministic. Can you prove if this is true?
+How?</li>
+	<li>Can you express the dependency chain of applications in there? Generate a diagram
+of them?</li>
+	<li>Can you add more processes to the main application than those described in the
+README?</li>
+
+</ol>
+
+<h2>Chapter 2</h2>
+<h2>Building Open Source Erlang
+Software</h2>
+<p>Most Erlang books tend to explain how to build Erlang/OTP applications, but few of them
+go very much in depth about how to integrate with the Erlang community doing Open
+Source work. Some of them even avoid the topic on purpose. This chapter dedicates itself
+to doing a quick tour of the state of affairs in Erlang.</p>
+<p>OTP applications are the vast majority of the open source code people will encounter.
+In fact, many people who would need to build an OTP release would do so as one umbrella
+OTP application.</p>
+
+<p>If what you’re writing is a stand-alone piece of code that could be used by someone
+building a product, it’s likely an OTP application. If what you’re building is a product
+that stands on its own and should be deployed by users as-is (or with a little configuration),
+what you should be building is an OTP release.</p>
+
+<p>The main build tools supported are rebar and erlang.mk. The former is a portable
+Erlang script that will be used to wrap around a lot of standard functionality and add its
+own, while the latter is a very fancy makefile that does a bit less, but tends to be faster
+when it comes to compiling. In this chapter, I’ll mostly focus on using rebar to build
+things, given it’s the ad-hoc standard, is well-established, and erlang.mk applications tend
+to also be supported by rebar as dependencies.</p>
+
+<h3>Project Structure</h3>
+
+<p>The structures of OTP applications and of OTP releases are different. An OTP application
+can be expected to have one top-level supervisor (if any) and possibly a bunch of
+dependencies that sit below it. An OTP release will usually be composed of multiple OTP applications, which may or may not depend on each other. This will lead to two major
+ways to lay out applications.</p>
+
+<h4>OTP Applications</h4>
+<p>For OTP applications, the proper structure is pretty much the same as what was explained
+in 1.2:</p>
+
+<blockquote>
+	1 doc/
+2 deps/
+3 ebin/
+4 src/
+5 test/
+6 LICENSE.txt
+7 README.md
+8 rebar.config
+</blockquote>
+
+<p>What’s new in this one is the deps/ directory, which is fairly useful to have, but that
+will be generated automatically by rebar2 if necessary. That’s because there is no canonical
+package management in Erlang. People instead adopted rebar, which fetches dependencies
+locally, on a per-project basis. This is fine and removes a truckload of conflicts, but means
+that each project you have may have to download its own set of dependencies</p>
+
+<p>This is accomplished with rebar by adding a few config lines to rebar.config:</p>
+
+<blockquote>
+	
+	1 {deps,
+2 [{application_name, "1.0.*",
+3 {git, "git://github.com/user/myapp.git", {branch,"master"}}},
+4 {application_name, "2.0.1",
+5 {git, "git://github.com/user/hisapp.git", {tag,"2.0.1"}}},
+6 {application_name, "",
+7 {git, "https://bitbucket.org/user/herapp.git", "7cd0aef4cd65"}},
+8 {application_name, "my regex",
+9 {hg, "https://bitbucket.org/user/theirapp.hg" {branch, "stable"}}}]}.
+</blockquote>
+
+<sub>
+	2A lot of people package rebar directly in their application. This was initially done to help people who
+had never used rebar before use libraries and projects in a boostrapped manner. Feel free to install rebar
+globally on your system, or keep a local copy if you require a specific version to build your system.
+</sub>
+
+<p>Applications are fetched directly from a git (or hg, or svn) source, recursively. They can
+then be compiled, and specific compile options can be added with the {erl_opts, List}.
+option in the config file3.</p>
+
+<p>Within these directories, you can do your regular development of an OTP application.
+To compile them, call rebar get-deps compile, which will download all dependencies,
+and then build them and your app at once.</p>
+
+<p>When making your application public to the world, distribute it without the dependencies.
+It’s quite possible that other developers’ applications depend on the same applications
+yours do, and it’s no use shipping them all multiple times. The build system in place (in this
+case, rebar) should be able to figure out duplicated entries and fetch everything necessary
+only once.</p>
+
+<h4>OTP Releases</h4>
+
+<p>For releases, the structure should be a bit different4. Releases are collections of applications,
+and their structures should reflect that</p>
+
+<p>Instead of having a top-level app, applications should be nested one level deeper and
+divided into two categories: apps and deps. The apps directory contains your applications’
+source code (say, internal business code), and the deps directory contains independently
+managed dependency applications.</p>
+
+<blockquote>
+apps/
+doc/
+deps/
+LICENSE.txt
+README.md
+rebar.config
+</blockquote>
+
+<p>This structure lends itself to generating releases. Tools such as Systool and Reltool have
+been covered before5, and can allow the user plenty of power. An easier tool that recently
+appeared is relx6.</p>
+
+<p>A relx configuration file for the directory structure above would look like:</p>
+<blockquote>1 {paths, ["apps", "deps"]}.
+2 {include_erts, false}. % will use currently installed Erlang
+3 {default_release, demo, "1.0.0"}.
+4
+5 {release, {demo, "1.0.0"},
+6 [members,
+7 feedstore,
+8 ...
+9 recon]}.</blockquote>
+<sub>
+	<br/>3More details by calling rebar help compile
+<br/>4I say should because many Erlang developers put their final system under a single top-level application
+(in src) and a bunch of follower ones as dependencies (in deps), which is less than ideal for distribution
+purposes and conflicts with assumptions on directory structures made by OTP. People who do that tend
+to build from source on the production servers and run custom commands to boot their applications.
+<br/>5http://learnyousomeerlang.com/release-is-the-word
+<br/>6https://github.com/erlware/relx/wiki
+</sub>
+
+<p>Calling ./relx (if the executable is in the current directory) will build a release, to be
+found in the _rel/ directory. If you really like using rebar, you can build a release as part
+of the project’s compilation by using a rebar hook in rebar.config:</p>
+
+<blockquote>
+	
+	1 {post_hooks,[{compile, "./relx"}]}.
+</blockquote>
+
+<p>
+	And every time rebar compile will be called, the release will be generated.
+</p>
+<h3>Supervisors and start_link Semantics</h3>
+
+<p>In complex production systems, most faults and errors are transient, and retrying an operation
+is a good way to do things — Jim Gray’s paper7 quotes Mean Times Between Failures
+(MTBF) of systems handling transient bugs being better by a factor of 4 when doing this.
+Still, supervisors aren’t just about restarting</p>
+
+<p>One very important part of Erlang supervisors and their supervision trees is that their
+start phases are synchronous. Each OTP process has the potential to prevent its siblings
+and cousins from booting. If the process dies, it’s retried again, and again, until it works,
+or fails too often.</p>
+
+<p>That’s where people make a very common mistake. There isn’t a backoff or cooldown
+period before a supervisor restarts a crashed child. When a network-based application tries
+to set up a connection during its initialization phase and the remote service is down, the
+application fails to boot after too many fruitless restarts. Then the system may shut down.</p>
+
+<p>Many Erlang developers end up arguing in favor of a supervisor that has a cooldown
+period. I strongly oppose the sentiment for one simple reason: it’s all about the guarantees.</p>
+
+<h4>It’s About the Guarantees</h4>
+
+<p>Restarting a process is about bringing it back to a stable, known state. From there, things
+can be retried. When the initialization isn’t stable, supervision is worth very little. An initialized process should be stable no matter what happens. That way, when its siblings
+and cousins get started later on, they can be booted fully knowing that the rest of the
+system that came up before them is healthy.</p>
+
+<sub>7http://mononcqc.tumblr.com/post/35165909365/why-do-computers-stop</sub>
+
+<p>If you don’t provide that stable state, or if you were to start the entire system asynchronously,
+you would get very little benefit from this structure that a try ... catch in
+a loop wouldn’t provide.</p>
+
+<p>Supervised processes provide guarantees in their initialization phase, not a best effort.
+This means that when you’re writing a client for a database or service, you shouldn’t need
+a connection to be established as part of the initialization phase unless you’re ready to say
+it will always be available no matter what happens.</p>
+<p>You could force a connection during initialization if you know the database is on the
+same host and should be booted before your Erlang system, for example. Then a restart
+should work. In case of something incomprehensible and unexpected that breaks these
+guarantees, the node will end up crashing, which is desirable: a pre-condition to starting
+your system hasn’t been met. It’s a system-wide assertion that failed.</p>
+
+<p>If, on the other hand, your database is on a remote host, you should expect the connection
+to fail. It’s just a reality of distributed systems that things go down.8 In this
+case, the only guarantee you can make in the client process is that your client will be
+able to handle requests, but not that it will communicate to the database. It could return
+{error, not_connected} on all calls during a net split, for example.</p>
+
+<p>The reconnection to the database can then be done using whatever cooldown or backoff
+strategy you believe is optimal, without impacting the stability of the system. It can be
+attempted in the initialization phase as an optimization, but the process should be able to
+reconnect later on if anything ever disconnects.</p>
+
+<p>If you expect failure to happen on an external service, do not make its presence a
+guarantee of your system. We’re dealing with the real world here, and failure of external
+dependencies is always an option.</p>
+
+<h4>Side Effects</h4>
+<p>Of course, the libraries and processes that call such a client will then error out if they don’t
+expect to work without a database. That’s an entirely different issue in a different problem
+space, one that depends on your business rules and what you can or can’t do to a client,
+but one that is possible to work around. For example, consider a client for a service that
+stores operational metrics — the code that calls that client could very well ignore the errors
+without adverse effects to the system as a whole.</p>
+
+<p>The difference in both initialization and supervision approaches is that the client’s
+callers make the decision about how much failure they can tolerate, not the client itself.
+That’s a very important distinction when it comes to designing fault-tolerant systems. Yes,
+supervisors are about restarts, but they should be about restarts to a stable known state.</p>
+
+<sub>8Or latency shoots up enough that it is impossible to tell the difference from failure.</sub>
+
+<h4>Example: Initializing without guaranteeing connections</h4>
+
+<p>The following code attempts to guarantee a connection as part of the process’ state:</p>
+
+<blockquote>
+	1 init(Args) ->
+2 Opts = parse_args(Args),
+3 {ok, Port} = connect(Opts),
+4 {ok, #state{sock=Port, opts=Opts}}.
+5
+6 [...]
+7
+8 handle_info(reconnect, S = #state{sock=undefined, opts=Opts}) ->
+9 %% try reconnecting in a loop
+10 case connect(Opts) of
+11 {ok, New} -> {noreply, S#state{sock=New}};
+12 _ -> self() ! reconnect, {noreply, S}
+13 end;
+</blockquote>
+
+<p>Instead, consider rewriting it as:</p>
+
+<blockquote>
+	1 init(Args) ->
+2 Opts = parse_args(Args),
+3 %% you could try connecting here anyway, for a best
+4 %% effort thing, but be ready to not have a connection.
+5 self() ! reconnect,
+6 {ok, #state{sock=undefined, opts=Opts}}.
+7
+8 [...]
+9
+10 handle_info(reconnect, S = #state{sock=undefined, opts=Opts}) ->
+11 %% try reconnecting in a loop
+12 case connect(Opts) of
+13 {ok, New} -> {noreply, S#state{sock=New}};
+14 _ -> self() ! reconnect, {noreply, S}
+15 end;
+</blockquote>
+<p>You now allow initializations with fewer guarantees: they went from the connection is
+available to the connection manager is available.</p>
+
+<h4>In a nutshell</h4>
+<p>Production systems I have worked with have been a mix of both approaches.
+Things like configuration files, access to the file system (say for logging purposes), local
+resources that can be depended on (opening UDP ports for logs), restoring a stable state
+from disk or network, and so on, are things I’ll put into requirements of a supervisor and
+may decide to synchronously load no matter how long it takes (some applications may
+just end up having over 10 minute boot times in rare cases, but that’s okay because we’re
+possibly syncing gigabytes that we need to work with as a base state if we don’t want to
+serve incorrect information.)</p>
+
+<p>On the other hand, code that depends on non-local databases and external services
+will adopt partial startups with quicker supervision tree booting because if the failure is
+expected to happen often during regular operations, then there’s no difference between now
+and later. You have to handle it the same, and for these parts of the system, far less strict
+guarantees are often the better solution.</p>
+
+<h4>Application Strategies</h4>
+<p>No matter what, a sequence of failures is not a death sentence for the node. Once a system
+has been divided into various OTP applications, it becomes possible to choose which applications
+are vital or not to the node. Each OTP application can be started in 3 ways: temporary,
+transient, permanent, either by doing it manually in application:start(Name, Type),
+or in the config file for your release:</p>
+
+<ul>
+	<li>permanent: if the app terminates, the entire system is taken down, excluding manual
+termination of the app with application:stop/1</li>
+	<li>transient: if the app terminates for reason normal, that’s ok. Any other reason for
+termination shuts down the entire system.</li>
+	<li>temporary: the application is allowed to stop for any reason. It will be reported, but
+nothing bad will happen.</li>
+</ul>
+<p>It is also possible to start an application as an included application, which starts it under
+your own OTP supervisor with its own strategy to restart it.</p>
+
+<h3>Exercises</h3>
+<h4>Review Questions</h4>
+<ol>
+	<li>Are Erlang supervision trees started depth-first? breadth-first? Synchronously or
+asynchronously?</li>
+	<li>What are the three application strategies? What do they do?</li>
+	<li>What are the main differences between the directory structure of an app and a release?</li>
+	<li>When should you use a release?</li>
+	<li>Give two examples of the type of state that can go in a process’ init function, and
+two examples of the type of state that shouldn’t go in a process’ init function</li>
+</ol>
+<h4>Hands-On</h4>
+<p>Using the code at https://github.com/ferd/recon_demo:</p>
+
+<ol>
+	<li>Extract the main application hosted in the release to make it independent, and includable
+in other projects.</li>
+	<li>Host the application somewhere (Github, Bitbucket, local server), and build a release
+with that application as a dependency.</li>
+	<li>The main application’s workers (council_member) starts a server and connects to
+it in its init/1 function. Can you make this connection happen outside of the init
+function’s? Is there a benefit to doing so in this specific case?</li>
+</ol>
+<h2>Chapter 3</h2>
+<h2>Planning for Overload</h2>
+<p>By far, the most common cause of failure I’ve encountered in real-world scenarios is due
+to the node running out of memory. Furthermore, it is usually related to message queues
+going out of bounds.1 There are plenty of ways to deal with this, but knowing which one
+to use will require a decent understanding of the system you’re working on.</p>
+
+<p>To oversimplify things, most of the projects I end up working on can be visualized
+as a very large bathroom sink. User and data input are flowing from the faucet. The
+Erlang system itself is the sink and the pipes, and wherever the output goes (whether it’s
+a database, an external API or service, and so on) is the sewer system.</p>
+<img src="images/sink.png">
+<p>When an Erlang node dies because of a queue overflowing, figuring out who to blame is
+crucial. Did someone put too much water in the sink? Are the sewer systems backing up ? Did you just design too small a pipe?</p>
+<sub>1Figuring out that a message queue is the problem is explained in Chapter 6, specifically in Section 6.2</sub>
+
+<p>Determining what queue blew up is not necessarily hard. This is information that can
+be found in a crash dump. Finding out why it blew up is trickier. Based on the role of
+the process or run-time inspection, it’s possible to figure out whether causes include fast
+flooding, blocked processes that won’t process messages fast enough, and so on.</p>
+
+<p>The most difficult part is to decide how to fix it. When the sink gets clogged up by
+too much waste, we will usually start by trying to make the bathroom sink itself larger
+(the part of our program that crashed, at the edge). Then we figure out the sink’s drain is
+too small, and optimize that. Then we find out the pipes themselves are too narrow, and
+optimize that. The overload gets pushed further down the system, until the sewers can’t
+take it anymore. At that point, we may try to add sinks or add bathrooms to help with
+the global input level.</p>
+
+<p>Then there’s a point where things can’t be improved anymore at the bathroom’s level.
+There are too many logs sent around, there’s a bottleneck on databases that need the
+consistency, or there’s simply not enough knowledge or manpower in your organization to
+improve things there.</p>
+
+<p>By finding that point, we identified what the true bottleneck of the system was, and all
+the prior optimization was nice (and likely expensive), but it was more or less in vain.</p>
+
+<p>We need to be more clever, and so things are moved back up a level. We try to
+massage the information going in the system to make it either lighter (whether it is through
+compression, better algorithms and data representation, caching, and so on).</p>
+
+<p>Even then, there are times where the overload will be too much, and we have to make the
+hard decisions between restricting the input to the system, discarding it, or accepting that
+the system will reduce its quality of service up to the point it will crash. These mechanisms
+fall into two broad strategies: back-pressure and load-shedding.</p>
+
+<p>We’ll explore them in this chapter, along with common events that end up causing
+Erlang systems to blow up.</p>
+
+<h3>Common Overload Sources</h3>
+<p>There are a few common causes of queues blowing up and overload in Erlang systems that
+most people will encounter sooner or later, no matter how they approach their system.
+They’re usually symptomatic of having your system grow up and require some help scaling
+up, or of an unexpected type of failure that ends up cascading much harder than it should
+have.</p>
+<h4>error_logger Explodes</h4>
+<p>Ironically, the process in charge of error logging is one of the most fragile ones. In a default
+Erlang install, the error_logger2 process will take its sweet time to log things to disk or
+over the network, and will do so much more slowly than errors can be generated.</p>
+
+<p>This is especially true of user-generated log messages (not for errors), and for crashes in
+large processes. For the former, this is because error_logger doesn’t really expect arbitrary
+levels of messages coming in continually. It’s for exceptional cases only and doesn’t expect
+lots of traffic. For the latter, it’s because the entire state of processes (including their
+mailboxes) gets copied over to be logged. It only takes a few messages to cause memory to
+bubble up a lot, and if that’s not enough to cause the node to run Out Of Memory (OOM),
+it may slow the logger enough that additional messages will.</p>
+<p>The best solution for this at the time of writing is to use lager as a substitute logging
+library.</p>
+<p>While lager will not solve all your problems, it will truncate voluminous log messages,
+optionally drop OTP-generated error messages when they go over a certain threshold, and
+will automatically switch between asynchronous and synchronous modes for user-submitted
+messages in order to self-regulate.</p>
+<p>It won’t be able to deal with very specific cases, such as when user-submitted messages
+are very large in volume and all coming from one-off processes. This is, however, a much
+rarer occurrence than everything else, and one where the programmer tends to have more
+control.</p>
+<h3>Locks and Blocking Operations</h3>
+<p>Locking and blocking operations will often be problematic when they’re taking unexpectedly
+long to execute in a process that’s constantly receiving new tasks.</p>
+
+<p>One of the most common examples I’ve seen is a process blocking while accepting a
+connection or waiting for messages with TCP sockets. During blocking operations of this
+kind, messages are free to pile up in the message queue.</p>
+
+<p>One particularly bad example was in a pool manager for HTTP connections that I had
+written in a fork of the lhttpc library. It worked fine in most test cases we had, and we
+even had a connection timeout set to 10 milliseconds to be sure it never took too long3.
+After a few weeks of perfect uptime, the HTTP client pool caused an outage when one of
+the remote servers went down.</p>
+
+<p>The reason behind this degradation was that when the remote server would go down, all
+of a sudden, all connecting operations would take at least 10 milliseconds, the time before
+which the connection attempt is given up on. With around 9,000 messages per second to the central process, each usually taking under 5 milliseconds, the impact became similar to
+roughly 18,000 messages a second and things got out of hand.</p>
+
+<sub>
+	<br/>2Defined at http://www.erlang.org/doc/man/error_logger.html
+<br/>310 milliseconds is very short, but was fine for collocated servers used for real-time bidding.
+</sub>
+
+<p>The solution we came up with was to leave the task of connecting to the caller process,
+and enforce the limits as if the manager had done it on its own. The blocking operations
+were now distributed to all users of the library, and even less work was required to be done
+by the manager, now free to accept more requests.</p>
+
+<p>When there is any point of your program that ends up being a central hub for receiving
+messages, lengthy tasks should be moved out of there if possible. Handling predictable overload4
+situations by adding more processes — which either handle the blocking operations
+or instead act as a buffer while the "main" process blocks — is often a good idea.</p>
+
+<p>There will be increased complexity in managing more processes for activities that aren’t
+intrinsically concurrent, so make sure you need them before programming defensively.</p>
+
+<p>Another option is to transform the blocking task into an asynchronous one. If the type
+of work allows it, start the long-running job and keep a token that identifies it uniquely,
+along with the original requester you’re doing work for. When the resource is available,
+have it send a message back to the server with the aforementioned token. The server will
+eventually get the message, match the token to the requester, and answer back, without
+being blocked by other requests in the mean time.5</p>
+
+<p>This option tends to be more obscure than using many processes and can quickly devolve
+into callback hell, but may use fewer resources.</p>
+
+<h4>Unexpected Messages</h4>
+<p>Messages you didn’t know about tend to be rather rare when using OTP applications.
+Because OTP behaviours pretty much expect you to handle anything with some clause in
+handle_info/2, unexpected messages will not accumulate much.</p>
+<p>However, all kinds of OTP-compliant systems end up having processes that may not
+implement a behaviour, or processes that go in a non-behaviour stretch where it overtakes
+message handling. If you’re lucky enough, monitoring tools6 will show a constant memory
+increase, and inspecting for large queue sizes7 will let you find which process is at fault.
+You can then fix the problem by handling the messages as required.</p>
+
+<sub>
+	<br/>4Something you know for a fact gets overloaded in production
+	<br/>5The redo application is an example of a library doing this, in its redo_block module. The [underdocumented]
+module turns a pipelined connection into a blocking one, but does so while maintaining pipeline
+aspects to the caller — this allows the caller to know that only one call failed when a timeout occurs, not
+all of the in-transit ones, without having the server stop accepting requests.
+	<br/>6See Section 5.1
+	<br/>7See Subsection 5.2.1
+</sub>
+</body>
+</html>

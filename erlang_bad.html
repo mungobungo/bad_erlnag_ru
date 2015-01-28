@@ -320,7 +320,7 @@ most languages whenever the project you work on is not one you designed yourself
 code bases, OTP applications, and OTP releases. In this chapter, we’ll look at each of these
 and try to provide helpful tips on navigating them.</p>
 
-<a id="raw_erlang"><h4>Raw Erlang</h4></a>
+<a id="raw_erlang"><h3>1.1. Raw Erlang</h3></a>
 <p>If you encounter a raw Erlang code base, you’re pretty much on your own. These rarely
 follow any specific standard, and you have to dive in the old way to figure out whatever
 happens in there.</p>
@@ -334,10 +334,10 @@ need a serious rewrite. In general, the advent of tools such as rebar1 made it s
 people use OTP Applications.</p>
 
 <sub>
-	1https://github.com/rebar/rebar/ — a build tool briefly introduced in Chapter 2
+	1https://github.com/rebar/rebar/ — a build tool briefly introduced in <a href="#chapter_2">Chapter 2</a>
 </sub>
 
-<a id="otp_applications"><h4>OTP Applications</h4></a>
+<a id="otp_applications"><h3>1.2 OTP Applications</h3></a>
 <p>Figuring out OTP applications is usually rather simple. They usually all share a directory
 structure that looks like:</p>
 
@@ -388,7 +388,7 @@ often, src/<AppName>.app.src2. There are two main varieties of app files:</p>
 src/<AppName>.app.src files do not specify modules and let the build system take care of it.
 </sub>
 
-<a id="library_applications"><h5>Library Applications</h5></a>
+<a id="library_applications"><h4>1.2.1 Library Applications</h4></a>
 <p>Library applications will usually have modules named appname _something, and one module
 named appname . This will usually be the interface module that’s central to the library and
 contains a quick way into most of the functionality provided.</p>
@@ -401,7 +401,7 @@ your hands. For this case, the module’s exported functions should give you a q
 understand its purpose.
 </p>
 
-<a id="regular_applications"><h5>Regular Applications</h5></a>
+<a id="regular_applications"><h4>1.2.2 Regular Applications</h4></a>
 <p>For a regular OTP application, there are two potential modules that act as the entry point:</p>
 <ol>
 	<li>appname</li>
@@ -472,7 +472,7 @@ functions, usually in that order.</p>
 at the interface to be used by other modules and the behaviours implemented should reveal
 a lot of information about the program you’re diving into.</p>
 
-<a id="dependencies"><h5>Dependencies</h5></a>
+<a id="dependencies"><h4>1.2.3 Dependencies</h4></a>
 
 <p>All applications have dependencies5, and these dependencies will have their own dependencies.
 OTP applications usually share no state between them, so it’s possible to know what
@@ -497,7 +497,7 @@ dies.
 ignores dependencies on common applications like kernel and stdlib. Ovals are applications,
 rectangles are library applications.</p>
 
-<a id="otp_releases"><h3>OTP Releases</h3></a>
+<a id="otp_releases"><h3>1.3 OTP Releases</h3></a>
 <p>OTP releases are not a lot harder to understand than most OTP applications you’ll encounter
 in the wild. A release is a set of OTP applications packaged in a production-ready
 manner so it boots and shuts down without needing to manually call application:start/2
@@ -510,7 +510,7 @@ packaging. To understand them, I recommend reading existing documentation on the
 you’re lucky, the project may be using relx9, an easier tool that was officially released in
 early 2014.</p>
 
-<a id="1_4_exercises"><h3>Exercises</h3></a>
+<a id="1_4_exercises"><h3>1.4 Exercises</h3></a>
 <a id="1_4_review_questions"><h4>Review Questions</h4></a>
 <ol>
 	<li>How do you know if a code base is an application? A release?</li>
@@ -560,14 +560,14 @@ when it comes to compiling. In this chapter, I’ll mostly focus on using rebar 
 things, given it’s the ad-hoc standard, is well-established, and erlang.mk applications tend
 to also be supported by rebar as dependencies.</p>
 
-<a id="project_structure"><h3>Project Structure</h3></a>
+<a id="2_1_project_structure"><h3>2.1 Project Structure</h3></a>
 
 <p>The structures of OTP applications and of OTP releases are different. An OTP application
 can be expected to have one top-level supervisor (if any) and possibly a bunch of
 dependencies that sit below it. An OTP release will usually be composed of multiple OTP applications, which may or may not depend on each other. This will lead to two major
 ways to lay out applications.</p>
 
-<a id="otp_applications"><h4>OTP Applications</h4></a>
+<a id="2_1_1_otp_applications"><h4>2.1.1 OTP Applications</h4></a>
 <p>For OTP applications, the proper structure is pretty much the same as what was explained
 in 1.2:</p>
 <pre><code class="erlang">1 doc/
@@ -620,7 +620,7 @@ yours do, and it’s no use shipping them all multiple times. The build system i
 case, rebar) should be able to figure out duplicated entries and fetch everything necessary
 only once.</p>
 
-<a id="otp_releases4"><h4>OTP Releases</h4></a>
+<a id="2_1_2_otp_releases4"><h4>2.1.2 OTP Releases</h4></a>
 
 <p>For releases, the structure should be a bit different4. Releases are collections of applications,
 and their structures should reflect that</p>
@@ -678,7 +678,7 @@ of the project’s compilation by using a rebar hook in rebar.config:</p>
 <p>
 	And every time rebar compile will be called, the release will be generated.
 </p>
-<a id="supervisors_and_start_link_semantics"><h3>Supervisors and start_link Semantics</h3></a>
+<a id="2_2_supervisors_and_start_link_semantics"><h3>2.2 Supervisors and start_link Semantics</h3></a>
 
 <p>In complex production systems, most faults and errors are transient, and retrying an operation
 is a good way to do things — Jim Gray’s paper7 quotes Mean Times Between Failures
@@ -698,7 +698,7 @@ application fails to boot after too many fruitless restarts. Then the system may
 <p>Many Erlang developers end up arguing in favor of a supervisor that has a cooldown
 period. I strongly oppose the sentiment for one simple reason: it’s all about the guarantees.</p>
 
-<a id="its_about_the_guarantees"><h4>It’s About the Guarantees</h4></a>
+<a id="2_2_1_its_about_the_guarantees"><h4>2.2.1 It’s About the Guarantees</h4></a>
 
 <p>Restarting a process is about bringing it back to a stable, known state. From there, things
 can be retried. When the initialization isn’t stable, supervision is worth very little. An initialized process should be stable no matter what happens. That way, when its siblings
@@ -736,27 +736,19 @@ reconnect later on if anything ever disconnects.</p>
 guarantee of your system. We’re dealing with the real world here, and failure of external
 dependencies is always an option.</p>
 
-<a id="side_effects"><h4>Side Effects</h4></a>
-<p>Of course, the libraries and processes that call such a client will then error out if they don’t
-expect to work without a database. That’s an entirely different issue in a different problem
-space, one that depends on your business rules and what you can or can’t do to a client,
-but one that is possible to work around. For example, consider a client for a service that
-stores operational metrics — the code that calls that client could very well ignore the errors
-without adverse effects to the system as a whole.</p>
+<a id="2_2_2_side_effects"><h4>2.2.2 Side Effects</h4></a>
+	<p>Of course, the libraries and processes that call such a client will then error out if they don’t expect to work without a database. That’s an entirely different issue in a different problem space, one that depends on your business rules and what you can or can’t do to a client, but one that is possible to work around. For example, consider a client for a service that stores operational metrics — the code that calls that client could very well ignore the errors without adverse effects to the system as a whole.</p>
 
-<p>The difference in both initialization and supervision approaches is that the client’s
-callers make the decision about how much failure they can tolerate, not the client itself.
-That’s a very important distinction when it comes to designing fault-tolerant systems. Yes,
-supervisors are about restarts, but they should be about restarts to a stable known state.</p>
+	<p>The difference in both initialization and supervision approaches is that the client’s callers make the decision about how much failure they can tolerate, not the client itself. That’s a very important distinction when it comes to designing fault-tolerant systems. Yes, supervisors are about restarts, but they should be about restarts to a stable known state.</p>
 
-<sub>8Or latency shoots up enough that it is impossible to tell the difference from failure.</sub>
+	<sub>8Or latency shoots up enough that it is impossible to tell the difference from failure.</sub>
 
-<h4>Example: Initializing without guaranteeing connections</h4>
+<a id="2_2_3_example_initializing"> <h4>2.2.3 Example: Initializing without guaranteeing connections</h4></a>
 
-<p>The following code attempts to guarantee a connection as part of the process’ state:</p>
+	<p>The following code attempts to guarantee a connection as part of the process’ state:</p>
 
 
-<pre>
+	<pre>
 	<code class="erlang">1 init(Args) ->
 2 	Opts = parse_args(Args),
 3 	{ok, Port} = connect(Opts),
@@ -772,7 +764,7 @@ supervisors are about restarts, but they should be about restarts to a stable kn
 13 	end;</code></pre>
 
 
-<p>Instead, consider rewriting it as:</p>
+	<p>Instead, consider rewriting it as:</p>
 
 
 <pre>
@@ -795,364 +787,190 @@ supervisors are about restarts, but they should be about restarts to a stable kn
 <p>You now allow initializations with fewer guarantees: they went from the connection is
 available to the connection manager is available.</p>
 
-<h4>In a nutshell</h4>
-<p>Production systems I have worked with have been a mix of both approaches.
-Things like configuration files, access to the file system (say for logging purposes), local
-resources that can be depended on (opening UDP ports for logs), restoring a stable state
-from disk or network, and so on, are things I’ll put into requirements of a supervisor and
-may decide to synchronously load no matter how long it takes (some applications may
-just end up having over 10 minute boot times in rare cases, but that’s okay because we’re
-possibly syncing gigabytes that we need to work with as a base state if we don’t want to
-serve incorrect information.)</p>
+<a id="2_2_4_in_a_nutshell"> <h4>In a nutshell</h4></a>
+	<p>Production systems I have worked with have been a mix of both approaches. Things like configuration files, access to the file system (say for logging purposes), local resources that can be depended on (opening UDP ports for logs), restoring a stable state from disk or network, and so on, are things I’ll put into requirements of a supervisor and may decide to synchronously load no matter how long it takes (some applications may just end up having over 10 minute boot times in rare cases, but that’s okay because we’re possibly syncing gigabytes that we need to work with as a base state if we don’t want to serve incorrect information.)</p>
 
-<p>On the other hand, code that depends on non-local databases and external services
-will adopt partial startups with quicker supervision tree booting because if the failure is
-expected to happen often during regular operations, then there’s no difference between now
-and later. You have to handle it the same, and for these parts of the system, far less strict
-guarantees are often the better solution.</p>
+	<p>On the other hand, code that depends on non-local databases and external services will adopt partial startups with quicker supervision tree booting because if the failure is expected to happen often during regular operations, then there’s no difference between now and later. You have to handle it the same, and for these parts of the system, far less strict guarantees are often the better solution.</p>
 
-<h4>Application Strategies</h4>
-<p>No matter what, a sequence of failures is not a death sentence for the node. Once a system
-has been divided into various OTP applications, it becomes possible to choose which applications
-are vital or not to the node. Each OTP application can be started in 3 ways: temporary,
-transient, permanent, either by doing it manually in application:start(Name, Type),
-or in the config file for your release:</p>
+<a id="2_2_5_application_strategies"> <h4>2.2.5 Application Strategies</h4></a>
 
-<ul>
-	<li>permanent: if the app terminates, the entire system is taken down, excluding manual
-termination of the app with application:stop/1</li>
-	<li>transient: if the app terminates for reason normal, that’s ok. Any other reason for
-termination shuts down the entire system.</li>
-	<li>temporary: the application is allowed to stop for any reason. It will be reported, but
-nothing bad will happen.</li>
-</ul>
-<p>It is also possible to start an application as an included application, which starts it under
-your own OTP supervisor with its own strategy to restart it.</p>
+	<p>No matter what, a sequence of failures is not a death sentence for the node. Once a system has been divided into various OTP applications, it becomes possible to choose which applications are vital or not to the node. Each OTP application can be started in 3 ways: temporary, transient, permanent, either by doing it manually in application:start(Name, Type), or in the config file for your release:</p>
 
-<h3>Exercises</h3>
-<h4>Review Questions</h4>
-<ol>
-	<li>Are Erlang supervision trees started depth-first? breadth-first? Synchronously or
-asynchronously?</li>
-	<li>What are the three application strategies? What do they do?</li>
-	<li>What are the main differences between the directory structure of an app and a release?</li>
-	<li>When should you use a release?</li>
-	<li>Give two examples of the type of state that can go in a process’ init function, and
-two examples of the type of state that shouldn’t go in a process’ init function</li>
-</ol>
-<h4>Hands-On</h4>
-<p>Using the code at https://github.com/ferd/recon_demo:</p>
+	<ul>
+		<li>permanent: if the app terminates, the entire system is taken down, excluding manual termination of the app with application:stop/1</li>
+		<li>transient: if the app terminates for reason normal, that’s ok. Any other reason for termination shuts down the entire system.</li>
+		<li>temporary: the application is allowed to stop for any reason. It will be reported, but nothing bad will happen.</li>
+	</ul>
 
-<ol>
-	<li>Extract the main application hosted in the release to make it independent, and includable
-in other projects.</li>
-	<li>Host the application somewhere (Github, Bitbucket, local server), and build a release
-with that application as a dependency.</li>
-	<li>The main application’s workers (council_member) starts a server and connects to
-it in its init/1 function. Can you make this connection happen outside of the init
-function’s? Is there a benefit to doing so in this specific case?</li>
-</ol>
-<h2>Chapter 3</h2>
+	<p>It is also possible to start an application as an included application, which starts it under your own OTP supervisor with its own strategy to restart it.</p>
+
+<a id="2_3_exercises"> <h3>2.3 Exercises</h3></a>
+	<h4>Review Questions</h4>
+		<ol>
+			<li>Are Erlang supervision trees started depth-first? breadth-first? Synchronously or asynchronously?</li>
+			<li>What are the three application strategies? What do they do?</li>
+			<li>What are the main differences between the directory structure of an app and a release?</li>
+			<li>When should you use a release?</li>
+			<li>Give two examples of the type of state that can go in a process’ init function, and two examples of the type of state that shouldn’t go in a process’ init function</li>
+		</ol>
+	<h4>Hands-On</h4>
+		<p>Using the code at <a href="https://github.com/ferd/recon_demo">https://github.com/ferd/recon_demo</a>:</p>
+
+		<ol>
+			<li>Extract the main application hosted in the release to make it independent, and includable in other projects.</li>
+			<li>Host the application somewhere (Github, Bitbucket, local server), and build a release with that application as a dependency.</li>
+			<li>The main application’s workers (council_member) starts a server and connects to it in its init/1 function. Can you make this connection happen outside of the init function’s? Is there a benefit to doing so in this specific case?</li>
+		</ol>
+
+<a href="chapter_3"> <h2>Chapter 3</h2></a>
 <h2>Planning for Overload</h2>
-<p>By far, the most common cause of failure I’ve encountered in real-world scenarios is due
-to the node running out of memory. Furthermore, it is usually related to message queues
-going out of bounds.1 There are plenty of ways to deal with this, but knowing which one
-to use will require a decent understanding of the system you’re working on.</p>
+	<p>By far, the most common cause of failure I’ve encountered in real-world scenarios is due	to the node running out of memory. Furthermore, it is usually related to message queues going out of bounds.1 There are plenty of ways to deal with this, but knowing which one to use will require a decent understanding of the system you’re working on.</p>
 
-<p>To oversimplify things, most of the projects I end up working on can be visualized
-as a very large bathroom sink. User and data input are flowing from the faucet. The
-Erlang system itself is the sink and the pipes, and wherever the output goes (whether it’s
-a database, an external API or service, and so on) is the sewer system.</p>
-<img src="images/sink.png">
-<p>When an Erlang node dies because of a queue overflowing, figuring out who to blame is
-crucial. Did someone put too much water in the sink? Are the sewer systems backing up ? Did you just design too small a pipe?</p>
-<sub>1Figuring out that a message queue is the problem is explained in Chapter 6, specifically in Section 6.2</sub>
+	<p>To oversimplify things, most of the projects I end up working on can be visualized as a very large bathroom sink. User and data input are flowing from the faucet. The Erlang system itself is the sink and the pipes, and wherever the output goes (whether it’s a database, an external API or service, and so on) is the sewer system.</p>
 
-<p>Determining what queue blew up is not necessarily hard. This is information that can
-be found in a crash dump. Finding out why it blew up is trickier. Based on the role of
-the process or run-time inspection, it’s possible to figure out whether causes include fast
-flooding, blocked processes that won’t process messages fast enough, and so on.</p>
+	<img src="images/sink.png">
 
-<p>The most difficult part is to decide how to fix it. When the sink gets clogged up by
-too much waste, we will usually start by trying to make the bathroom sink itself larger
-(the part of our program that crashed, at the edge). Then we figure out the sink’s drain is
-too small, and optimize that. Then we find out the pipes themselves are too narrow, and
-optimize that. The overload gets pushed further down the system, until the sewers can’t
-take it anymore. At that point, we may try to add sinks or add bathrooms to help with
-the global input level.</p>
+	<p>When an Erlang node dies because of a queue overflowing, figuring out who to blame is crucial. Did someone put too much water in the sink? Are the sewer systems backing up ? Did you just design too small a pipe?</p>
+	
+	<sub>1Figuring out that a message queue is the problem is explained in Chapter 6, specifically in Section 6.2</sub>
 
-<p>Then there’s a point where things can’t be improved anymore at the bathroom’s level.
-There are too many logs sent around, there’s a bottleneck on databases that need the
-consistency, or there’s simply not enough knowledge or manpower in your organization to
-improve things there.</p>
+	<p>Determining what queue blew up is not necessarily hard. This is information that can be found in a crash dump. Finding out why it blew up is trickier. Based on the role of the process or run-time inspection, it’s possible to figure out whether causes include fast flooding, blocked processes that won’t process messages fast enough, and so on.</p>
 
-<p>By finding that point, we identified what the true bottleneck of the system was, and all
-the prior optimization was nice (and likely expensive), but it was more or less in vain.</p>
+	<p>The most difficult part is to decide how to fix it. When the sink gets clogged up by too much waste, we will usually start by trying to make the bathroom sink itself larger (the part of our program that crashed, at the edge). Then we figure out the sink’s drain is too small, and optimize that. Then we find out the pipes themselves are too narrow, and optimize that. The overload gets pushed further down the system, until the sewers can’t take it anymore. At that point, we may try to add sinks or add bathrooms to help with the global input level.</p>
 
-<p>We need to be more clever, and so things are moved back up a level. We try to
-massage the information going in the system to make it either lighter (whether it is through
-compression, better algorithms and data representation, caching, and so on).</p>
+	<p>Then there’s a point where things can’t be improved anymore at the bathroom’s level. There are too many logs sent around, there’s a bottleneck on databases that need the consistency, or there’s simply not enough knowledge or manpower in your organization to improve things there.</p>
 
-<p>Even then, there are times where the overload will be too much, and we have to make the
-hard decisions between restricting the input to the system, discarding it, or accepting that
-the system will reduce its quality of service up to the point it will crash. These mechanisms
-fall into two broad strategies: back-pressure and load-shedding.</p>
+	<p>By finding that point, we identified what the true bottleneck of the system was, and all the prior optimization was nice (and likely expensive), but it was more or less in vain.</p>
 
-<p>We’ll explore them in this chapter, along with common events that end up causing
-Erlang systems to blow up.</p>
+	<p>We need to be more clever, and so things are moved back up a level. We try to massage the information going in the system to make it either lighter (whether it is through compression, better algorithms and data representation, caching, and so on).</p>
 
-<h3>Common Overload Sources</h3>
-<p>There are a few common causes of queues blowing up and overload in Erlang systems that
-most people will encounter sooner or later, no matter how they approach their system.
-They’re usually symptomatic of having your system grow up and require some help scaling
-up, or of an unexpected type of failure that ends up cascading much harder than it should
-have.</p>
-<h4>error_logger Explodes</h4>
-<p>Ironically, the process in charge of error logging is one of the most fragile ones. In a default
-Erlang install, the error_logger2 process will take its sweet time to log things to disk or
-over the network, and will do so much more slowly than errors can be generated.</p>
+	<p>Even then, there are times where the overload will be too much, and we have to make the 	hard decisions between restricting the input to the system, discarding it, or accepting that the system will reduce its quality of service up to the point it will crash. These mechanisms 	fall into two broad strategies: back-pressure and load-shedding.</p>
 
-<p>This is especially true of user-generated log messages (not for errors), and for crashes in
-large processes. For the former, this is because error_logger doesn’t really expect arbitrary
-levels of messages coming in continually. It’s for exceptional cases only and doesn’t expect
-lots of traffic. For the latter, it’s because the entire state of processes (including their
-mailboxes) gets copied over to be logged. It only takes a few messages to cause memory to
-bubble up a lot, and if that’s not enough to cause the node to run Out Of Memory (OOM),
-it may slow the logger enough that additional messages will.</p>
-<p>The best solution for this at the time of writing is to use lager as a substitute logging
-library.</p>
-<p>While lager will not solve all your problems, it will truncate voluminous log messages,
-optionally drop OTP-generated error messages when they go over a certain threshold, and
-will automatically switch between asynchronous and synchronous modes for user-submitted
-messages in order to self-regulate.</p>
-<p>It won’t be able to deal with very specific cases, such as when user-submitted messages
-are very large in volume and all coming from one-off processes. This is, however, a much
-rarer occurrence than everything else, and one where the programmer tends to have more
-control.</p>
-<h3>Locks and Blocking Operations</h3>
-<p>Locking and blocking operations will often be problematic when they’re taking unexpectedly
-long to execute in a process that’s constantly receiving new tasks.</p>
+	<p>We’ll explore them in this chapter, along with common events that end up causing Erlang systems to blow up.</p>
 
-<p>One of the most common examples I’ve seen is a process blocking while accepting a
-connection or waiting for messages with TCP sockets. During blocking operations of this
-kind, messages are free to pile up in the message queue.</p>
+	<a id="3_1_common_overload_sources"><h3>3.1 Common Overload Sources</h3></a>
+		<p>There are a few common causes of queues blowing up and overload in Erlang systems that most people will encounter sooner or later, no matter how they approach their system. They’re usually symptomatic of having your system grow up and require some help scaling up, or of an unexpected type of failure that ends up cascading much harder than it should have.</p>
+			<a id="3_1_1_error_logger_explodes"></a> <h4>3.1.1. error_logger Explodes</h4>
+				<p>Ironically, the process in charge of error logging is one of the most fragile ones. In a defaultErlang install, the error_logger2 process will take its sweet time to log things to disk orover the network, and will do so much more slowly than errors can be generated.</p>
 
-<p>One particularly bad example was in a pool manager for HTTP connections that I had
-written in a fork of the lhttpc library. It worked fine in most test cases we had, and we
-even had a connection timeout set to 10 milliseconds to be sure it never took too long3.
-After a few weeks of perfect uptime, the HTTP client pool caused an outage when one of
-the remote servers went down.</p>
+				<p>This is especially true of user-generated log messages (not for errors), and for crashes in large processes. For the former, this is because error_logger doesn’t really expect arbitrary levels of messages coming in continually. It’s for exceptional cases only and doesn’t expect lots of traffic. For the latter, it’s because the entire state of processes (including their mailboxes) gets copied over to be logged. It only takes a few messages to cause memory to bubble up a lot, and if that’s not enough to cause the node to run Out Of Memory (OOM), it may slow the logger enough that additional messages will.</p>
 
-<p>The reason behind this degradation was that when the remote server would go down, all
-of a sudden, all connecting operations would take at least 10 milliseconds, the time before
-which the connection attempt is given up on. With around 9,000 messages per second to the central process, each usually taking under 5 milliseconds, the impact became similar to
-roughly 18,000 messages a second and things got out of hand.</p>
+				<p>The best solution for this at the time of writing is to use lager as a substitute logging library.</p>
 
-<sub>
-	<br/>2Defined at http://www.erlang.org/doc/man/error_logger.html
-<br/>310 milliseconds is very short, but was fine for collocated servers used for real-time bidding.
-</sub>
+				<p>While lager will not solve all your problems, it will truncate voluminous log messages, optionally drop OTP-generated error messages when they go over a certain threshold, and will automatically switch between asynchronous and synchronous modes for user-submitted messages in order to self-regulate.</p>
 
-<p>The solution we came up with was to leave the task of connecting to the caller process,
-and enforce the limits as if the manager had done it on its own. The blocking operations
-were now distributed to all users of the library, and even less work was required to be done
-by the manager, now free to accept more requests.</p>
+				<p>It won’t be able to deal with very specific cases, such as when user-submitted messages are very large in volume and all coming from one-off processes. This is, however, a much rarer occurrence than everything else, and one where the programmer tends to have more control.</p>
 
-<p>When there is any point of your program that ends up being a central hub for receiving
-messages, lengthy tasks should be moved out of there if possible. Handling predictable overload4
-situations by adding more processes — which either handle the blocking operations
-or instead act as a buffer while the "main" process blocks — is often a good idea.</p>
+		<a id="3_1_2_locks_and_blocking_operations"> <h3>3.1.2 Locks and Blocking Operations</h3></a>
+			
+			<p>Locking and blocking operations will often be problematic when they’re taking unexpectedly long to execute in a process that’s constantly receiving new tasks.</p>
 
-<p>There will be increased complexity in managing more processes for activities that aren’t
-intrinsically concurrent, so make sure you need them before programming defensively.</p>
+			<p>One of the most common examples I’ve seen is a process blocking while accepting a connection or waiting for messages with TCP sockets. During blocking operations of this kind, messages are free to pile up in the message queue.</p>
 
-<p>Another option is to transform the blocking task into an asynchronous one. If the type
-of work allows it, start the long-running job and keep a token that identifies it uniquely,
-along with the original requester you’re doing work for. When the resource is available,
-have it send a message back to the server with the aforementioned token. The server will
-eventually get the message, match the token to the requester, and answer back, without
-being blocked by other requests in the mean time.5</p>
+			<p>One particularly bad example was in a pool manager for HTTP connections that I had written in a fork of the lhttpc library. It worked fine in most test cases we had, and we even had a connection timeout set to 10 milliseconds to be sure it never took too long3. After a few weeks of perfect uptime, the HTTP client pool caused an outage when one of the remote servers went down.</p>
 
-<p>This option tends to be more obscure than using many processes and can quickly devolve
-into callback hell, but may use fewer resources.</p>
+			<p>The reason behind this degradation was that when the remote server would go down, all of a sudden, all connecting operations would take at least 10 milliseconds, the time before which the connection attempt is given up on. With around 9,000 messages per second to the central process, each usually taking under 5 milliseconds, the impact became similar to roughly 18,000 messages a second and things got out of hand.</p>
 
-<h4>Unexpected Messages</h4>
-<p>Messages you didn’t know about tend to be rather rare when using OTP applications.
-Because OTP behaviours pretty much expect you to handle anything with some clause in
-handle_info/2, unexpected messages will not accumulate much.</p>
-<p>However, all kinds of OTP-compliant systems end up having processes that may not
-implement a behaviour, or processes that go in a non-behaviour stretch where it overtakes
-message handling. If you’re lucky enough, monitoring tools6 will show a constant memory
-increase, and inspecting for large queue sizes7 will let you find which process is at fault.
-You can then fix the problem by handling the messages as required.</p>
+			<sub>
+				<br/>2Defined at http://www.erlang.org/doc/man/error_logger.html
+			
+				<br/>310 milliseconds is very short, but was fine for collocated servers used for real-time bidding.
+			</sub>
 
-<sub>
-	<br/>4Something you know for a fact gets overloaded in production
-	<br/>5The redo application is an example of a library doing this, in its redo_block module. The [underdocumented]
-module turns a pipelined connection into a blocking one, but does so while maintaining pipeline
-aspects to the caller — this allows the caller to know that only one call failed when a timeout occurs, not
-all of the in-transit ones, without having the server stop accepting requests.
-	<br/>6See Section 5.1
-	<br/>7See Subsection 5.2.1
-</sub>
+			<p>The solution we came up with was to leave the task of connecting to the caller process, and enforce the limits as if the manager had done it on its own. The blocking operations were now distributed to all users of the library, and even less work was required to be done by the manager, now free to accept more requests.</p>
 
-<h3>Restricting Input
-</h3>
-<p>Restricting input is the simplest way to manage message queue growth in Erlang systems.
-It’s the simplest approach because it basically means you’re slowing the user down (applying
-back-pressure), which instantly fixes the problem without any further optimization required.
-On the other hand, it can lead to a really crappy experience for the user.
-</p>
-<p>The most common way to restrict data input is to make calls to a process whose queue
-would grow in uncontrollable ways synchronously. By requiring a response before moving
-on to the next request, you will generally ensure that the direct source of the problem will
-be slowed down.
-</p>
-<p>The difficult part for this approach is that the bottleneck causing the queue to grow is
-usually not at the edge of the system, but deep inside it, which you find after optimizing
-nearly everything that came before. Such bottlenecks will often be database operations,
-disk operations, or some service over the network.
-</p>
-<p>This means that when you introduce synchronous behaviour deep in the system, you’ll
-possibly need to handle back-pressure, level by level, until you end up at the system’s edges
-and can tell the user, "please slow down." Developers that see this pattern will often try to
-put API limits per user8 on the system entry points. This is a valid approach, especially
-since it can guarantee a basic quality of service (QoS) to the system and allows one to
-allocate resources as fairly (or unfairly) as desired.
-</p>
-<h4> How Long Should a Time Out Be
-</h4>
-<p>What’s particularly tricky about applying back-pressure to handle overload via synchronous
-calls is having to determine what the typical operation should be taking in terms of time,
-or rather, at what point the system should time out.
-</p>
-<p>The best way to express the problem is that the first timer to be started will be at
-the edge of the system, but the critical operations will be happening deep within it. This
-means that the timer at the edge of the system will need to have a longer wait time that
-those within, unless you plan on having operations reported as timing out at the edge even
-though they succeeded internally.
-</p>
-<p>An easy way out of this is to go for infinite timeouts. Pat Helland9 has an interesting
-answer to this:
-</p>
-<blockquote>
-	Some application developers may push for no timeout and argue it is OK to
-wait indefinitely. I typically propose they set the timeout to 30 years. That, in
-turn, generates a response that I need to be reasonable and not silly. Why is 30
-years silly but infinity is reasonable? I have yet to see a messaging application
-that really wants to wait for an unbounded period of time. . .
-</blockquote>
-<sub>8
-There’s a tradeoff between slowing down all requests equally or using rate-limiting, both of which are
-valid. Rate-limiting per user would mean you’d still need to increase capacity or lower the limits of all users
-when more new users hammer your system, whereas a synchronous system that indiscriminately blocks
-should adapt to any load with more ease, but possibly unfairly.
-<br/>9
-Idempotence is Not a Medical Condition, April 14, 2012
-</sub>
-<p>This is, ultimately, a case-by-case issue. In many cases, it may be more practical to use
-a different mechanism for that flow control.10
-</p>
-<h4>Asking For Permission
-</h4>
-<p>A somewhat simpler approach to back-pressure is to identify the resources we want to block
-on, those that cannot be made faster and are critical to your business and users. Lock these
-resources behind a module or procedure where a caller must ask for the right to make a
-request and use them. There’s plenty of variables that can be used: memory, CPU, overall
-load, a bounded number of calls, concurrency, response times, a combination of them, and
-so on.
-</p>
-<p>The SafetyValve 11 application is a system-wide framework that can be used when you
-know back-pressure is what you’ll need.
-</p>
-<p>For more specific use cases having to do with service or system failures, there are plenty
-of circuit breaker applications available. Examples include breaky12 , fuse13, or Klarna’s
-circuit_breaker14 .
-</p>
-<p>Otherwise, ad-hoc solutions can be written using processes, ETS, or any other tool
-available. The important part is that the edge of the system (or subsystem) may block and
-ask for the right to process data, but the critical bottleneck in code is the one to determine
-whether that right can be granted or not.
-</p>
-<p>The advantage of proceeding that way is that you may just avoid all the tricky stuff
-about timers and making every single layer of abstraction synchronous. You’ll instead put
-guards at the bottleneck and at a given edge or control point, and everything in between
-can be expressed in the most readable way possible.
-</p>
-<h4> What Users See</h4>
-<p>The tricky part about back-pressure is reporting it. When back-pressure is done implicitly
-through synchronous calls, the only way to know it is at work due to overload is that the
-system becomes slower and less usable. Sadly, this is also going to be a potential symptom
-of bad hardware, bad network, unrelated overload, and possibly a slow client.
-</p>
-<p>Trying to figure out that a system is applying back-pressure by measuring its respon-
-siveness is equivalent to trying to diagnose which illness someone has by observing that
-person has a fever. It tells you something is wrong, but not what.
-</p>
-<sub>10
-In Erlang, using the value infinity will avoid creating a timer, avoiding some resources. If you do
-use this, remember to at least have a well-defined timeout somewhere in the sequence of calls.
-<br/>11
-https://github.com/jlouis/safetyvalve
-<br/>12
-https://github.com/mmzeeman/breaky
-<br/>13
-https://github.com/jlouis/fuse
-<br/>14
-https://github.com/klarna/circuit_breaker
-</sub>
+			<p>When there is any point of your program that ends up being a central hub for receiving messages, lengthy tasks should be moved out of there if possible. Handling predictable overload4 situations by adding more processes — which either handle the blocking operations or instead act as a buffer while the "main" process blocks — is often a good idea.</p>
 
-<p>Asking for permission, as a mechanism, will generally allow you to define your interface
-in such a way that you can explicitly report what is going on: the system as a whole is
-overloaded, or you’re hitting a limit into the rate at which you can perform an operation
-and adjust accordingly.
-</p>
-<p>There is a choice to be made when designing the system. Are your users going to have
-per-account limits, or are the limits going to be global to the system?
-</p>
-<p>System-global or node-global limits are usually easy to implement, but will have the
-downside that they may be unfair. A user doing 90% of all your requests may end up
-making the platform unusable for the vast majority of the other users.
-</p>
-<p>Per-account limits, on the other hand, tend to be very fair, and allow fancy schemes
-such as having premium users who can go above the usual limits. This is extremely nice,
-but has the downside that the more users use your system, the higher the effective global
-system limit tends to move. Starting with 100 users that can do 100 requests a minute gives
-you a global 10000 requests per minute. Add 20 new users with that same rate allowed,
-and suddenly you may crash a lot more often.
-</p>
-<p>The safe margin of error you established when designing the system slowly erodes as
-more people use it. It’s important to consider the tradeoffs your business can tolerate from
-that point of view, because users will tend not to appreciate seeing their allowed usage go
-down all the time, possibly even more so than seeing the system go down entirely from time
-to time.
-</p>
-<h3>3.3
- Discarding Data
-</h3>
-<p>When nothing can slow down outside of your Erlang system and things can’t be scaled up,
-you must either drop data or crash (which drops data that was in flight, for most cases,
-but with more violence).
-</p>
-<p>It’s a sad reality that nobody really wants to deal with. Programmers, software engi-
-neers, and computer scientists are trained to purge the useless data, and keep everything
-that’s useful. Success comes through optimization, not giving up.
-</p>
-<p>However, there’s a point that can be reached where the data that comes in does so at a
-rate faster than it goes out, even if the Erlang system on its own is able to do everything
-fast enough. In some cases, It’s the component after it that blocks.
-</p>
-<p>If you don’t have the option of limiting how much data you receive, you then have to
-drop messages to avoid crashing.
-</p>
-<h4>Random Drop
-</h4>
-<p>Randomly dropping messages is the easiest way to do such a thing, and might also be the
-most robust implementation, due to its simplicity.
-</p>
-<p>The trick is to define some threshold value between 0.0 and 1.0 and to fetch a random
-number in that range:
-</p>
+			<p>There will be increased complexity in managing more processes for activities that aren’t intrinsically concurrent, so make sure you need them before programming defensively.</p>
+
+			<p>Another option is to transform the blocking task into an asynchronous one. If the type of work allows it, start the long-running job and keep a token that identifies it uniquely, along with the original requester you’re doing work for. When the resource is available, have it send a message back to the server with the aforementioned token. The server will eventually get the message, match the token to the requester, and answer back, without being blocked by other requests in the mean time.5</p>
+
+			<p>This option tends to be more obscure than using many processes and can quickly devolve into callback hell, but may use fewer resources.</p>
+
+		<a id="3_1_3_unexpected_messages"> <h4>3.1.3 Unexpected Messages</h4></a>
+			<p>Messages you didn’t know about tend to be rather rare when using OTP applications. Because OTP behaviours pretty much expect you to handle anything with some clause in handle_info/2, unexpected messages will not accumulate much.</p>
+
+			<p>However, all kinds of OTP-compliant systems end up having processes that may not implement a behaviour, or processes that go in a non-behaviour stretch where it overtakes message handling. If you’re lucky enough, monitoring tools6 will show a constant memory increase, and inspecting for large queue sizes7 will let you find which process is at fault. You can then fix the problem by handling the messages as required.</p>
+
+			<sub>
+				<br/>4Something you know for a fact gets overloaded in production
+				<br/>5The redo application is an example of a library doing this, in its redo_block module. The [underdocumented] module turns a pipelined connection into a blocking one, but does so while maintaining pipeline aspects to the caller — this allows the caller to know that only one call failed when a timeout occurs, not all of the in-transit ones, without having the server stop accepting requests.
+				<br/>6See Section 5.1
+				<br/>7See Subsection 5.2.1
+			</sub>
+
+	<a id="3_2_restricting_input"> <h3>3.2 Restricting Input</h3> </a>
+		
+		<p>Restricting input is the simplest way to manage message queue growth in Erlang systems. It’s the simplest approach because it basically means you’re slowing the user down (applying back-pressure), which instantly fixes the problem without any further optimization required. On the other hand, it can lead to a really crappy experience for the user.</p>
+
+		<p>The most common way to restrict data input is to make calls to a process whose queue would grow in uncontrollable ways synchronously. By requiring a response before moving on to the next request, you will generally ensure that the direct source of the problem will be slowed down.</p>
+
+		<p>The difficult part for this approach is that the bottleneck causing the queue to grow is usually not at the edge of the system, but deep inside it, which you find after optimizing nearly everything that came before. Such bottlenecks will often be database operations, disk operations, or some service over the network.</p>
+		
+		<p>This means that when you introduce synchronous behaviour deep in the system, you’ll possibly need to handle back-pressure, level by level, until you end up at the system’s edges and can tell the user, "please slow down." Developers that see this pattern will often try to put API limits per user8 on the system entry points. This is a valid approach, especially since it can guarantee a basic quality of service (QoS) to the system and allows one to allocate resources as fairly (or unfairly) as desired. </p>
+		<a id="3_2_1_how_long_should_timeout_be"><h4>3.2.1 How Long Should a Time Out Be</h4></a>
+			<p>What’s particularly tricky about applying back-pressure to handle overload via synchronous calls is having to determine what the typical operation should be taking in terms of time, or rather, at what point the system should time out. </p>
+
+			<p>The best way to express the problem is that the first timer to be started will be at the edge of the system, but the critical operations will be happening deep within it. This means that the timer at the edge of the system will need to have a longer wait time that those within, unless you plan on having operations reported as timing out at the edge even though they succeeded internally. </p>
+
+			<p>An easy way out of this is to go for infinite timeouts. Pat Helland9 has an interesting answer to this: </p>
+			
+			<div>Some application developers may push for no timeout and argue it is OK to wait indefinitely. I typically propose they set the timeout to 30 years. That, in turn, generates a response that I need to be reasonable and not silly. Why is 30 years silly but infinity is reasonable? I have yet to see a messaging application that really wants to wait for an unbounded period of time. . . </div>
+			
+			<sub>8
+				There’s a tradeoff between slowing down all requests equally or using rate-limiting, both of which are valid. Rate-limiting per user would mean you’d still need to increase capacity or lower the limits of all users when more new users hammer your system, whereas a synchronous system that indiscriminately blocks should adapt to any load with more ease, but possibly unfairly.
+				<br/>9 Idempotence is Not a Medical Condition, April 14, 2012
+			</sub>
+			<p>This is, ultimately, a case-by-case issue. In many cases, it may be more practical to use a different mechanism for that flow control.10 </p>
+		<a id="3_2_2_asking_for_permission"><h4>3.2.2 Asking For Permission</h4></a>
+			<p>A somewhat simpler approach to back-pressure is to identify the resources we want to block on, those that cannot be made faster and are critical to your business and users. Lock these resources behind a module or procedure where a caller must ask for the right to make a request and use them. There’s plenty of variables that can be used: memory, CPU, overall load, a bounded number of calls, concurrency, response times, a combination of them, and so on.</p>
+			
+			<p>The SafetyValve 11 application is a system-wide framework that can be used when you know back-pressure is what you’ll need. </p>
+
+			<p>For more specific use cases having to do with service or system failures, there are plenty of circuit breaker applications available. Examples include breaky12 , fuse13, or Klarna’s circuit_breaker14.</p>
+
+			<p>Otherwise, ad-hoc solutions can be written using processes, ETS, or any other tool available. The important part is that the edge of the system (or subsystem) may block and ask for the right to process data, but the critical bottleneck in code is the one to determine whether that right can be granted or not. </p>
+
+			<p>The advantage of proceeding that way is that you may just avoid all the tricky stuff about timers and making every single layer of abstraction synchronous. You’ll instead put guards at the bottleneck and at a given edge or control point, and everything in between can be expressed in the most readable way possible.</p>
+
+		<a id="3_2_3_what_users_see"> <h4>3.2.2 What Users See</h4></a>
+			<p>The tricky part about back-pressure is reporting it. When back-pressure is done implicitly through synchronous calls, the only way to know it is at work due to overload is that the system becomes slower and less usable. Sadly, this is also going to be a potential symptom of bad hardware, bad network, unrelated overload, and possibly a slow client.</p>
+
+			<p>Trying to figure out that a system is applying back-pressure by measuring its responsiveness is equivalent to trying to diagnose which illness someone has by observing that person has a fever. It tells you something is wrong, but not what.</p>
+
+			<sub>10 In Erlang, using the value infinity will avoid 	creating a timer, avoiding some resources. If you do use this, remember to at least have a well-defined timeout somewhere in the sequence of calls.
+				<br/>11
+				https://github.com/jlouis/safetyvalve
+				<br/>12
+				https://github.com/mmzeeman/breaky
+				<br/>13
+				https://github.com/jlouis/fuse
+				<br/>14
+				https://github.com/klarna/circuit_breaker
+			</sub>
+
+			<p>Asking for permission, as a mechanism, will generally allow you to define your interface in such a way that you can explicitly report what is going on: the system as a whole is overloaded, or you’re hitting a limit into the rate at which you can perform an operation and adjust accordingly. </p>
+			
+			<p>There is a choice to be made when designing the system. Are your users going to have per-account limits, or are the limits going to be global to the system?</p>
+			
+			<p>System-global or node-global limits are usually easy to implement, but will have the downside that they may be unfair. A user doing 90% of all your requests may end up making the platform unusable for the vast majority of the other users.</p>
+			
+			<p>Per-account limits, on the other hand, tend to be very fair, and allow fancy schemes such as having premium users who can go above the usual limits. This is extremely nice, but has the downside that the more users use your system, the higher the effective global system limit tends to move. Starting with 100 users that can do 100 requests a minute gives you a global 10000 requests per minute. Add 20 new users with that same rate allowed, and suddenly you may crash a lot more often.</p>
+			
+			<p>The safe margin of error you established when designing the system slowly erodes as more people use it. It’s important to consider the tradeoffs your business can tolerate from that point of view, because users will tend not to appreciate seeing their allowed usage go down all the time, possibly even more so than seeing the system go down entirely from time to time.</p>
+	<a id="3_3_discarding_data"><h3>3.3 Discarding Data</h3></a>
+		<p>When nothing can slow down outside of your Erlang system and things can’t be scaled up, you must either drop data or crash (which drops data that was in flight, for most cases, but with more violence).</p>
+
+		<p>It’s a sad reality that nobody really wants to deal with. Programmers, software engineers, and computer scientists are trained to purge the useless data, and keep everything that’s useful. Success comes through optimization, not giving up.</p>
+
+		<p>However, there’s a point that can be reached where the data that comes in does so at a rate faster than it goes out, even if the Erlang system on its own is able to do everything fast enough. In some cases, It’s the component after it that blocks. </p>
+
+		<p>If you don’t have the option of limiting how much data you receive, you then have to drop messages to avoid crashing.</p>
+
+		<a id="3_3_1_random_drop"><h4>3.3.1 Random Drop</h4></a>
+			<p>Randomly dropping messages is the easiest way to do such a thing, and might also be the most robust implementation, due to its simplicity.</p>
+
+			<p>The trick is to define some threshold value between 0.0 and 1.0 and to fetch a random number in that range:</p>
 
 <pre><code class="erlang">-module(drop).
 -export([random/1]).
@@ -1168,136 +986,70 @@ maybe_seed() ->
 		_ -> ok
 	end.</code></pre>
 
-<p>If you aim to keep 95% of the messages you send, the authorization could be written
-by a call to case drop:random(0.95) of true -> send(); false -> drop() end, or a
-shorter drop:random(0.95) andalso send() if you don’t need to do anything specific
-when dropping a message.
-</p>
-<p>The maybe_seed() function will check that a valid seed is present in the process dic-
-tionary and use it rather than a crappy one, but only if it has not been defined before, in
-order to avoid calling now() (a monotonic function that requires a global lock) too often.
-</p>
-<p>There is one ‘gotcha’ to this method, though: the random drop must ideally be done
-at the producer level rather than at the queue (the receiver) level. The best way to avoid
-overloading a queue is to not send data its way in the first place. Because there are no
-bounded mailboxes in Erlang, dropping in the receiving process only guarantees that this
-process will be spinning wildly, trying to get rid of messages, and fighting the schedulers to
-do actual work.
-</p>
-<p>On the other hand, dropping at the producer level is guaranteed to distribute the work
-equally across all processes.
-</p>
-<p>This can give place to interesting optimizations where the working process or a given
-monitor process15 uses values in an ETS table or application:set_env/3 to dynamically
-increase and decrease the threshold to be used with the random number. This allows control
-over how many messages are dropped based on overload, and the configuration data can be
-fetched by any process rather efficiently by using application:get_env/2.
-</p>
-<p>Similar techniques could also be used to implement different drop ratios for different
-message priorities, rather than trying to sort it all out at the consumer level.
-</p>
-<sub>15
-Any process tasked with checking the load of specific processes using heuristics such as
-process_info(Pid, message_queue_len) could be a monitor
-</sub>
-<h4>Queue Buffers
-</h4>
-<p>Queue buffers are a good alternative when you want more control over the messages you
-get rid of than with random drops, particularly when you expect overload to be coming in
-bursts rather than a constant stream in need of thinning.
-</p>
-<p>Even though the regular mailbox for a process has the form of a queue, you’ll generally
-want to pull all the messages out of it as soon as possible. A queue buffer will need two
-processes to be safe:
-</p>
-<ul>
-	<li>The regular process you’d work with (likely a gen_server);
-</li>
-	<li>A new process that will do nothing but buffer the messages. Messages from the
-outside should go to this process.
-</li>
-</ul>
-<p>To make things work, the buffer process only has to remove all the messages it can from
-its mail box and put them in a queue data structure16 it manages on its own. Whenever
-the server is ready to do more work, it can ask the buffer process to send it a given number
-of messages that it can work on. The buffer process picks them from its queue, forwards
-them to the server, and goes back to accumulating data.
-</p>
-<p>Whenever the queue grows beyond a certain size17 and you receive a new message, you
-can then pop the oldest one and push the new one in there, dropping the oldest elements
-as you go.18
-</p>
-<p>This should keep the entire number of messages received to a rather stable size and
-provide a good amount of resistance to overload, somewhat similar to the functional version
-of a ring buffer.
-</p>
-<p>The PO Box 19 library implements such a queue buffer.
-</p>
-<h4> Stack Buffers
-</h4>
-<p>Stack buffers are ideal when you want the amount of control offered by queue buffers, but
-you have an important requirement for low latency.
-</p>
-<p>To use a stack as a buffer, you’ll need two processes, just like you would with queue
-buffers, but a list20 will be used instead of a queue data structure.
-</p>
-<sub>
-	16
-The queue module in Erlang provides a purely functional queue data structure that can work fine for
-such a buffer.
-<br/>17
-To calculate the length of a queue, it is preferable to use a counter that gets incremented and decre-
-mented on each message sent or received, rather than iterating over the queue every time. It takes slightly
-more memory, but will tend to distribute the load of counting more evenly, helping predictability and
-avoiding more sudden build-ups in the buffer’s mailbox
-<br/>18
-You can alternatively make a queue that pops the newest message and queues up the oldest ones if you
-feel previous data is more important to keep.
-<br/>19
-Available at: https://github.com/ferd/pobox, the library has been used in production for a long time
-in large scale products at Heroku and is considered mature
-<br/>20
-Erlang lists are stacks, for all we care. They provide push and pop operations that take O(1) complexity
-and are very fast
+			<p>If you aim to keep 95% of the messages you send, the authorization could be written by a call to case drop:random(0.95) of true -> send(); false -> drop() end, or a shorter drop:random(0.95) andalso send() if you don’t need to do anything specific when dropping a message.</p>
+			
+			<p>The maybe_seed() function will check that a valid seed is present in the process dictionary and use it rather than a crappy one, but only if it has not been defined before, in order to avoid calling now() (a monotonic function that requires a global lock) too often.</p>
+			
+			<p>There is one ‘gotcha’ to this method, though: the random drop must ideally be done at the producer level rather than at the queue (the receiver) level. The best way to avoid overloading a queue is to not send data its way in the first place. Because there are no bounded mailboxes in Erlang, dropping in the receiving process only guarantees that this process will be spinning wildly, trying to get rid of messages, and fighting the schedulers to do actual work.</p>
 
-</sub>
-<p>The reason the stack buffer is particularly good for low latency is related to issues
-similar to bufferbloat21. If you get behind on a few messages being buffered in a queue,
-all the messages in the queue get to be slowed down and acquire milliseconds of wait time.
-Eventually, they all get to be too old and the entire buffer needs to be discarded.
-</p>
-<p>On the other hand, a stack will make it so only a restricted number of elements are
-kept waiting while the newer ones keep making it to the server to be processed in a timely
-manner.
-</p>
-<p>Whenever you see the stack grow beyond a certain size or notice that an element in it
-is too old for your QoS requirements you can just drop the rest of the stack and keep going
-from there. PO Box also offers such a buffer implementation.
-</p>
-<p>A major downside of stack buffers is that messages are not necessarily going to be
-processed in the order they were submitted — they’re nicer for independent tasks, but will
-ruin your day if you expect a sequence of events to be respected.
-</p>
-<h4>Time-Sensitive Buffers
-</h4>
-<p>If you need to react to old events before they are too old, then things become more complex,
-as you can’t know about it without looking deep in the stack each time, and dropping from
-the bottom of the stack in a constant manner gets to be inefficient. An interesting approach
-could be done with buckets, where multiple stacks are used, with each of them containing a
-given time slice. When requests get too old for the QoS constraints, drop an entire bucket,
-but not the entire buffer.
-</p>
-<p>It may sound counter-intuitive to make some requests a lot worse to benefit the majority
-— you’ll have great medians but poor 99 percentiles — but this happens in a state where
-you would drop messages anyway, and is preferable in cases where you do need low latency.
-</p>
-<h4>Dealing With Constant Overload
-</h4>
-<p>Being under constant overload may require a new solution. Whereas both queues and
-buffers will be great for cases where overload happens from time to time (even if it’s a
-rather prolonged period of time), they both work more reliably when you expect the input
-rate to eventually drop, letting you catch up.
-</p>
+			<p>On the other hand, dropping at the producer level is guaranteed to distribute the work equally across all processes.</p>
+			
+			<p>This can give place to interesting optimizations where the working process or a given monitor process15 uses values in an ETS table or application:set_env/3 to dynamically increase and decrease the threshold to be used with the random number. This allows control over how many messages are dropped based on overload, and the configuration data can be fetched by any process rather efficiently by using application:get_env/2.</p>
+			
+			<p>Similar techniques could also be used to implement different drop ratios for different message priorities, rather than trying to sort it all out at the consumer level.</p>
+			
+			<sub>15
+				Any process tasked with checking the load of specific processes using heuristics such as process_info(Pid, message_queue_len) could be a monitor
+			</sub>
+		<a id="3_3_2_queue_buffers"> <h4>3.3.2 Queue Buffers</h4> </a>
+			<p>Queue buffers are a good alternative when you want more control over the messages you get rid of than with random drops, particularly when you expect overload to be coming in bursts rather than a constant stream in need of thinning.</p>
+
+			<p>Even though the regular mailbox for a process has the form of a queue, you’ll generally want to pull all the messages out of it as soon as possible. A queue buffer will need two processes to be safe: </p>
+			
+			<ul>
+				<li>The regular process you’d work with (likely a gen_server);</li>
+				<li>A new process that will do nothing but buffer the messages. Messages from theoutside should go to this process.</li>
+			</ul>
+			
+			<p>To make things work, the buffer process only has to remove all the messages it can from its mail box and put them in a queue data structure16 it manages on its own. Whenever the server is ready to do more work, it can ask the buffer process to send it a given number of messages that it can work on. The buffer process picks them from its queue, forwards them to the server, and goes back to accumulating data. </p>
+			
+			<p>Whenever the queue grows beyond a certain size17 and you receive a new message, you can then pop the oldest one and push the new one in there, dropping the oldest elements as you go.18 </p>
+			
+			<p>This should keep the entire number of messages received to a rather stable size and provide a good amount of resistance to overload, somewhat similar to the functional version of a ring buffer.</p>
+			
+			<p>The PO Box 19 library implements such a queue buffer.</p>
+			
+		<a id="3_3_3_stack_buffers"> <h4>3.3.3 Stack Buffers </h4></a>
+			<p>Stack buffers are ideal when you want the amount of control offered by queue buffers, but you have an important requirement for low latency.</p>
+			
+			<p>To use a stack as a buffer, you’ll need two processes, just like you would with queue buffers, but a list20 will be used instead of a queue data structure.</p>
+			
+			<sub>
+				16
+				The queue module in Erlang provides a purely functional queue data structure that can work fine for such a buffer.
+				<br/>17 To calculate the length of a queue, it is preferable to use a counter that gets incremented and decremented on each message sent or received, rather than iterating over the queue every time. It takes slightly more memory, but will tend to distribute the load of counting more evenly, helping predictability and avoiding more sudden build-ups in the buffer’s mailbox
+				<br/>18 You can alternatively make a queue that pops the newest message and queues up the oldest ones if you feel previous data is more important to keep.
+				<br/>19 Available at: https://github.com/ferd/pobox, the library has been used in production for a long time in large scale products at Heroku and is considered mature 
+				<br/>20 Erlang lists are stacks, for all we care. They provide push and pop operations that take O(1) complexity and are very fast
+			</sub>
+
+			<p>The reason the stack buffer is particularly good for low latency is related to issues similar to bufferbloat21. If you get behind on a few messages being buffered in a queue, all the messages in the queue get to be slowed down and acquire milliseconds of wait time. Eventually, they all get to be too old and the entire buffer needs to be discarded.</p>
+			
+			<p>On the other hand, a stack will make it so only a restricted number of elements are kept waiting while the newer ones keep making it to the server to be processed in a timely manner.</p>
+			
+			<p>Whenever you see the stack grow beyond a certain size or notice that an element in it is too old for your QoS requirements you can just drop the rest of the stack and keep going from there. PO Box also offers such a buffer implementation. </p>
+
+			<p>A major downside of stack buffers is that messages are not necessarily going to be processed in the order they were submitted — they’re nicer for independent tasks, but will ruin your day if you expect a sequence of events to be respected. </p>
+		
+		<a id="3_3_4_time_sensitive_buffers"><h4>3.3.4 Time-Sensitive Buffers</h4></a>
+			<p>If you need to react to old events before they are too old, then things become more complex, as you can’t know about it without looking deep in the stack each time, and dropping from the bottom of the stack in a constant manner gets to be inefficient. An interesting approach could be done with buckets, where multiple stacks are used, with each of them containing a given time slice. When requests get too old for the QoS constraints, drop an entire bucket, but not the entire buffer.</p>
+			
+			<p>It may sound counter-intuitive to make some requests a lot worse to benefit the majority — you’ll have great medians but poor 99 percentiles — but this happens in a state where you would drop messages anyway, and is preferable in cases where you do need low latency. </p>
+
+		<a id="3_3_5_dealing_with_constant_overload"> <h4>3.3.5 Dealing With Constant Overload</h4></a>
+
+			<p>Being under constant overload may require a new solution. Whereas both queues and buffers will be great for cases where overload happens from time to time (even if it’s a rather prolonged period of time), they both work more reliably when you expect the input rate to eventually drop, letting you catch up.</p>
+			
 <p>You’ll mostly get problems when trying to send so many messages they can’t make it
 all to one process without overloading it. Two approaches are generally good for this case:
 </p>

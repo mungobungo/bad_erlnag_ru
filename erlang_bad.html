@@ -320,7 +320,7 @@ most languages whenever the project you work on is not one you designed yourself
 code bases, OTP applications, and OTP releases. In this chapter, we’ll look at each of these
 and try to provide helpful tips on navigating them.</p>
 
-<h4>Raw Erlang</h4>
+<a id="raw_erlang"><h4>Raw Erlang</h4></a>
 <p>If you encounter a raw Erlang code base, you’re pretty much on your own. These rarely
 follow any specific standard, and you have to dive in the old way to figure out whatever
 happens in there.</p>
@@ -337,7 +337,7 @@ people use OTP Applications.</p>
 	1https://github.com/rebar/rebar/ — a build tool briefly introduced in Chapter 2
 </sub>
 
-<h4>OTP Applications</h4>
+<a id="otp_applications"><h4>OTP Applications</h4></a>
 <p>Figuring out OTP applications is usually rather simple. They usually all share a directory
 structure that looks like:</p>
 
@@ -366,8 +366,7 @@ often, src/<AppName>.app.src2. There are two main varieties of app files:</p>
 ]}.
 </code>
 </pre>
-<p>And.
-</p>
+<p>And.</p>
 <pre>
 <code class="erlang" >{application, dispcount, [
 	{description, "A dispatching library for resources and task "
@@ -389,7 +388,7 @@ often, src/<AppName>.app.src2. There are two main varieties of app files:</p>
 src/<AppName>.app.src files do not specify modules and let the build system take care of it.
 </sub>
 
-<h5>Library Applications</h5>
+<a id="library_applications"><h5>Library Applications</h5></a>
 <p>Library applications will usually have modules named appname _something, and one module
 named appname . This will usually be the interface module that’s central to the library and
 contains a quick way into most of the functionality provided.</p>
@@ -402,7 +401,7 @@ your hands. For this case, the module’s exported functions should give you a q
 understand its purpose.
 </p>
 
-<h5>Regular Applications</h5>
+<a id="regular_applications"><h5>Regular Applications</h5></a>
 <p>For a regular OTP application, there are two potential modules that act as the entry point:</p>
 <ol>
 	<li>appname</li>
@@ -473,7 +472,7 @@ functions, usually in that order.</p>
 at the interface to be used by other modules and the behaviours implemented should reveal
 a lot of information about the program you’re diving into.</p>
 
-<h5>Dependencies</h5>
+<a id="dependencies"><h5>Dependencies</h5></a>
 
 <p>All applications have dependencies5, and these dependencies will have their own dependencies.
 OTP applications usually share no state between them, so it’s possible to know what
@@ -498,7 +497,7 @@ dies.
 ignores dependencies on common applications like kernel and stdlib. Ovals are applications,
 rectangles are library applications.</p>
 
-<h3>OTP Releases</h3>
+<a id="otp_releases"><h3>OTP Releases</h3></a>
 <p>OTP releases are not a lot harder to understand than most OTP applications you’ll encounter
 in the wild. A release is a set of OTP applications packaged in a production-ready
 manner so it boots and shuts down without needing to manually call application:start/2
@@ -511,15 +510,15 @@ packaging. To understand them, I recommend reading existing documentation on the
 you’re lucky, the project may be using relx9, an easier tool that was officially released in
 early 2014.</p>
 
-<h3>1.4 Exercises</h3>
-<h4>Review Questions</h4>
+<a id="1_4_exercises"><h3>Exercises</h3></a>
+<a id="1_4_review_questions"><h4>Review Questions</h4></a>
 <ol>
 	<li>How do you know if a code base is an application? A release?</li>
 	<li>What differentiates an application from a library application?</li>
 	<li>What can be said of processes under a one_for_all scheme for supervision?</li>
 	<li>Why would someone use a gen_fsm behaviour over a gen_server?</li>
 </ol>
-<h4>Hands-on</h4>
+<a id="1_4_hands_on"><h4>Hands-on</h4></a>
 <p>Download the code at https://github.com/ferd/recon_demo. This will be used as a test
 bed for exercises throughout the book. Given you are not familiar with the code base yet,
 let’s see if you can use the tips and tricks mentioned in this chapter to get an understanding
@@ -538,7 +537,7 @@ README?</li>
 
 </ol>
 
-<h2>Chapter 2</h2>
+<a id="chapter_2"><h2>Chapter 2</h2></a>
 <h2>Building Open Source Erlang
 Software</h2>
 <p>Most Erlang books tend to explain how to build Erlang/OTP applications, but few of them
@@ -561,14 +560,14 @@ when it comes to compiling. In this chapter, I’ll mostly focus on using rebar 
 things, given it’s the ad-hoc standard, is well-established, and erlang.mk applications tend
 to also be supported by rebar as dependencies.</p>
 
-<h3>Project Structure</h3>
+<a id="project_structure"><h3>Project Structure</h3></a>
 
 <p>The structures of OTP applications and of OTP releases are different. An OTP application
 can be expected to have one top-level supervisor (if any) and possibly a bunch of
 dependencies that sit below it. An OTP release will usually be composed of multiple OTP applications, which may or may not depend on each other. This will lead to two major
 ways to lay out applications.</p>
 
-<h4>OTP Applications</h4>
+<a id="otp_applications"><h4>OTP Applications</h4></a>
 <p>For OTP applications, the proper structure is pretty much the same as what was explained
 in 1.2:</p>
 <pre><code class="erlang">1 doc/
@@ -621,7 +620,7 @@ yours do, and it’s no use shipping them all multiple times. The build system i
 case, rebar) should be able to figure out duplicated entries and fetch everything necessary
 only once.</p>
 
-<h4>OTP Releases</h4>
+<a id="otp_releases4"><h4>OTP Releases</h4></a>
 
 <p>For releases, the structure should be a bit different4. Releases are collections of applications,
 and their structures should reflect that</p>
@@ -679,7 +678,7 @@ of the project’s compilation by using a rebar hook in rebar.config:</p>
 <p>
 	And every time rebar compile will be called, the release will be generated.
 </p>
-<h3>Supervisors and start_link Semantics</h3>
+<a id="supervisors_and_start_link_semantics"><h3>Supervisors and start_link Semantics</h3></a>
 
 <p>In complex production systems, most faults and errors are transient, and retrying an operation
 is a good way to do things — Jim Gray’s paper7 quotes Mean Times Between Failures
@@ -699,7 +698,7 @@ application fails to boot after too many fruitless restarts. Then the system may
 <p>Many Erlang developers end up arguing in favor of a supervisor that has a cooldown
 period. I strongly oppose the sentiment for one simple reason: it’s all about the guarantees.</p>
 
-<h4>It’s About the Guarantees</h4>
+<a id="its_about_the_guarantees"><h4>It’s About the Guarantees</h4></a>
 
 <p>Restarting a process is about bringing it back to a stable, known state. From there, things
 can be retried. When the initialization isn’t stable, supervision is worth very little. An initialized process should be stable no matter what happens. That way, when its siblings
@@ -737,7 +736,7 @@ reconnect later on if anything ever disconnects.</p>
 guarantee of your system. We’re dealing with the real world here, and failure of external
 dependencies is always an option.</p>
 
-<h4>Side Effects</h4>
+<a id="side_effects"><h4>Side Effects</h4></a>
 <p>Of course, the libraries and processes that call such a client will then error out if they don’t
 expect to work without a database. That’s an entirely different issue in a different problem
 space, one that depends on your business rules and what you can or can’t do to a client,

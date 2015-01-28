@@ -1,9 +1,10 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<script type="text/javascript" src="jquery.js"></script>
-<script type="text/javascript" src="jquery_plantuml.js"></script>
-<!-- rawdeflate.js is implicity used by jquery_plantuml.js -->
+
+<link rel="stylesheet" href="css/monokai_sublime.css" type="text/css">
+<script type="text/javascript" src="js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
 </head>
 
 <body>
@@ -340,7 +341,8 @@ people use OTP Applications.</p>
 <p>Figuring out OTP applications is usually rather simple. They usually all share a directory
 structure that looks like:</p>
 
-<div class="code">
+<pre>
+<code class="erlang">
 doc/
 ebin/
 src/
@@ -348,37 +350,42 @@ test/
 LICENSE.txt
 README.md
 rebar.config
-</div>
+</code>
+</pre>
 
 <p>There might be slight differences, but the general structure will be the same.</p>
 
 <p>Each OTP application should contain an app file, either ebin/<AppName>.app or more
 often, src/<AppName>.app.src2. There are two main varieties of app files:</p>
 
-<div style="code"> 
+<pre>
+<code class="erlang"> 
 {application, useragent, [
-{description, "Identify browsers & OSes from useragent strings"},
-{vsn, "0.1.2"},
-{registered, []},
-{applications, [kernel, stdlib]},
-{modules, [useragent]}
+	{description, "Identify browsers & OSes from useragent strings"},
+	{vsn, "0.1.2"},
+	{registered, []},
+	{applications, [kernel, stdlib]},
+	{modules, [useragent]}
 ]}.
-</div>
+</code>
+</pre>
 <p>And.
 </p>
-<div style="code" >
-	{application, dispcount, [
-{description, "A dispatching library for resources and task "
-"limiting based on shared counters"},
-{vsn, "1.0.0"},
-{applications, [kernel, stdlib]},
-{registered, []},
-{mod, {dispcount, []}},
-{modules, [dispcount, dispcount_serv, dispcount_sup,
-dispcount_supersup, dispcount_watcher, watchers_sup]}
+<pre>
+<code class="erlang" >
+{application, dispcount, [
+	{description, "A dispatching library for resources and task "
+			"limiting based on shared counters"},
+	{vsn, "1.0.0"},
+	{applications, [kernel, stdlib]},
+	{registered, []},
+	{mod, {dispcount, []}},
+	{modules, [dispcount, dispcount_serv, dispcount_sup,
+			dispcount_supersup, dispcount_watcher, watchers_sup]}
 ]}.
 
-</div>
+</code>
+</pre>
 
 <p>This first case is called a <i>library application</i>, while the second case is a regular <i>application</i>.</p>
 
@@ -570,16 +577,17 @@ ways to lay out applications.</p>
 <p>For OTP applications, the proper structure is pretty much the same as what was explained
 in 1.2:</p>
 
-<blockquote>
-	1 doc/
+
+<pre><code class="erlang">
+1 doc/
 2 deps/
 3 ebin/
 4 src/
 5 test/
 6 LICENSE.txt
 7 README.md
-8 rebar.config
-</blockquote>
+8 rebar.config</code></pre>
+
 
 <p>What’s new in this one is the deps/ directory, which is fairly useful to have, but that
 will be generated automatically by rebar2 if necessary. That’s because there is no canonical
@@ -589,18 +597,18 @@ that each project you have may have to download its own set of dependencies</p>
 
 <p>This is accomplished with rebar by adding a few config lines to rebar.config:</p>
 
-<blockquote>
+
 	
-	1 {deps,
-2 [{application_name, "1.0.*",
-3 {git, "git://github.com/user/myapp.git", {branch,"master"}}},
-4 {application_name, "2.0.1",
-5 {git, "git://github.com/user/hisapp.git", {tag,"2.0.1"}}},
-6 {application_name, "",
-7 {git, "https://bitbucket.org/user/herapp.git", "7cd0aef4cd65"}},
-8 {application_name, "my regex",
-9 {hg, "https://bitbucket.org/user/theirapp.hg" {branch, "stable"}}}]}.
-</blockquote>
+<pre><code class="erlang">
+1 {deps,
+2 	[{application_name, "1.0.*",
+3 		{git, "git://github.com/user/myapp.git", {branch,"master"}}},
+4 	{application_name, "2.0.1",
+5 		{git, "git://github.com/user/hisapp.git", {tag,"2.0.1"}}},
+6 	{application_name, "",
+7		 {git, "https://bitbucket.org/user/herapp.git", "7cd0aef4cd65"}},
+8 	{application_name, "my regex",
+9 		{hg, "https://bitbucket.org/user/theirapp.hg" {branch, "stable"}}}]}.</code></pre>
 
 <sub>
 	2A lot of people package rebar directly in their application. This was initially done to help people who
@@ -632,29 +640,34 @@ divided into two categories: apps and deps. The apps directory contains your app
 source code (say, internal business code), and the deps directory contains independently
 managed dependency applications.</p>
 
-<blockquote>
+
+<pre><code class="erlang">
 apps/
 doc/
 deps/
 LICENSE.txt
 README.md
 rebar.config
-</blockquote>
+</code></pre>
+
 
 <p>This structure lends itself to generating releases. Tools such as Systool and Reltool have
 been covered before5, and can allow the user plenty of power. An easier tool that recently
 appeared is relx6.</p>
 
 <p>A relx configuration file for the directory structure above would look like:</p>
-<blockquote>1 {paths, ["apps", "deps"]}.
+
+<pre><code class="erlang">
+1 {paths, ["apps", "deps"]}.
 2 {include_erts, false}. % will use currently installed Erlang
 3 {default_release, demo, "1.0.0"}.
 4
-5 {release, {demo, "1.0.0"},
-6 [members,
-7 feedstore,
-8 ...
-9 recon]}.</blockquote>
+5 	{release, {demo, "1.0.0"},
+6 	[members,
+7 	feedstore,
+8 	...
+9 	recon]}.</code></pre>
+
 <sub>
 	<br/>3More details by calling rebar help compile
 <br/>4I say should because many Erlang developers put their final system under a single top-level application
@@ -669,10 +682,9 @@ to build from source on the production servers and run custom commands to boot t
 found in the _rel/ directory. If you really like using rebar, you can build a release as part
 of the project’s compilation by using a rebar hook in rebar.config:</p>
 
-<blockquote>
-	
-	1 {post_hooks,[{compile, "./relx"}]}.
-</blockquote>
+
+<pre><code>1 {post_hooks,[{compile, "./relx"}]}.</code></pre>
+
 
 <p>
 	And every time rebar compile will be called, the release will be generated.
@@ -754,41 +766,42 @@ supervisors are about restarts, but they should be about restarts to a stable kn
 
 <p>The following code attempts to guarantee a connection as part of the process’ state:</p>
 
-<blockquote>
-	1 init(Args) ->
-2 Opts = parse_args(Args),
-3 {ok, Port} = connect(Opts),
-4 {ok, #state{sock=Port, opts=Opts}}.
+
+<pre><code class="erlang">
+1 init(Args) ->
+2 	Opts = parse_args(Args),
+3 	{ok, Port} = connect(Opts),
+4 	{ok, #state{sock=Port, opts=Opts}}.
 5
 6 [...]
 7
 8 handle_info(reconnect, S = #state{sock=undefined, opts=Opts}) ->
-9 %% try reconnecting in a loop
-10 case connect(Opts) of
-11 {ok, New} -> {noreply, S#state{sock=New}};
-12 _ -> self() ! reconnect, {noreply, S}
-13 end;
-</blockquote>
+9 	%% try reconnecting in a loop
+10 	case connect(Opts) of
+11 		{ok, New} -> {noreply, S#state{sock=New}};
+12 		_ -> self() ! reconnect, {noreply, S}
+13 	end;</code></pre>
+
 
 <p>Instead, consider rewriting it as:</p>
 
-<blockquote>
-	1 init(Args) ->
-2 Opts = parse_args(Args),
-3 %% you could try connecting here anyway, for a best
-4 %% effort thing, but be ready to not have a connection.
-5 self() ! reconnect,
-6 {ok, #state{sock=undefined, opts=Opts}}.
+
+<pre><code class="erlang">
+1 init(Args) ->
+2 	Opts = parse_args(Args),
+3 	%% you could try connecting here anyway, for a best
+4 	%% effort thing, but be ready to not have a connection.
+5 	self() ! reconnect,
+6 	{ok, #state{sock=undefined, opts=Opts}}.
 7
 8 [...]
 9
 10 handle_info(reconnect, S = #state{sock=undefined, opts=Opts}) ->
-11 %% try reconnecting in a loop
-12 case connect(Opts) of
-13 {ok, New} -> {noreply, S#state{sock=New}};
-14 _ -> self() ! reconnect, {noreply, S}
-15 end;
-</blockquote>
+11 	%% try reconnecting in a loop
+12 	case connect(Opts) of
+13 		{ok, New} -> {noreply, S#state{sock=New}};
+14 		_ -> self() ! reconnect, {noreply, S}
+15 	end;</code></pre>
 <p>You now allow initializations with fewer guarantees: they went from the connection is
 available to the connection manager is available.</p>
 

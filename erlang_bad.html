@@ -1163,20 +1163,22 @@ most robust implementation, due to its simplicity.
 <p>The trick is to define some threshold value between 0.0 and 1.0 and to fetch a random
 number in that range:
 </p>
-<blockquote>
-	-module(drop).
--export([random/1]).
-random(Rate) ->
-maybe_seed(),
-random:uniform() =< Rate.
-maybe_seed() ->
-case get(random_seed) of
-undefined -> random:seed(erlang:now());
-{X,X,X} -> random:seed(erlang:now());
-_ -> ok
-end.
 
-</blockquote>
+<pre><code class="erlang">
+-module(drop).
+-export([random/1]).
+
+random(Rate) ->
+	maybe_seed(),
+	random:uniform() =< Rate.
+
+maybe_seed() ->
+	case get(random_seed) of
+		undefined -> random:seed(erlang:now());
+		{X,X,X} -> random:seed(erlang:now());
+		_ -> ok
+	end.</code></pre>
+
 <p>If you aim to keep 95% of the messages you send, the authorization could be written
 by a call to case drop:random(0.95) of true -> send(); false -> drop() end, or a
 shorter drop:random(0.95) andalso send() if you don’t need to do anything specific
@@ -1483,30 +1485,24 @@ http://www.erlang.org/doc/reference_manual/distributed.html#id83619
 <p>The Job Control Mode (JCL mode) is the menu you get when you press ˆG in the Erlang
 shell. From that menu, there is an option allowing you to connect to a remote shell:
 </p>
-<blockquote>
-	(somenode@ferdmbp.local)1>
+
+<pre><code class="erlang">
+(somenode@ferdmbp.local)1>
 User switch command
 --> h
-c [nn]
- - connect to job
-i [nn]
- - interrupt job
-k [nn]
- - kill job
-j
- - list all jobs
-s [shell]
- - start local shell
-r [node [shell]] - start remote shell
-q
- - quit erlang
-? | h
- - this message
+	c [nn]	 		 - connect to job
+	i [nn]	 		 - interrupt job
+	k [nn]	 		 - kill job
+	j		 	 - list all jobs
+	s [shell]	 	 - start local shell
+	r [node [shell]] 	 - start remote shell
+	q		 	 - quit erlang
+	? | h   		 - this message
 --> r ’server@ferdmbp.local’
 --> c
 Eshell Vx.x.x (abort with ^G)
-(server@ferdmbp.local)1>
-</blockquote>
+(server@ferdmbp.local)1></code></pre>
+
 <p>When that happens, the local shell runs all the line editing and job management locally,
 but the evaluation is actually done remotely. All output coming from said remote evaluation
 will be forwarded to the local shell.
@@ -1514,12 +1510,13 @@ will be forwarded to the local shell.
 <p>To quit the shell, go back in the JCL mode with ˆG. This job management is, as I said,
 done locally, and it is thus safe to quit with ˆG q:
 </p>
-<blockquote>
-	(server@ferdmbp.local)1>
+<pre><code class="erlang">
+(server@ferdmbp.local)1>
 User switch command
 --> q
+</code>
+</pre>
 
-</blockquote>
 <p>You may choose to start the initial shell in hidden mode (with the argument -hidden)
 to avoid connecting to an entire cluster automatically.
 </p>
@@ -1529,13 +1526,13 @@ to avoid connecting to an entire cluster automatically.
 invoked in a different manner. The entire JCL mode sequence can by bypassed by starting
 the shell as follows for long names:
 </p>
-<blockquote>erl -name local@domain.name -remsh remote@domain.name
-</blockquote>
+<pre><code class="erlang">erl -name local@domain.name -remsh remote@domain.name
+</code></pre>
 <p>And as follows for short names:
 </p>
-<blockquote>
+<pre><code class="erlang">
 	erl -sname local@domain -remsh remote@domain
-</blockquote>
+</code></pre>
 
 <p>All other Erlang arguments (such as -hidden and -setcookie $COOKIE) are also valid.
 The underlying mechanisms are the same as when using JCL mode, but the initial shell is
@@ -1550,8 +1547,8 @@ a client. Part of it is a demo application providing a remote shell working in E
 <p>To get this to work, you usually need to have your keys to have access to SSH stuff
 remotely in place already, but for quick test purposes, you can get things working by doing:
 </p>
-<blockquote>
-	$ mkdir /tmp/ssh
+<pre><code class="erlang">
+$ mkdir /tmp/ssh
 $ ssh-keygen -t rsa -f /tmp/ssh/ssh_host_rsa_key
 $ ssh-keygen -t rsa1 -f /tmp/ssh/ssh_host_key
 $ ssh-keygen -t dsa -f /tmp/ssh/ssh_host_dsa_key
@@ -1563,18 +1560,18 @@ $ erl
  {user_dir, "/home/ferd/.ssh"}]).
 {ok,<0.52.0>}
 
-</blockquote>
+</code></pre>
 <p>I’ve only set a few options here, namely system_dir, which is where the host files are,
 and user_dir, which contains SSH configuration files. There are plenty of other options
 available to allow for specific passwords, customize handling of public keys, and so on3 .
 </p>
 <p>To connect to the daemon, any SSH client will do:
 </p>
-<blockquote>
-	$ ssh -p 8989 ferd@127.0.0.1
+<pre><code class="erlang">
+$ ssh -p 8989 ferd@127.0.0.1
 Eshell Vx.x.x (abort with ^G)
 1>
-</blockquote>
+</code></pre>
 <sub>3
 Complete instructions with all options to
  get
@@ -1600,17 +1597,17 @@ get debug output.
 is through named pipes. This can be done by starting Erlang with run_erl, which wraps
 Erlang in a named pipe5 :
 </p>
-<blockquote>$ run_erl /tmp/erl_pipe /tmp/log_dir "erl"
-</blockquote>
+<pre><code class="erlang">$ run_erl /tmp/erl_pipe /tmp/log_dir "erl"
+</code></pre>
 <p>The first argument is the name of the file that will act as the named pipe. The second
 one is where logs will be saved6 .
 </p>
 <p>To connect to the node, you use the to_erl program:
 </p>
-<blockquote>$ to_erl /tmp/erl_pipe
+<pre><code class="erlang">$ to_erl /tmp/erl_pipe
 Attaching to /tmp/erl_pipe (^D to exit)
 1>
-</blockquote>
+</code></pre>
 <p>And the shell is connected. Closing stdio (with ˆD) will disconnect from the shell while
 leaving it running.
 </p>
@@ -1725,8 +1722,8 @@ that will let you look through your metrics over time.
 <p>The memory reported by the Erlang VM in most tools will be a variant of what is reported
 by erlang:memory():
 </p>
-<blockquote>
-	1> erlang:memory().
+<pre><code class="erlang">
+1> erlang:memory().
 [{total,13772400},
 {processes,4390232},
 {processes_used,4390112},
@@ -1736,8 +1733,7 @@ by erlang:memory():
 {binary,979264},
 {code,4026603},
 {ets,305920}]
-
-</blockquote>
+</code></pre>
 <sub>
 	3
 https://github.com/boundary/folsom
@@ -1836,31 +1832,24 @@ the ratio, the higher the workload.
 <p>While the basic usage is explained in the Erlang/OTP reference manual13 , the value
 can be obtained by calling recon:
 </p>
-<blockquote>
-	1> recon:scheduler_usage(1000).
+<pre><code class="erlang">
+1> recon:scheduler_usage(1000).
 [{1,0.9919596133421669},
 {2,0.9369579039389054},
 {3,1.9294092120138725e-5},
 {4,1.2087551402238991e-5}]
-
-</blockquote>
+</code></pre>
 <p>The function recon:scheduler_usage(N) will poll for N milliseconds (here, 1 second)
 and output the value of each scheduler. In this case, the VM has two very loaded schedulers
 (at 99.2% and 93.7% repectively), and two mostly unused ones at far below 1%. Yet, a tool
 like htop would report something closer to this for each core:
 </p>
-<blockquote>
-	1
- [||||||||||||||||||||||||| 70.4%]
-<br/>2
- [|||||||                   20.6%]
-<br/> 3
- [|||||||||||||||||||||||||||||100.0%]
-<br/>4
- [||||||||||||||||
- 40.2%]
-
-</blockquote>
+<pre><code class="erlang">
+1 [||||||||||||||||||||||||| 70.4%]
+2 [|||||||                   20.6%]
+3 [|||||||||||||||||||||||||100.0%]
+4 [||||||||||||||||          40.2%]
+</code></pre>
 <sub>13
 http://www.erlang.org/doc/man/erlang.html#statistics_scheduler_wall_time
 </sub>
@@ -1888,9 +1877,9 @@ and therefore the number of processes on a node can be used as a metric for load
 <p>Most tools mentioned in section 5.1 will track them in one way or another, but if the
 process count needs to be done manually, calling the following expression is enough:
 </p>
-<blockquote>1> length(processes()).
+<pre><code class="erlang">1> length(processes()).
 56535
-</blockquote>
+</code></pre>
 <p>Tracking this value over time can be extremely helpful to try and characterize load or
 detect process leaks, along with other metrics you may have around.
 </p>
@@ -1904,14 +1893,14 @@ UDP sockets, SCTP sockets, file descriptors, and so on.
 However, this function merges in all types of ports into a single entity. Instead, one can
 use recon to get them sorted by type:
 </p>
-<blockquote>1> recon:port_types().
+<pre><code class="erlang">1> recon:port_types().
 [{"tcp_inet",21480},
 {"efile",2},
 {"udp_inet",2},
 {"0/1",1},
 {"2/2",1},
 {"inet_gethost 4 ",1}]
-</blockquote>
+</code></pre>
 <p>This list contains the types and the count for each type of port. The type name is a
 string and is defined by the Erlang VM itself.
 </p>
@@ -2075,8 +2064,8 @@ See Section 7.2
 function to help:
 </p>
 
-<blockquote>
-	1> recon:info("<0.12.0>").
+<pre><code class="erlang">
+1> recon:info("<0.12.0>").
 [{meta,[{registered_name,rex},
 {dictionary,[{’$ancestors’,[kernel_sup,<0.10.0>]},
 {’$initial_call’,{rpc,init,1}}]},
@@ -2100,8 +2089,7 @@ function to help:
 {fullsweep_after,65535},
 {minor_gcs,0}]}]},
 {work,[{reductions,35}]}]
-
-</blockquote>
+</code></pre>
 <p>For the sake of convenience, recon:info/1 will accept any pid-like first argument and
 handle it: literal pids, strings ("<0.12.0>"), registered atoms, global names ({global, Atom}),
 names registered with a third-party registry (e.g. with gproc: {via, gproc, Name}), or
@@ -2109,18 +2097,17 @@ tuples ({0,12,0}). The process just needs to be local to the node you’re debug
 </p>
 <p>If only a category of information is wanted, the category can be used directly:
 </p>
-<blockquote>
-	2> recon:info(self(), work).
+<pre><code class="erlang">
+2> recon:info(self(), work).
 {work,[{reductions,11035}]}
+</code></pre>
 
-</blockquote>
 <p>or can be used in exactly the same way as process_info/2:
 </p>
-<blockquote>
-	3> recon:info(self(), [memory, status]).
+<pre><code class="erlang">
+3> recon:info(self(), [memory, status]).
 [{memory,10600},{status,running}]
-
-</blockquote>
+</code></pre>
 
 <p>This latter form can be used to fetch unsafe information.
 </p>
@@ -2133,8 +2120,8 @@ of a node’s processes and find the top N consumers. Using the attributes above
 recon:proc_count(Attribute, N) function, we can get these results:
 </p>
 
-<blockquote>
-	4> recon:proc_count(memory, 3).
+<pre><code class="erlang">
+4> recon:proc_count(memory, 3).
 [{<0.26.0>,831448,
 [{current_function,{group,server_loop,3}},
 {initial_call,{group,server,3}}]},
@@ -2146,8 +2133,7 @@ recon:proc_count(Attribute, N) function, we can get these results:
 [code_server,
 {current_function,{code_server,loop,1}},
 {initial_call,{erlang,apply,2}}]}]
-
-</blockquote>
+</code></pre>
 <p>Any of the attributes mentioned earlier can work, and for nodes with long-lived processes
 that can cause problems, it’s a fairly useful function.
 </p>
@@ -2161,9 +2147,9 @@ function.
 <p>It is important to see this function as a snapshot over a sliding window. A program’s
 timeline during sampling might look like this:
 </p>
-<blockquote>
-	--w---- [Sample1] ---x-------------y----- [Sample2] ---z--->
-</blockquote>
+<pre><code class="erlang">
+--w---- [Sample1] ---x-------------y----- [Sample2] ---z--->
+</code></pre>
 <p>The function will take two samples at an interval defined by Milliseconds.
 </p>
 <p>Some processes will live between w and die at x, some between y and z, and some
@@ -2177,8 +2163,8 @@ look like huge consumers when they’re not one.22
 </p>
 <p>The function, once running gives results like follows:
 </p>
-<blockquote>
-	5> recon:proc_window(reductions, 3, 500).
+<pre><code class="erlang">
+5> recon:proc_window(reductions, 3, 500).
 [{<0.46.0>,51728,
 [{current_function,{queue,in,2}},
 {initial_call,{erlang,apply,2}}]},
@@ -2188,8 +2174,7 @@ look like huge consumers when they’re not one.22
 {<0.43.0>,650,
 [{current_function,{timer,sleep,1}},
 {initial_call,{erlang,apply,2}}]}]
-
-</blockquote>
+</code></pre>
 <p>With these two functions, it becomes possible to hone in on a specific process that is
 causing issues or misbehaving.
 </p>
@@ -2278,8 +2263,8 @@ has to wait for slow devices etc, and wants to yield back to the emulator.
 list is returned.</p>
 
 <p>The list can be obtained as follows:</p>
-
-<blockquote>1> recon:port_info("#Port<0.818>").
+<pre><code class="erlang">
+1> recon:port_info("#Port<0.818>").
 [{meta,[{id,6544},{name,"tcp_inet"},{os_pid,undefined}]},
 {signals,[{connected,<0.56.0>},
 {links,[<0.56.0>]},
@@ -2298,7 +2283,8 @@ list is returned.</p>
 {broadcast,false},
 {buffer,1460},
 {delay_send,...},
-{...}|...]}]}]</blockquote>
+{...}|...]}]}]
+</code></pre>
 <p>On top of this, functions to find out specific problematic ports exist the way they do
 for processes. The gotcha is that so far, recon only supports them for inet ports and
 with restricted attributes: the number of octets (bytes) sent, received, or both (send_oct,
@@ -2308,26 +2294,27 @@ recv_cnt, cnt, respectively).</p>
 <p>So for the cumulative total, which can help find out who is slowly but surely eating up
 all your bandwidth:</p>
 
-<blockquote>
-	2> recon:inet_count(oct, 3).
+<pre><code class="erlang">
+2> recon:inet_count(oct, 3).
 [{#Port<0.6821166>,15828716661,
 [{recv_oct,15828716661},{send_oct,0}]},
 {#Port<0.6757848>,15762095249,
 [{recv_oct,15762095249},{send_oct,0}]},
 {#Port<0.6718690>,15630954707,
 [{recv_oct,15630954707},{send_oct,0}]}]
-</blockquote>
+</code></pre>
 <p>Which suggest some ports are doing only input and eating lots of bytes. You can then
 use recon:port_info("#Port<0.6821166>") to dig in and find who owns that socket, and
 what is going on with it.</p>
 <p>Or in any other case, we can look at what is sending the most data within any time
 window27 with the recon:inet_window(Attribute, Count, Milliseconds) function:</p>
 
-<blockquote>3> recon:inet_window(send_oct, 3, 5000).
+<pre><code class="erlang">
+3> recon:inet_window(send_oct, 3, 5000).
 [{#Port<0.11976746>,2986216,[{send_oct,4421857688}]},
 {#Port<0.11704865>,1881957,[{send_oct,1476456967}]},
-{#Port<0.12518151>,1214051,[{send_oct,600070031}]}]</blockquote>
-
+{#Port<0.12518151>,1214051,[{send_oct,600070031}]}]
+</code></pre>
 <p>For this one, the value in the middle of the tuple is what send_oct was worth (or any
 chosen attribute for each call) during the specific time interval chosen (5 seconds here).</p>
 <p>There is still some manual work involved into properly linking a misbehaving port to a
@@ -2404,7 +2391,7 @@ by specifying the ERL_CRASH_DUMP environment variable3.</p>
 <p>Reading the crash dump will be useful to figure out possible reasons for a node to die a posteriori.
 One way to get a quick look at things is to use recon’s erl_crashdump_analyzer.sh4
 and run it on a crash dump:</p>
-<blockquote>$ ./recon/script/erl_crashdump_analyzer.sh erl_crash.dump
+<pre><code class="erlang">$ ./recon/script/erl_crashdump_analyzer.sh erl_crash.dump
 analyzing erl_crash.dump, generated on: Thu Apr 17 18:34:53 2014
 Slogan: eheap_alloc: Cannot allocate 2733560184 bytes of memory
 (of type "old_heap").
@@ -2461,7 +2448,7 @@ Process States when crashing (sum):
 1 Garbing
 74 Scheduled
 36421 Waiting
-</blockquote>
+</code></pre>
 
 <sub>
 	1If it isn’t killed by the OS for violating ulimits while dumping or didn’t segfault.
@@ -2501,7 +2488,7 @@ can log on it and go inspect it. If you find out many mailboxes are loaded, you 
 to use recon’s queue_fun.awk to figure out what function they’re running at the time of
 the crash:</p>
 
-<blockquote>1 $ awk -v threshold=10000 -f queue_fun.awk /path/to/erl_crash.dump
+<pre><code class="erlang">1 $ awk -v threshold=10000 -f queue_fun.awk /path/to/erl_crash.dump
 2 MESSAGE QUEUE LENGTH: CURRENT FUNCTION
 3 ======================================
 4 10641: io:wait_io_mon_reply/2
@@ -2510,7 +2497,8 @@ the crash:</p>
 7 2183837: io:wait_io_mon_reply/2
 8 730790: io:wait_io_mon_reply/2
 9 80194: io:wait_io_mon_reply/2
-10 ...</blockquote>
+10 ...
+</code></pre>
 
 <p>This one will run over the crash dump and output all of the functions scheduled to run
 for processes with at least 10000 messages in their mailbox. In the case of this run, the
@@ -2660,9 +2648,9 @@ need to buy time, however.6</p>
 <p>Is the global process count indicative of a leak? If so, you may need to investigate unlinked
 processes, or peek inside supervisors’ children lists to see what may be weird-looking.</p>
 <p>Finding unlinked (and unmonitored) processes is easy to do with a few basic commands:</p>
-<blockquote>1> [P || P <- processes(),
+<pre><code class="erlang">1> [P || P <- processes(),
 [{_,Ls},{_,Ms}] <- [process_info(P, [links,monitors])],
-[]==Ls, []==Ms].</blockquote>
+[]==Ls, []==Ms].</code></pre>
 <sub>5http://www.erlang.org/doc/man/HiPE_app.html
 <br/>6See the compressed option for ets:new/2</sub>
 <p>This will return a list of processes with neither. For supervisors, just fetching
@@ -2674,7 +2662,7 @@ you can find which individual processes use the most memory by looking for their
 memory attribute. You can look things up either as absolute terms or as a sliding window.</p>
 <p>For memory leaks, unless you’re in a predictable fast increase, absolute values are usually
 those worth digging into first:</p>
-<blockquote>1> recon:proc_count(memory, 3).
+<pre><code class="erlang">1> recon:proc_count(memory, 3).
 [{<0.175.0>,325276504,
 [myapp_stats,
 {current_function,{gen_server,loop,6}},
@@ -2686,7 +2674,7 @@ those worth digging into first:</p>
 {<0.72.0>,4193496,
 [gproc,
 {current_function,{gen_server,loop,6}},
-{initial_call,{proc_lib,init_p,5}}]}]</blockquote>
+{initial_call,{proc_lib,init_p,5}}]}]</code></pre>
 <p>Attributes that may be interesting to check other than memory may be any other fields
 in Subsection 5.2.1, including message_queue_len, but memory will usually encompass all
 other types.</p>
@@ -2701,7 +2689,7 @@ setting up Erlang’s system monitor7 might be the best way to go at it.</p>
 periods and large process heaps, among other things. A monitor can temporarily
 be set up as follows:</p>
 <sub>7http://www.erlang.org/doc/man/erlang.html#system_monitor-2</sub>
-<blockquote>1> erlang:system_monitor().
+<pre><code class="erlang">1> erlang:system_monitor().
 undefined
 2> erlang:system_monitor(self(), [{long_gc, 500}]).
 undefined
@@ -2717,7 +2705,7 @@ Shell got {monitor,<4683.31798.0>,long_gc,
 5> erlang:system_monitor(undefined).
 {<0.26706.4961>,[{long_gc,500}]}
 6> erlang:system_monitor().
-undefined</blockquote>
+undefined</code></pre>
 
 <p>The first command checks that nothing (or nobody else) is using a system monitor yet
 — you don’t want to take this away from an existing application or coworker.</p>
@@ -2760,7 +2748,7 @@ each process’ list of binary references (using the binary attribute), force a 
 collection, take another snapshot, and calculate the difference.</p>
 <p>This can be done directly with recon:bin_leak(Max) and looking at the node’s total
 memory before and after the call:</p>
-<blockquote>1> recon:bin_leak(5).
+<pre><code class="erlang">1> recon:bin_leak(5).
 [{<0.4612.0>,-5580,
 [{current_function,{gen_fsm,loop,7}},
 {initial_call,{proc_lib,init_p,5}}]},
@@ -2775,7 +2763,8 @@ memory before and after the call:</p>
 {initial_call,{proc_lib,init_p,5}}]},
 {<0.22711.1>,-2532,
 [{current_function,{gen_fsm,loop,7}},
-{initial_call,{proc_lib,init_p,5}}]}]</blockquote>
+{initial_call,{proc_lib,init_p,5}}]}]
+</code></pre>
 
 <sub>8http://www.erlang.org/doc/efficiency_guide/binaryhandling.html#id65798</sub>
 <p>This will show how many individual binaries were held and then freed by each process
@@ -2788,8 +2777,8 @@ drastically after running this call, you may have had a lot of idling refc binar
 that might be a good sign you have a problem.</p>
 <p>You can further validate the top consumers in total binary memory by using the special
 binary_memory attribute supported in recon:</p>
-<blockquote>
-	1> recon:proc_count(binary_memory, 3).
+<pre><code class="erlang">
+1> recon:proc_count(binary_memory, 3).
 [{<0.169.0>,77301349,
 [app_sup,
 {current_function,{gen_server,loop,6}},
@@ -2800,7 +2789,7 @@ binary_memory attribute supported in recon:</p>
 {<0.12386.1172>,7208179,
 [{current_function,{erlang,hibernate,3}},
 {initial_call,{proc_lib,init_p,5}}]}]
-</blockquote>
+</code></pre>
 <p>This will return the N top processes sorted by the amount of memory the refc binaries reference
 to hold, and can help point to specific processes that hold a few large binaries, instead
 of their raw amount. You may want to try running this function before recon:bin_leak/1,
@@ -3019,12 +3008,12 @@ contain little data, according to their needs.</p>
 has this piece of memory that can be imagined as one box:</p>
 <blockquote>1 [ ]</blockquote>
 <p>On one end you have the heap, and on the other, you have the stack:</p>
-<blockquote>[heap |      | stack]</blockquote>
+<pre><code class="erlang">[heap |      | stack]</code></pre>
 
 <p>In practice there’s more data (you have an old heap and a new heap, for generational
 GC, and also a virtual binary heap, to account for the space of reference-counted binaries
 on a specific sub-allocator not used by the process — binary_alloc vs. eheap_alloc):</p>
-<blockquote>[heap     ||      stack]</blockquote>
+<pre><code class="erlang">[heap     ||      stack]</code></pre>
 <sub>
 	<p>19http://www.erlang.org/doc/man/erts_alloc.html#M_mbsd
 
@@ -3138,7 +3127,7 @@ find issues with a single look at the final result.</li>
 
 	<p>It will be left to the reader to thoroughly read each of these application’s documentation.
 The other approach will be to run recon:proc_window/3 as introduced in Subsection 5.2.1:</p>
-<blockquote>1> recon:proc_window(reductions, 3, 500).
+<pre><code class="erlang">1> recon:proc_window(reductions, 3, 500).
 [{<0.46.0>,51728,
 [{current_function,{queue,in,2}},
 {initial_call,{erlang,apply,2}}]},
@@ -3147,7 +3136,7 @@ The other approach will be to run recon:proc_window/3 as introduced in Subsectio
 {initial_call,{erlang,apply,2}}]},
 {<0.43.0>,650,
 [{current_function,{timer,sleep,1}},
-{initial_call,{erlang,apply,2}}]}]</blockquote>
+{initial_call,{erlang,apply,2}}]}]</code></pre>
 <p>The reduction count has a direct link to function calls in Erlang, and a high count is
 usually the synonym of a high amount of CPU usage.</p>
 <p>What’s interesting with this function is to try it while a system is already rather busy,6
@@ -3178,7 +3167,7 @@ busy processes, either through NIFs or some other means, that end up making them
 to de-schedule.8</p>
 <p>We’ve seen how to set such a system monitor In Garbage Collection in 7.1.5, but here’s
 a different pattern9 I’ve used before to catch long-running items:</p>
-<blockquote>1> F = fun(F) ->
+<pre><code class="erlang">1> F = fun(F) ->
 receive
 {monitor, Pid, long_schedule, Info} ->
 io:format("monitor=long_schedule pid=~p info=~p~n", [Pid, Info]);
@@ -3196,7 +3185,8 @@ end end.
 <0.1293.0>
 monitor=long_schedule pid=<0.54.0> info=[{timeout,1102},
 {in,{some_module,some_function,3}},
-{out,{some_module,some_function,3}}]</blockquote>
+{out,{some_module,some_function,3}}]
+</code></pre>
 <p>Be sure to set the long_schedule and long_gc values to large-ish values that might be
 reasonable to you. In this example, they’re set to 1000 milliseconds. You can either kill
 the monitor by calling exit(whereis(temp_sys_monitor), kill) (which will in turn kill
@@ -3340,7 +3330,7 @@ in ETS10. Finally, multiple patterns can be put into a list to broaden the match
 of matches per time interval.</p>
 <sub>10http://www.erlang.org/doc/man/ets.html#fun2ms-1</sub>
 <p>Rather than going more in details, here’s a list of examples and how to trace for them.</p>
-<blockquote>%% All calls from the queue module, with 10 calls printed at most:
+<pre><code class="erlang">%% All calls from the queue module, with 10 calls printed at most:
 recon_trace:calls({queue, ’_’, ’_’}, 10)
 
 %% All calls to lists:seq(A,B), with 100 calls printed at most:
@@ -3372,7 +3362,7 @@ recon_trace:calls({Mod,handle_call,3}, {1,100}, [{pid, [{via, gproc, Name}, new]
 recon_trace:calls({Mod,Fun,fun(_) -> return_trace() end}, Max, Opts)
 recon_trace:calls({Mod,Fun,[{’_’, [], [{return_trace}]}]}, Max, Opts)
 
-</blockquote>
+</code></pre>
 <p>Each call made will override the previous one, and all calls can be cancelled with
 recon_trace:clear/0.</p>
 <p>There’s a few more combination possible, with more options:</p>
@@ -3399,29 +3389,30 @@ get the data you need without deploying any code or altering its readability.</p
 
 <h3>Example Sessions</h3>
 <p>First let’s trace the queue:new functions in any process:</p>
-<blockquote>1> recon_trace:calls({queue, new, ’_’}, 1).
+<pre><code class="erlang">1> recon_trace:calls({queue, new, ’_’}, 1).
 1
 13:14:34.086078 <0.44.0> queue:new()
-Recon tracer rate limit tripped.</blockquote>
+Recon tracer rate limit tripped.</code></pre>
 <p>The limit was set to 1 trace message at most, and recon let us know when that limit
 was reached.</p>
 <p>Let’s instead look for all the queue:in/2 calls, to see what it is we’re inserting in queues:</p>
-<blockquote>2> recon_trace:calls({queue, in, 2}, 1).
+<pre><code class="erlang">2> recon_trace:calls({queue, in, 2}, 1).
 1
 13:14:55.365157 <0.44.0> queue:in(a, {[],[]})
-Recon tracer rate limit tripped.</blockquote>
+Recon tracer rate limit tripped.
+</code></pre>
 
 <p>In order to see the content we want, we should change the trace patterns to use a fun
 that matches on all arguments in a list (_) and returns return_trace(). This last part
 will generate a second trace for each call that includes the return value:</p>
-<blockquote>3> recon_trace:calls({queue, in, fun(_) -> return_trace() end}, 3).
+<pre><code class="erlang">3> recon_trace:calls({queue, in, fun(_) -> return_trace() end}, 3).
 1
 13:15:27.655132 <0.44.0> queue:in(a, {[],[]})
 13:15:27.655467 <0.44.0> queue:in/2 --> {[a],[]}
 13:15:27.757921 <0.44.0> queue:in(a, {[],[]})
-Recon tracer rate limit tripped.</blockquote>
+Recon tracer rate limit tripped.</code></pre>
 <p>Matching on argument lists can be done in a more complex manner:</p>
-<blockquote>4> recon_trace:calls(
+<pre><code class="erlang">4> recon_trace:calls(
 4> {queue, ’_’,
 4> fun([A,_]) when is_list(A); is_integer(A) andalso A > 1 ->
 4> return_trace()
@@ -3435,7 +3426,7 @@ Recon tracer rate limit tripped.</blockquote>
 13:25:14.695194 <0.53.0> queue:split/2 --> {{[4,3,2],[1]},{[10,9,8,7],[5,6]}}
 5> recon_trace:clear().
 ok
-</blockquote>
+</code></pre>
 
 <p>Note that in the pattern above, no specific function (’_’) was matched against. Instead,
 the fun used restricted functions to those having two arguments, the first of which is either

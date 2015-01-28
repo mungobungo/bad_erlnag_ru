@@ -2577,7 +2577,344 @@ always to ask for data. Interesting questions to ask and pieces of data to consi
 <ul>
 	<li>Do you have a crash dump and is it complaining about memory specifically? If not,
 the issue may be unrelated. If so, go dig into it, it’s full of data.</li>
+	<li>Are the crashes cyclical? How predictable are they? What else tends to happen at
+around the same time and could it be related?</li>
+	<li>Do crashes coincide with peaks in load on your systems, or do they seem to happen
+at more or less any time? Crashes that happen especially during peak times are often
+due to bad overload management (see Chapter 3). Crashes that happen at any time,
+even when load goes down following a peak are more likely to be actual memory
+issues.</li>
 
 </ul>
+<p>If all of this seems to point towards a memory leak, install one of the metrics libraries
+mentioned in Chapter 5 and/or recon and get ready to dive in.1</p>
+<p>The first thing to look at in any of these cases is trends. Check for all types of memory
+using erlang:memory() or some variant of it you have in a library or metrics system. Check
+for the following points:</p>
+<ul>
+	<li>Is any type of memory growing faster than others?</li>
+	<li>Is there any type of memory that’s taking the majority of the space available?</li>
+	<li>Is there any type of memory that never seems to go down, and always up (other than
+atoms)?</li>
+<p>Many options are available depending on the type of memory that’s growing.</p>
+</ul>
+<h4>Atom</h4>
+<p>Don’t use dynamic atoms! Atoms go in a global table and are cached forever. Look
+for places where you call erlang:binary_to_term/1 and erlang:list_to_atom/1, and
+consider switching to safer variants (erlang:binary_to_term(Bin, [safe]) and
+erlang:list_to_existing_atom/1).</p>
+<p>If you use the xmerl library that ships with Erlang, consider open source alternatives2
+or figuring the way to add your own SAX parser that can be safe3.</p>
+<p>If you do none of this, consider what you do to interact with the node. One specific
+case that bit me in production was that some of our common tools used random names to
+connect to nodes remotely, or generated nodes with random names that connected to each
+other from a central server.4 Erlang node names are converted to atoms, so just having this
+was enough to slowly but surely exhaust space on atom tables. Make sure you generate
+them from a fixed set, or slowly enough that it won’t be a problem in the long run.</p>
+<h4>Binary</h4>
+<p>See Section 7.2.</p>
+<h4>Code</h4>
+<p>The code on an Erlang node is loaded in memory in its own area, and sits there until it is
+garbage collected. Only two copies of a module can coexist at one time, so looking for very
+large modules should be easy-ish.</p>
+<sub>1See Chapter 4 if you need help to connect to a running node
+<br/>2I don’t dislike exml or erlsom
+<br/>3See Ulf Wiger at http://erlang.org/pipermail/erlang-questions/2013-July/074901.html
+<br/>4This is a common approach to figuring out how to connect nodes together: have one or two central nodes
+with fixed names, and have every other one log to them. Connections will then propagate automatically.</sub>
+
+<p>If none of them stand out, look for code compiled with HiPE5. HiPE code, unlike
+regular BEAM code, is native code and cannot be garbage collected from the VM when
+new versions are loaded. Memory can accumulate, usually very slowly, if many or large
+modules are native-compiled and loaded at run time.</p>
+<p>Alternatively, you may look for weird modules you didn’t load yourself on the node and
+panic if someone got access to your system!</p>
+
+<h4>ETS</h4>
+<p>ETS tables are never garbage collected, and will maintain their memory usage as long as
+records will be left undeleted in a table. Only removing records manually (or deleting the
+table) will reclaim memory.</p>
+<p>In the rare cases you’re actually leaking ETS data, call the undocumented ets:i()
+function in the shell. It will print out information regarding number of entries (size) and
+how much memory they take (mem). Figure out if anything is bad.</p>
+<p>It’s entirely possible all the data there is legit, and you’re facing the difficult problem
+of needing to shard your data set and distribute it over many nodes. This is out of scope
+for this book, so best of luck to you. You can look into compression of your tables if you
+need to buy time, however.6</p>
+<h4>Processes</h4>
+<h5>Links and Monitors</h5>
+<p>Is the global process count indicative of a leak? If so, you may need to investigate unlinked
+processes, or peek inside supervisors’ children lists to see what may be weird-looking.</p>
+<p>Finding unlinked (and unmonitored) processes is easy to do with a few basic commands:</p>
+<blockquote>1> [P || P <- processes(),
+[{_,Ls},{_,Ms}] <- [process_info(P, [links,monitors])],
+[]==Ls, []==Ms].</blockquote>
+<sub>5http://www.erlang.org/doc/man/HiPE_app.html
+<br/>6See the compressed option for ets:new/2</sub>
+<p>This will return a list of processes with neither. For supervisors, just fetching
+supervisor:count_children(SupervisorPidOrName) and seeing what looks normal can
+be a good pointer.</p>
+<h5>Memory Used</h5>
+<p>The per-process memory model is briefly described in Subsection 7.3.2, but generally speaking,
+you can find which individual processes use the most memory by looking for their
+memory attribute. You can look things up either as absolute terms or as a sliding window.</p>
+<p>For memory leaks, unless you’re in a predictable fast increase, absolute values are usually
+those worth digging into first:</p>
+<blockquote>1> recon:proc_count(memory, 3).
+[{<0.175.0>,325276504,
+[myapp_stats,
+{current_function,{gen_server,loop,6}},
+{initial_call,{proc_lib,init_p,5}}]},
+{<0.169.0>,73521608,
+[myapp_giant_sup,
+{current_function,{gen_server,loop,6}},
+{initial_call,{proc_lib,init_p,5}}]},
+{<0.72.0>,4193496,
+[gproc,
+{current_function,{gen_server,loop,6}},
+{initial_call,{proc_lib,init_p,5}}]}]</blockquote>
+<p>Attributes that may be interesting to check other than memory may be any other fields
+in Subsection 5.2.1, including message_queue_len, but memory will usually encompass all
+other types.</p>
+<h5>Garbage Collections</h5>
+<p>It is very well possible that a process uses lots of memory, but only for short periods of time.
+For long-lived nodes with a large overhead for operations, this is usually not a problem, but
+whenever memory starts being scarce, such spiky behaviour might be something you want
+to get rid of.</p>
+<p>Monitoring all garbage collections in real-time from the shell would be costly. Instead,
+setting up Erlang’s system monitor7 might be the best way to go at it.</p>
+<p>Erlang’s system monitor will allow you to track information such as long garbage collection
+periods and large process heaps, among other things. A monitor can temporarily
+be set up as follows:</p>
+<sub>7http://www.erlang.org/doc/man/erlang.html#system_monitor-2</sub>
+<blockquote>1> erlang:system_monitor().
+undefined
+2> erlang:system_monitor(self(), [{long_gc, 500}]).
+undefined
+3> flush().
+Shell got {monitor,<4683.31798.0>,long_gc,
+[{timeout,515},
+{old_heap_block_size,0},
+{heap_block_size,75113},
+{mbuf_size,0},
+{stack_size,19},
+{old_heap_size,0},
+{heap_size,33878}]}
+5> erlang:system_monitor(undefined).
+{<0.26706.4961>,[{long_gc,500}]}
+6> erlang:system_monitor().
+undefined</blockquote>
+
+<p>The first command checks that nothing (or nobody else) is using a system monitor yet
+— you don’t want to take this away from an existing application or coworker.</p>
+<p>The second command will be notified every time a garbage collection takes over 500
+milliseconds. The result is flushed in the third command. Feel free to also check for
+{large_heap, NumWords} if you want to monitor such sizes. Be careful to start with large
+values at first if you’re unsure. You don’t want to flood your process’ mailbox with a bunch
+of heaps that are 1-word large or more, for example.</p>
+<p>Command 5 unsets the system monitor (exiting or killing the monitor process also frees
+it up), and command 6 validates that everything worked.</p>
+<p>You can then find out if such monitoring messages tend to coincide with the memory
+increases that seem to result in leaks or overuses, and try to catch culprits before things
+are too bad. Quickly reacting and digging into the process (possibly with recon:info/1)
+may help find out what’s wrong with the application.</p>
+
+<h4>Nothing in Particular</h4>
+<p>If nothing seems to stand out in the preceding material, binary leaks (Section 7.2) and
+memory fragmentation (Section 7.3) may be the culprits. If nothing there fits either, it’s
+possible a C driver, NIF, or even the VM itself is leaking. Of course, a possible scenario is
+that load on the node and memory usage were proportional, and nothing specifically ended
+up being leaky or modified. The system just needs more resources or nodes.</p>
+<h3>Erlang’s binaries are of two main types: ProcBins and Refc binaries8. Binaries up to 64
+bytes are allocated directly on the process’s heap, and their entire life cycle is spent in
+there. Binaries bigger than that get allocated in a global heap for binaries only, and each
+process to use one holds a local reference to it in its local heap. These binaries are referencecounted,
+and the deallocation will occur only once all references are garbage-collected from
+all processes that pointed to a specific binary.</h3>
+<p>In 99% of the cases, this mechanism works entirely fine. In some cases, however, the
+process will either:</p>
+<ol>
+	<li>do too little work to warrant allocations and garbage collection;</li>
+	<li>eventually grow a large stack or heap with various data structures, collect them, then
+get to work with a lot of refc binaries. Filling the heap again with binaries (even
+though a virtual heap is used to account for the refc binaries’ real size) may take a
+lot of time, giving long delays between garbage collections.</li>
+</ol>
+<h4>Detecting Leaks</h4>
+<p>Detecting leaks for reference-counted binaries is easy enough: take a measure of all of
+each process’ list of binary references (using the binary attribute), force a global garbage
+collection, take another snapshot, and calculate the difference.</p>
+<p>This can be done directly with recon:bin_leak(Max) and looking at the node’s total
+memory before and after the call:</p>
+<blockquote>1> recon:bin_leak(5).
+[{<0.4612.0>,-5580,
+[{current_function,{gen_fsm,loop,7}},
+{initial_call,{proc_lib,init_p,5}}]},
+{<0.17479.0>,-3724,
+[{current_function,{gen_fsm,loop,7}},
+{initial_call,{proc_lib,init_p,5}}]},
+{<0.31798.0>,-3648,
+[{current_function,{gen_fsm,loop,7}},
+{initial_call,{proc_lib,init_p,5}}]},
+{<0.31797.0>,-3266,
+[{current_function,{gen,do_call,4}},
+{initial_call,{proc_lib,init_p,5}}]},
+{<0.22711.1>,-2532,
+[{current_function,{gen_fsm,loop,7}},
+{initial_call,{proc_lib,init_p,5}}]}]</blockquote>
+
+<sub>8http://www.erlang.org/doc/efficiency_guide/binaryhandling.html#id65798</sub>
+<p>This will show how many individual binaries were held and then freed by each process
+as a delta. The value -5580 means there were 5580 fewer refc binaries after the call than
+before.</p>
+<p>It is normal to have a given amount of them stored at any point in time, and not all
+numbers are a sign that something is bad. If you see the memory used by the VM go down
+drastically after running this call, you may have had a lot of idling refc binaries.</p>
+<p>Similarly, if you instead see some processes hold impressively large numbers of them9,
+that might be a good sign you have a problem.</p>
+<p>You can further validate the top consumers in total binary memory by using the special
+binary_memory attribute supported in recon:</p>
+<blockquote>
+	1> recon:proc_count(binary_memory, 3).
+[{<0.169.0>,77301349,
+[app_sup,
+{current_function,{gen_server,loop,6}},
+{initial_call,{proc_lib,init_p,5}}]},
+{<0.21928.1>,9733935,
+[{current_function,{erlang,hibernate,3}},
+{initial_call,{proc_lib,init_p,5}}]},
+{<0.12386.1172>,7208179,
+[{current_function,{erlang,hibernate,3}},
+{initial_call,{proc_lib,init_p,5}}]}]
+</blockquote>
+<p>This will return the N top processes sorted by the amount of memory the refc binaries reference
+to hold, and can help point to specific processes that hold a few large binaries, instead
+of their raw amount. You may want to try running this function before recon:bin_leak/1,
+given the latter garbage collects the entire node first.</p>
+<h4>Fixing Leaks</h4>
+<p>Once you’ve established you’ve got a binary memory leak using recon:bin_leak(Max), it
+should be simple enough to look at the top processes and see what they are and what kind
+of work they do.</p>
+<p>Generally, refc binaries memory leaks can be solved in a few different ways, depending
+on the source:</p>
+<ul>
+	<li>call garbage collection manually at given intervals (icky, but somewhat efficient);</li>
+	<li>stop using binaries (often not desirable);</li>
+	<li>use binary:copy/1-210 if keeping only a small fragment (usually less than 64 bytes)
+of a larger binary;11</li>
+	<li>move work that involves larger binaries to temporary one-off processes that will die
+when they’re done (a lesser form of manual GC!);</li>
+	<li>or add hibernation calls when appropriate (possibly the cleanest solution for inactive
+processes).</li>
+</ul>
+<sub>9We’ve seen some processes hold hundreds of thousands of them during leak investigations at Heroku!</sub>
+<p>The first two options are frankly not agreeable and should not be attempted before all
+else failed. The last three options are usually the best ones to be used.</p>
+<h5>Routing Binaries</h5>
+<p>There’s a specific solution for a specific use case some Erlang users have reported. The
+problematic use case is usually having a middleman process routing binaries from one
+process to another one. That middleman process will therefore acquire a reference to every
+binary passing through it and risks being a common major source of refc binaries leaks.</p>
+<p>The solution to this pattern is to have the router process return the pid to route to and
+let the original caller move the binary around. This will make it so that only processes that
+do need to touch the binaries will do so.</p>
+<p>A fix for this can be implemented transparently in the router’s API functions, without
+any visible change required by the callers.</p>
+
+<h2>Memory Fragmentation</h2>
+<p>Memory fragmentation issues are intimately related to Erlang’s memory model, as described
+in Section 7.3.2. It is by far one of the trickiest issues of running long-lived Erlang nodes
+(often when individual node uptime reaches many months), and will show up relatively
+rarely.</p>
+<p>The general symptoms of memory fragmentation are large amounts of memory being
+allocated during peak load, and that memory not going away after the fact. The
+damning factor will be that the node will internally report much lower usage (through
+erlang:memory()) than what is reported by the operating system.</p>
+<h4>Finding Fragmentation</h4>
+<p>The recon_alloc module was developed specifically to detect and help point towards the
+resolution of such issues.</p>
+<sub>
+	<br/>10http://www.erlang.org/doc/man/binary.html#copy-1
+	<br/>11It might be worth copying even a larger fragment of a refc binary. For example, copying 10 megabytes
+off a 2 gigabytes binary should be worth the short-term overhead if it allows the 2 gigabytes binary to be
+garbage-collected while keeping the smaller fragment longer.
+</sub>
+
+<h5>Check Allocated Memory</h5>
+<p>Calling recon_alloc:memory/1 will report various memory metrics with more flexibility
+than erlang:memory/0. Here are the possibly relevant arguments:</p>
+<ol>
+	<li>call recon_alloc:memory(usage). This will return a value between 0 and 1 representing
+a percentage of memory that is being actively used by Erlang terms versus
+the memory that the Erlang VM has obtained from the OS for such purposes. If the
+usage is close to 100%, you likely do not have memory fragmentation issues. You’re
+just using a lot of it.</li>
+	<li>check if recon_alloc:memory(allocated) matches what the OS reports.12 It should
+match it fairly closely if the problem is really about fragmentation or a memory leak
+from Erlang terms.</li>
+</ol>
+<p>That should confirm if memory seems to be fragmented or not.</p>
+<h5>Find the Guilty Allocator</h5>
+<p>Call recon_alloc:memory(allocated_types) to see which type of util allocator (see Section
+7.3.2) is allocating the most memory. See if one looks like an obvious culprit when you
+compare the results with erlang:memory().</p>
+<p>Try recon_alloc:fragmentation(current). The resulting data dump will show different
+allocators on the node with various usage ratios.13</p>
+<p>If you see very low ratios, check if they differ when calling recon_alloc:fragmentation(max),
+which should show what the usage patterns were like under your max memory load.</p>
+<p>If there is a big difference, you are likely having issues with memory fragmentation for
+a few specific allocator types following usage spikes.</p>
+
+<h4>Erlang’s Memory Model</h4>
+<h5>The Global Level</h5>
+<p>To understand where memory goes, one must first understand the many allocators being
+used. Erlang’s memory model, for the entire virtual machine, is hierarchical. As shown in
+Figure 7.1, there are two main allocators, and a bunch of sub-allocators (numbered 1-9).
 </body>
+<sub>
+	12You can call recon_alloc:set_unit(Type) to set the values reported by recon_alloc in bytes,
+kilobytes, megabytes, or gigabytes
+<br/>13More information is available at http://ferd.github.io/recon/recon_alloc.html
+</sub>
+<img src="images/memory_allocators.png">
+
+<p>Figure 7.1: Erlang’s Memory allocators and their hierarchy. Not shown is the special super
+carrier, optionally allowing to pre-allocate (and limit) all memory available to the Erlang
+VM since R16B03.</p>
+
+<p>The sub-allocators are the specific allocators used directly by Erlang code and the VM for
+most data types:14</p>
+<ol>
+	<li>temp_alloc: does temporary allocations for short use cases (such as data living within
+a single C function call).</li>
+	<li>eheap_alloc: heap data, used for things such as the Erlang processes’ heaps</li>
+	<li>binary_alloc: the allocator used for reference counted binaries (what their ’global
+heap’ is). Reference counted binaries stored in an ETS table remain in this allocator.</li>
+	<li>ets_alloc: ETS tables store their data in an isolated part of memory that isn’t
+garbage collected, but allocated and deallocated as long as terms are being stored in
+tables</li>
+	<li>driver_alloc: used to store driver data in particular, which doesn’t keep drivers
+that generate Erlang terms from using other allocators. The driver data allocated
+here contains locks/mutexes, options, Erlang ports, etc.</li>
+	<li>sl_alloc: short-lived memory blocks will be stored there, and include items such as
+some of the VM’s scheduling information or small buffers used for some data types’
+handling.</li>
+	<li>ll_alloc: long-lived allocations will be in there. Examples include Erlang code itself
+and the atom table, which stay there.</li>
+	<li>fix_alloc: allocator used for frequently used fixed-size blocks of memory. One example
+of data used there is the internal processes’ C struct, used internally by the VM.</li>
+	<li>std_alloc: catch-all allocator for whatever didn’t fit the previous categories. The
+process registry for named process is there.</li>
+</ol>
+
+<img src="images/memory_allocators2.png">
+<p>Figure 7.2: Example memory allocated in a specific sub-allocator</p>
+
+<p>By default, there will be one instance of each allocator per scheduler (and you should
+have one scheduler per core), plus one instance to be used by linked-in drivers using async
+threads. This ends up giving you a structure a bit like in Figure 7.1, but split it in N parts
+at each leaf.</p>
+<p></p>
+<p></p>
+
 </html>

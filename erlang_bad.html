@@ -9,168 +9,167 @@
 		<p>Stuff goes bad. Erlang in anger</p>
 		<p>Contents</p>
 		<a href="#introduction"><p>Introduction</p></a>
-		<p>Writing Applications</p>
-		<ol>
-			<li>
-				How to Dive into a Code Base
-				<ol>
-					<li>Raw Erlang </li>
+		<p><a href="#i_writing_application">I Writing Applications</a></p>
+		<ul>
+			<li><a href="#chapter_1">Chapter 1 "How to Dive into a Code Base"</a>
+				<ul>
+					<li><a href="#1_1_raw_erlang"> 1.1 Raw Erlang </a></li>
 					<li>
-						OTP Applications
-						<ol>
-							<li>Library Applications</li>
-							<li>Regular Applications</li>
-							<li>Dependencies</li>
-						</ol>
+						<a href="#1_2_otp_applications"> 1.2 OTP Applications</a>
+						<ul>
+							<li><a href="#1_2_1_library_applications"> 1.2.1 Library Applications</a></li>
+							<li><a href="#1_2_2_regular_applications">1.2.2. Regular Applications</a></li>
+							<li><a href="#1_2_3_dependencies">1.2.3. Dependencies</a></li>
+						</ul>
 					</li>
-					<li>OTP Releases</li>
-					<li>Exercises</li>
-				</ol>
+					<li><a href="#1_3_otp_releases">1.3 OTP Releases</a></li>
+					<li><a href="#1_4_exercises">1.4 Exercises</a></li>
+				</ul>
 			</li>
 			<li>
-				Building Open Source Erlang Software
-				<ol>
-					<li>Project Structure </li>
-					<ol>
-						<li>OTP Applications</li>
-						<li>OTP Releases</li>
-					</ol>
-					<li>Supervisors and start_link Semantics</li>
-					<ol>
-						<li>It’s About the Guarantees</li>
-						<li>Side Effects</li>
-						<li>Example: Initializing without guaranteeing connections</li>
-						<li>In a nutshell</li>
-						<li>Application Strategies</li>
-					</ol>
-					<li> Exercises</li>
-				</ol>
+				<a href="#chapter_2">Chapter 2 "Building Open Source Erlang Software"</a>
+				<ul>
+					<li><a href="#2_1_project_structure">2.1 Project Structure</a> </li>
+					<ul>
+						<li><a href="#2_1_1_otp_applications">2.1.1 OTP Applications</a></li>
+						<li><a href="#2_1_2_otp_releases4">2.1.2 OTP Releases</a></li>
+					</ul>
+					<li>2.2 Supervisors and start_link Semantics</li>
+					<ul>
+						<li>2.2.1 It’s About the Guarantees</li>
+						<li>2.2.2 Side Effects</li>
+						<li>2.2.3 Example: Initializing without guaranteeing connections</li>
+						<li>2.2.4 In a nutshell</li>
+						<li>2.2.5 Application Strategies</li>
+					</ul>
+					<li>2.3 Exercises</li>
+				</ul>
 			</li>
 			<li>
-				Planning for Overload
-				<ol>
+				3 Planning for Overload
+				<ul>
 					<li>
-						Common Overload Sources
-						<ol>
-							<li>error_logger Explodes</li>
-							<li>Locks and Blocking Operations</li>
-							<li>Unexpected Messages</li>
-						</ol>
+						3.1 Common Overload Sources
+						<ul>
+							<li>3.1 error_logger Explodes</li>
+							<li>3.1.2 Locks and Blocking Operations</li>
+							<li>3.1.3 Unexpected Messages</li>
+						</ul>
 					</li>
 					
 				</li>
 				
 				<li>
-					Restricting Input
-					<ol>
-						<li>How Long Should a Time Out Be</li>
-						<li>Asking For Permission</li>
-						<li>What Users See</li>
-					</ol>
+					3.2 Restricting Input
+					<ul>
+						<li>3.2.1 How Long Should a Time Out Be</li>
+						<li>3.2.2 Asking For Permission</li>
+						<li>3.2.3 What Users See</li>
+					</ul>
 				</li>
 				<li>
-					Discarding Data
-					<ol>
-						<li>Random Drop</li>
-						<li>Queue Buffers</li>
-						<li>Stack Buffers</li>
-						<li>Time-Sensitive Buffers</li>
-						<li>Dealing With Constant Overload</li>
-						<li>How Do You Drop</li>
-					</ol>
+					3.3 Discarding Data
+					<ul>
+						<li>3.3.1 Random Drop</li>
+						<li>3.3.2 Queue Buffers</li>
+						<li>3.3.3 Stack Buffers</li>
+						<li>3.3.4 Time-Sensitive Buffers</li>
+						<li>3.3.5 Dealing With Constant Overload</li>
+						<li>3.3.6 How Do You Drop</li>
+					</ul>
 				</li>
-				<li>Exercises</li>
+				<li>3.4 Exercises</li>
 				
-			</ol>
-		</ol>
+			</ul>
+		</ul>
 		<p>II Diagnosing Applications</p>
-		<ol>
+		<ul>
 			<li>
-				Connecting to Remote Nodes
-				<ol>
-					<li>Job Control Mode</li>
-					<li>Remsh</li>
-					<li>SSH Daemon</li>
-					<li>Named Pipes</li>
-					<li>Exercises</li>
-				</ol>
+				4 Connecting to Remote Nodes
+				<ul>
+					<li>4.1 Job Control Mode</li>
+					<li>4.2 Remsh</li>
+					<li>4.3 SSH Daemon</li>
+					<li>4.4 Named Pipes</li>
+					<li>4.5 Exercises</li>
+				</ul>
 			</li>
 			<li>
-				Runtime Metrics
-				<ol>
-					<li>Global View</li>
-					<ol>
-						<li>Memory</li>
-						<li>CPU</li>
-						<li>Processes</li>
-						<li>Ports</li>
-					</ol>
-					<li>Digging In</li>
-					<ol>
-						<li>Processes</li>
-						<li>OTP Processes</li>
-						<li>Ports</li>
-					</ol>
-					<li>Exercises</li>
-				</ol>
+				5 Runtime Metrics
+				<ul>
+					<li>5.1 Global View</li>
+					<ul>
+						<li>5.1.1 Memory</li>
+						<li>5.1.2 CPU</li>
+						<li>5.1.3 Processes</li>
+						<li>5.1.4 Ports</li>
+					</ul>
+					<li>5.2 Digging In</li>
+					<ul>
+						<li>5.2.1 Processes</li>
+						<li>5.2.2 OTP Processes</li>
+						<li>5.2.3 Ports</li>
+					</ul>
+					<li>5.3 Exercises</li>
+				</ul>
 			</li>
 			<li>
-				Reading Crash Dumps
-				<ol>
-					<li>General View</li>
-					<li>Full Mailboxes</li>
-					<li>Too Many (or too few) Processes</li>
-					<li>Too Many Ports</li>
-					<li>Can’t Allocate Memory</li>
-					<li>Exercises</li>
-				</ol>
+				6 Reading Crash Dumps
+				<ul>
+					<li>6.1 General View</li>
+					<li>6.2 Full Mailboxes</li>
+					<li>6.3 Too Many (or too few) Processes</li>
+					<li>6.4 Too Many Ports</li>
+					<li>6.5 Can’t Allocate Memory</li>
+					<li>6.6 Exercises</li>
+				</ul>
 			</li>
 			<li>
-				Memory Leaks
-				<ol>
-					<li>Common Sources of Leaks
-						<ol>
-							<li>Atom</li>
-							<li>Binary</li>
-							<li>Code</li>
-							<li>ETS</li>
-							<li>Processes</li>
-							<li>Nothing in Particular</li>
-						</ol>
-						<li>Binaries</li>
-						<ol>
-							<li>Detecting Leaks</li>
-							<li>Fixing Leaks</li>
-						</ol>
-						<li>Memory Fragmentation</li>
-						<ol>
-							<li>Finding Fragmentation</li>
-							<li>Erlang’s Memory Model</li>
-							<li>Fixing Memory Fragmentation with a Different Allocation Strategy</li>
-						</ol>
-						<li>Exercises</li>
-					</ol>
+				7 Memory Leaks
+				<ul>
+					<li>7.1 Common Sources of Leaks
+						<ul>
+							<li>7.1.1 Atom</li>
+							<li>7.2.2 Binary</li>
+							<li>7.2.3 Code</li>
+							<li>7.2.4 ETS</li>
+							<li>7.2.5 Processes</li>
+							<li>7.2.6 Nothing in Particular</li>
+						</ul>
+						<li>7.2 Binaries</li>
+						<ul>
+							<li>7.2.1 Detecting Leaks</li>
+							<li>7.2.3 Fixing Leaks</li>
+						</ul>
+						<li>7.3 Memory Fragmentation</li>
+						<ul>
+							<li>7.3.1 Finding Fragmentation</li>
+							<li>7.3.2 Erlang’s Memory Model</li>
+							<li>7.3.3 Fixing Memory Fragmentation with a Different Allocation Strategy</li>
+						</ul>
+						<li>7.4 Exercises</li>
+					</ul>
 				</li>
 				
 				<li>
-					CPU and Scheduler Hogs
-					<ol>
-						<li>Profiling and Reduction Counts</li>
-						<li>System Monitors</li>
-						<ol>
-							<li>Suspended Ports</li>
-						</ol>
-						<li>Exercises</li>
-					</ol>
+					8 CPU and Scheduler Hogs
+					<ul>
+						<li>8.1 Profiling and Reduction Counts</li>
+						<li>8.2 System Monitors</li>
+						<ul>
+							<li>8.2.1 Suspended Ports</li>
+						</ul>
+						<li>8.3 Exercises</li>
+					</ul>
 				</li>
 				<li>
-					Tracing
-					<ol>
-						<li>Tracing Principles</li>
-						<li>Tracing with Recon</li>
-						<li>Example Sessions</li>
-						<li>Exercises</li>
-					</ol>
+					9 Tracing
+					<ul>
+						<li>9.1 Tracing Principles</li>
+						<li>9.2 Tracing with Recon</li>
+						<li>9.3 Example Sessions</li>
+						<li>9.4 Exercises</li>
+					</ul>
 				</li>
 				<li>
 					Conclusion
@@ -230,9 +229,9 @@
 			</sub>
 			<hr/>
 			<a id="part_i"><h1> Part I </h1></a>
-			<h1> Writing Applications </h1>
+			<a id="i_writing_application"><h1> Writing Applications </h1></a>
 			<a id="chapter_1"><h2> Chapter 1 </h2></a>
-			<a id="how_to_dive_into_a_code_base"><h3> How to Dive into a Code Base </h3></a>
+			<a id="how_to_dive_into_a_code_base"><h2> How to Dive into a Code Base </h2></a>
 			<p>"Read the source" is one of the most annoying things to be told, but dealing with Erlang programmers, you’ll have to do it often. Either the documentation for a library will be incomplete, outdated, or just not there. In other cases, Erlang programmers are a bit similar to Lispers in that they will tend to write libraries that will solve their problems and not really test or try them in other circumstances, leaving it to you to extend or fix issues that arise in new contexts.</p>
 			<p>It’s thus pretty much guaranteed you’ll have to go dive in some code base you know nothing about, either because you inherited it at work, or because you need to fix it or understand it to be able to move forward with your own system. This is in fact true of most languages whenever the project you work on is not one you designed yourself.</p>
 			<p>There are three main types of Erlang code bases you’ll encounter in the wild: raw Erlang code bases, OTP applications, and OTP releases. In this chapter, we’ll look at each of these and try to provide helpful tips on navigating them.</p>
@@ -243,7 +242,7 @@
 			<sub>
 			1https://github.com/rebar/rebar/ — a build tool briefly introduced in <a href="#chapter_2">Chapter 2</a>
 			</sub>
-			<a id="otp_applications"><h3>1.2 OTP Applications</h3></a>
+			<a id="1_2_otp_applications"><h3>1.2 OTP Applications</h3></a>
 			<p>Figuring out OTP applications is usually rather simple. They usually all share a directory structure that looks like:</p>
 <pre>
 <code class="erlang">doc/
@@ -284,11 +283,11 @@ dispcount_supersup, dispcount_watcher, watchers_sup]}
 					<sub>
 					2A build system generates the final file that goes in ebin. Note that in these cases, many src/<AppName>.app.src files do not specify modules and let the build system take care of it.
 						</sub>
-						<a id="library_applications"><h4>1.2.1 Library Applications</h4></a>
+						<a id="1_2_1_library_applications"><h4>1.2.1 Library Applications</h4></a>
 						<p>Library applications will usually have modules named appname _something, and one module named appname . This will usually be the interface module that’s central to the library and contains a quick way into most of the functionality provided.</p>
 						<p>	By looking at the source of the module, you can figure out how it works with little effort: If the module adheres to any given behaviour (gen_server, gen_fsm, etc.), you’re most likely expected to start a process under one of your own supervisors and call it that way. If no behaviour is included, then you probably have a functional, stateless library on your hands. For this case, the module’s exported functions should give you a quick way to understand its purpose.
 						</p>
-						<a id="regular_applications"><h4>1.2.2 Regular Applications</h4></a>
+						<a id="1_2_2_regular_applications"><h4>1.2.2 Regular Applications</h4></a>
 						<p>For a regular OTP application, there are two potential modules that act as the entry point:</p>
 						<ol>
 							<li>appname</li>
@@ -320,7 +319,7 @@ dispcount_supersup, dispcount_watcher, watchers_sup]}
 						<p>All of these modules will contain the same kind of structure: exported functions that
 						represent the user-facing interface, exported functions for the callback module, and private functions, usually in that order.</p>
 						<p>Based on their supervision relationship and the typical role of each behaviour, looking at the interface to be used by other modules and the behaviours implemented should reveal a lot of information about the program you’re diving into.</p>
-						<a id="dependencies"><h4>1.2.3 Dependencies</h4></a>
+						<a id="1_2_3_dependencies"><h4>1.2.3 Dependencies</h4></a>
 						<p>All applications have dependencies5, and these dependencies will have their own dependencies. OTP applications usually share no state between them, so it’s possible to know what bits of code depend on what other bits of code by looking at the app file only, assuming the developer wrote them in a mostly correct manner. Figure 1.1 shows a diagram that can be generated from looking at app files to help understand the structure of OTP applications.</p>
 						<p>Using such a hierarchy and looking at each application’s short description might be helpful to draw a rough, general map of where everything is located. To generate a similardiagram, find recon’s script directory and call escript script/app_deps.erl6. Similar hierarchies can be found using the observer7 application, but for individual supervision trees. Put together, you may get an easy way to find out what does what in the code base.</p>
 						<sub>
@@ -330,7 +329,7 @@ dispcount_supersup, dispcount_watcher, watchers_sup]}
 						</sub>
 						<img src="images/riak_arc.png">
 						<p>Figure 1.1: Dependency graph of riak_cs, Basho’s open source cloud library. The graphignores dependencies on common applications like kernel and stdlib. Ovals are applications,rectangles are library applications.</p>
-						<a id="otp_releases"><h3>1.3 OTP Releases</h3></a>
+						<a id="1_3_otp_releases"><h3>1.3 OTP Releases</h3></a>
 						<p>OTP releases are not a lot harder to understand than most OTP applications you’ll encounter in the wild. A release is a set of OTP applications packaged in a production-ready manner so it boots and shuts down without needing to manually call application:start/2 for any app. Of course there’s a bit more to releases than that, but generally, the same discovery process used for individual OTP applications will be applicable here.</p>
 						<p>You’ll usually have a file similar to the configuration files used by systools or reltool, which will state all applications part of the release and a few8 options regarding their packaging. To understand them, I recommend reading existing documentation on them. If you’re lucky, the project may be using relx9, an easier tool that was officially released in early 2014.</p>
 						<a id="1_4_exercises"><h3>1.4 Exercises</h3></a>
@@ -351,6 +350,7 @@ dispcount_supersup, dispcount_watcher, watchers_sup]}
 							<li>Can you express the dependency chain of applications in there? Generate a diagram of them?</li>
 							<li>Can you add more processes to the main application than those described in the README?</li>
 						</ol>
+						
 						<a id="chapter_2"><h2>Chapter 2</h2></a>
 						<h2>Building Open Source Erlang	Software</h2>
 						<p>Most Erlang books tend to explain how to build Erlang/OTP applications, but few of them go very much in depth about how to integrate with the Erlang community doing Open Source work. Some of them even avoid the topic on purpose. This chapter dedicates itself to doing a quick tour of the state of affairs in Erlang.</p>
@@ -1530,7 +1530,7 @@ undefined</code></pre>
 					<p>The second command will be notified every time a garbage collection takes over 500 milliseconds. The result is flushed in the third command. Feel free to also check for {large_heap, NumWords} if you want to monitor such sizes. Be careful to start with large values at first if you’re unsure. You don’t want to flood your process’ mailbox with a bunch of heaps that are 1-word large or more, for example.</p>
 					<p>Command 5 unsets the system monitor (exiting or killing the monitor process also frees it up), and command 6 validates that everything worked.</p>
 					<p>You can then find out if such monitoring messages tend to coincide with the memory increases that seem to result in leaks or overuses, and try to catch culprits before things are too bad. Quickly reacting and digging into the process (possibly with recon:info/1) may help find out what’s wrong with the application.</p>
-		<h4>Nothing in Particular</h4>
+		<a id="7_1_6_nothing_in_particular"><h4>Nothing in Particular</h4></a>
 			<p>If nothing seems to stand out in the preceding material, binary leaks (Section 7.2) and memory fragmentation (Section 7.3) may be the culprits. If nothing there fits either, it’s possible a C driver, NIF, or even the VM itself is leaking. Of course, a possible scenario is that load on the node and memory usage were proportional, and nothing specifically ended up being leaky or modified. The system just needs more resources or nodes.</p>
 									
 	<a id="7_2_binaries"><h3>7.2 Binaries</h3></a>
@@ -1581,7 +1581,7 @@ undefined</code></pre>
    {initial_call,{proc_lib,init_p,5}}]}]
 </code></pre>
 			<p>This will return the N top processes sorted by the amount of memory the refc binaries reference to hold, and can help point to specific processes that hold a few large binaries, instead of their raw amount. You may want to try running this function before recon:bin_leak/1, given the latter garbage collects the entire node first.</p>
-		<h4>Fixing Leaks</h4>
+		<a id="7_2_2_fixing_leaks"><h4>7.2.2 Fixing Leaks</h4></a>
 			<p>Once you’ve established you’ve got a binary memory leak using recon:bin_leak(Max), itshould be simple enough to look at the top processes and see what they are and what kindof work they do.</p>
 			<p>Generally, refc binaries memory leaks can be solved in a few different ways, dependingon the source:</p>
 			<ul>
@@ -1597,10 +1597,10 @@ undefined</code></pre>
 				<p>There’s a specific solution for a specific use case some Erlang users have reported. The problematic use case is usually having a middleman process routing binaries from one process to another one. That middleman process will therefore acquire a reference to every binary passing through it and risks being a common major source of refc binaries leaks.</p>
 				<p>The solution to this pattern is to have the router process return the pid to route to and let the original caller move the binary around. This will make it so that only processes that do need to touch the binaries will do so.</p>
 				<p>A fix for this can be implemented transparently in the router’s API functions, withoutany visible change required by the callers.</p>
-		<h3>Memory Fragmentation</h3>
+		<a id="7_3_memory_fragmentation"><h3>Memory Fragmentation</h3></a>
 			<p>Memory fragmentation issues are intimately related to Erlang’s memory model, as describedin Section 7.3.2. It is by far one of the trickiest issues of running long-lived Erlang nodes(often when individual node uptime reaches many months), and will show up relatively rarely.</p>
 			<p>The general symptoms of memory fragmentation are large amounts of memory beingallocated during peak load, and that memory not going away after the fact. Thedamning factor will be that the node will internally report much lower usage (through erlang:memory()) than what is reported by the operating system.</p>
-			<h4>Finding Fragmentation</h4>
+			<a id="7_3_1_finding_fragmentation"><h4>Finding Fragmentation</h4></a>
 				<p>The recon_alloc module was developed specifically to detect and help point towards the resolution of such issues.</p>
 				<sub>
 					<br/>10http://www.erlang.org/doc/man/binary.html#copy-1
@@ -1618,7 +1618,7 @@ undefined</code></pre>
 					<p>Try recon_alloc:fragmentation(current). The resulting data dump will show different allocators on the node with various usage ratios.13</p>
 					<p>If you see very low ratios, check if they differ when calling recon_alloc:fragmentation(max), which should show what the usage patterns were like under your max memory load.</p>
 					<p>If there is a big difference, you are likely having issues with memory fragmentation for a few specific allocator types following usage spikes.</p>
-			<h4>Erlang’s Memory Model</h4>
+			<a id="7_3_2_erlang_memory_model"><h4>Erlang’s Memory Model</h4></a>
 					<h5>The Global Level</h5>
 						<p>To understand where memory goes, one must first understand the many allocators being used. Erlang’s memory model, for the entire virtual machine, is hierarchical. As shown in Figure 7.1, there are two main allocators, and a bunch of sub-allocators (numbered 1-9)</p>
 						<sub>
@@ -1695,12 +1695,12 @@ undefined</code></pre>
 						<p>The space is allocated more and more up until either the stack or the heap can’t fit in anymore. This triggers a minor GC. The minor GC moves the data that can be kept into the old heap. It then collects the rest, and may end up reallocating more space.</p>
 						<p>After a given number of minor GCs and/or reallocations, a full-sweep GC is performed, which inspects both the new and old heaps, frees up more space, and so on. When a process dies, both the stack and heap are taken out at once. reference-counted binaries are decreased, and if the counter is at 0, they vanish.</p>
 						<p>When that happens, over 80% of the time, the only thing that happens is that the memory is marked as available in the sub-allocator and can be taken back by new processes or other ones that may need to be resized. Only after having this memory unused — and the multiblock carrier unused also — is it returned to mseg_alloc or sys_alloc, which may or may not keep it for a while longer.</p>
-			<h4>Fixing Memory Fragmentation with a Different Allocation Strategy</h4>
+			<a id="7_3_3_fixing_memory_fragmentation"><h4>Fixing Memory Fragmentation with a Different Allocation Strategy</h4></a>
 				<p>Tweaking your VM’s options for memory allocation may help.</p>
 				<p>You will likely need to have a good understanding of what your type of memory load and usage is, and be ready to do a lot of in-depth testing. The recon_alloc module contains a few helper functions to provide guidance, and the module’s documentation22 should be read at this point.</p>
 				<p>You will need to figure out what the average data size is, the frequency of allocation and deallocation, whether the data fits in mbcs or sbcs, and you will then need to try playing with a bunch of the options mentioned in recon_alloc, try the different strategies, deploy them, and see if things improve or if they impact times negatively.</p>
 				<p>This is a very long process for which there is no shortcut, and if issues happen only every few months per node, you may be in for the long haul.</p>
-		<h3>Exercises</h3>
+		<a id="7_4_exercises"><h3>Exercises</h3></a>
 		<h4>Review Questions</h4>
 			<ol>
 				<li>Name some of the common sources of leaks in Erlang programs.</li>
@@ -1725,7 +1725,7 @@ undefined</code></pre>
 			<ol>
 				<li>Using any system you know or have to maintain in Erlang (including toy systems),can you figure out if there are any binary memory leaks on there?</li>
 		</ol>
-<h2>Chapter 8</h2>
+<a id="chapter_8"><h2>Chapter 8</h2></a>
 <h2>CPU and Scheduler Hogs</h2>
 	<p>While memory leaks tend to absolutely kill your system, CPU exhaustion tends to act like
 	a bottleneck and limits the maximal work you can get out of a node. Erlang developers
@@ -1742,7 +1742,7 @@ undefined</code></pre>
 	<p>The existing approaches are often limited to profiling and reduction-counting if it’s in
 	your code, and to monitoring the scheduler’s work if it might be anywhere else (but also
 	your code).</p>
-	<h3>Profiling and Reduction Counts</h3>
+	<a id="8_1_profiling_and_reduction_counts"><h3>Profiling and Reduction Counts</h3></a>
 		<p>To pin issues to specific pieces of Erlang code, as mentioned earlier, there are two main
 		approaches. One will be to do the old standard profiling routine, likely using one of the
 		following applications:2</p>
@@ -1772,7 +1772,7 @@ undefined</code></pre>
 		<p>The reduction count has a direct link to function calls in Erlang, and a high count is usually the synonym of a high amount of CPU usage.</p>
 		<p>What’s interesting with this function is to try it while a system is already rather busy,6 with a relatively short interval. Repeat it many times, and you should hopefully see a pattern emerge where the same processes (or the same kind of processes) tend to always come up on top.</p>
 		<p>Using the code locations7 and current functions being run, you should be able to identify what kind of code hogs all your schedulers.</p>
-	<h3>System Monitors</h3>
+	<a id="8_2_system_monitors"><h3>8.2 System Monitors</h3></a>
 		<p>If nothing seems to stand out through either profiling or checking reduction counts, it’s possible some of your work ends up being done by NIFs, garbage collections, and so on.</p>
 		<sub>
 			<ol>
@@ -1814,11 +1814,11 @@ monitor=long_schedule pid=<0.54.0> info=[{timeout,1102},
 				<il>9If you’re on 17.0 or newer versions, the shell functions can be made recursive far more simply by using their named form, but to have the widest compatibility possible with older versions of Erlang, I’ve let them as is.</il>
 			</ol>
 		</sub>
-		<h4>Suspended Ports</h4>
+		<a id="8_2_1_suspended_ports"><h4>8.2.1 Suspended Ports</h4></a>
 			<p>An interesting part of system monitors that didn’t fit anywhere but may have to do with scheduling is regarding ports. When a process sends too many message to a port and the port’s internal queue gets full, the Erlang schedulers will forcibly de-schedule the sender until space is freed. This may end up surprising a few users who didn’t expect that implicit back-pressure from the VM.</p>
 			<p>This kind of event can be monitored by passing in the atom busy_port to the system monitor. Specifically for clustered nodes, the atom busy_dist_port can be used to find when a local process gets de-scheduled when contacting a process on a remote node whose inter-node communication was handled by a busy port.</p>
 			<p>If you find out you’re having problems with these, try replacing your sending functions where in critical paths with erlang:port_command(Port, Data, [nosuspend]) for ports, and erlang:send(Pid, Msg, [nosuspend]) for messages to distributed processes. They will then tell you when the message could not be sent and you would therefore have been descheduled.</p>
-	<h3>Exercises</h3>
+	<a id="8_3_exercises"><h3>8.3 Exercises</h3></a>
 		<h4>Review Questions</h4>
 			<ol>
 				<il>What are the two main approaches to pin issues about CPU usages?</il>
@@ -1830,7 +1830,7 @@ monitor=long_schedule pid=<0.54.0> info=[{timeout,1102},
 				<il>If you find that a process doing very little work with reductions ends up being scheduled for long periods of time, what can you guess about it or the code it runs?</il>
 				<il>Can you set up a system monitor and then trigger it with regular Erlang code? Can you use it to find out for how long processes seem to be scheduled on average? You may need to manually start random processes from the shell that are more aggressive in their work than those provided by the existing system.</il>
 			</ol>
-<h2>Chapter 9</h2>
+<a id="chapter_9"><h2>Chapter 9</h2></a>
 <h2>Tracing</h2>
 	<p>One of the lesser known and absolutely under-used features of Erlang and the BEAM virtual machine is just about how much tracing you can do on there.</p>
 	<p>Forget your debuggers, their use is too limited.1 Tracing makes sense in Erlang at all steps of your system’s life cycle, whether it’s for development or for diagnosing a running production system.</p>
@@ -1848,7 +1848,7 @@ monitor=long_schedule pid=<0.54.0> info=[{timeout,1102},
 			<p>2http://www.erlang.org/doc/man/sys.html</p>
 			<p>3http://www.erlang.org/doc/man/dbg.html</p>
 		</sub>
-		<h3>Tracing Principles</h3>
+		<a id="9_1_tracing_principles"><h3>9.1 Tracing Principles</h3></a>
 			<p>The Erlang Trace BIFs allow to trace any Erlang code at all8. They work in two parts: pid specifications, and trace patterns.</p>
 			<p>Pid specifications lets the user decide which processes to target. They can be specific pids, all pids, existing pids, or new pids (those not spawned at the time of the function call).</p>
 			<p>The trace patterns represent functions. Functions can be specified in two parts: specifying the modules, functions, and arity, and then with Erlang match specifications9 to add constraints to arguments.</p>
@@ -1866,7 +1866,7 @@ monitor=long_schedule pid=<0.54.0> info=[{timeout,1102},
 			</sub>
 			<img src="images/trace.png">
 			<p>Figure 9.1: What gets traced is the result of the intersection between the matching pidsand the matching trace patterns</p>
-			<h3>Tracing with Recon</h3>
+			<a id="9_2_tracing_with_recon"><h3>9.2 Tracing with Recon</h3></a>
 				<p>Recon, by default, will match all processes. This will often be good enough for a lotof debugging cases. The interesting part you’ll want to play with most of the time is specification of trace patterns. Recon support a few basic ways to declare them.</p>
 				<p>The most basic form is {Mod, Fun, Arity}, where Mod is a literal module, Fun is a function name, and Arity is the number of arguments of the function to trace. Any of these may also be replaced by wildcards (’_’). Recon will forbid forms that match too widely on everything (such as {’_’,’_’,’_’}), as they could be plain dangerous to run in production.</p>
 				<p>A fancier form will be to replace the arity by a function to match on lists of arguments. The function is limited to those usable by match specifications similar to what is available in ETS10. Finally, multiple patterns can be put into a list to broaden the matching scope.</p>
@@ -1914,7 +1914,7 @@ recon_trace:calls({Mod,Fun,[{’_’, [], [{return_trace}]}]}, Max, Opts)
 					<p>{scope, global | local}</p>
 					<p>By default, only ’global’ (fully qualified function calls) are traced, not calls made internally. To force tracing of local calls, pass in {scope, local}. This is useful whenever you want to track the changes of code in a process that isn’t called with Module:Fun(Args), but just Fun(Args).</p>
 					<p>With these options, the multiple ways to pattern match on specific calls for specific functions and whatnot, a lot of development and production issues can more quickly be diagnosed. If the idea ever comes to say "hm, maybe I should add more logging there to see what could cause that funny behaviour", tracing can usually be a very fast shortcut to get the data you need without deploying any code or altering its readability.</p>
-				<h3>Example Sessions</h3>
+				<a id="9_2_example_sessions"><h3>9.3 Example Sessions</h3></a>
 					<p>First let’s trace the queue:new functions in any process:</p>
 <pre><code class="erlang">1> recon_trace:calls({queue, new, ’_’}, 1).
 1
@@ -1953,7 +1953,7 @@ ok
 					<p>Note that in the pattern above, no specific function (’_’) was matched against. Instead,the fun used restricted functions to those having two arguments, the first of which is eithera list or an integer greater than 1.</p>
 					<p>Be aware that extremely broad patterns with lax rate-limitting (or very high absolutelimits) may impact your node’s stability in ways recon_trace cannot easily help you with.Similarly, tracing extremely large amounts of function calls (all of them, or all of io for example) can be risky if more trace messages are generated than any process on the nodecould ever handle, despite the precautions taken by the library.</p>
 					<p>In doubt, start with the most restrictive tracing possible, with low limits, and progressivelyincrease your scope.</p>
-		<h3>Exercises</h3>
+		<a id="9_4_exercises"><h3>9.4 Exercises</h3></a>
 			<h4>Review Questions</h4>
 				<ol>
 					<il>Why is debugger use generally limited on Erlang?</il>
@@ -1974,7 +1974,7 @@ ok
 					<il>Can you estimate the overall frequency at which messages are sent globally?</il>
 					<il>Can you crash a node using any of the tracing tools? (hint: dbg makes it easier due to its greater flexibility)</il>
 				</ol>
-<h2>Conclusion</h2>
+<a id="conclusion"><h2>Conclusion</h2></a>
 	<p>Maintaining and debugging software never ends. New bugs and confusing behaviours will keep popping up around the place all the time. There would probably be enough stuff out there to fill out dozens of manuals like this one, even when dealing with the cleanest of all systems.</p>
 	<p>I hope that after reading this text, the next time stuff goes bad, it won’t go too bad. Still, there are probably going to be plenty of opportunities to debug production systems. Even the most solid bridges need to be repainted all the time in order avoid corrosion to the point of their collapse.</p>
 	<p>Best of luck to you.</p>

@@ -570,29 +570,25 @@ rebar.config
 						<div>Some application developers may push for no timeout and argue it is OK to wait indefinitely. I typically propose they set the timeout to 30 years. That, in turn, generates a response that I need to be reasonable and not silly. Why is 30 years silly but infinity is reasonable? I have yet to see a messaging application that really wants to wait for an unbounded period of time. . . </div>
 						
 						<sub>
-						There’s a tradeoff between slowing down all requests equally or using rate-limiting, both of which are valid. Rate-limiting per user would mean you’d still need to increase capacity or lower the limits of all users when more new users hammer your system, whereas a synchronous system that indiscriminately blocks should adapt to any load with more ease, but possibly unfairly.
-						<br/>9 Idempotence is Not a Medical Condition, April 14, 2012
+						<p><a id="sub_3_8">8</a> There’s a tradeoff between slowing down all requests equally or using rate-limiting, both of which are valid. Rate-limiting per user would mean you’d still need to increase capacity or lower the limits of all users when more new users hammer your system, whereas a synchronous system that indiscriminately blocks should adapt to any load with more ease, but possibly unfairly.</p>
+						<p><a id="sub_3_9">9</a> Idempotence is Not a Medical Condition, April 14, 2012</p>
 						</sub>
-						<p>This is, ultimately, a case-by-case issue. In many cases, it may be more practical to use a different mechanism for that flow control.10 </p>
+						<p>This is, ultimately, a case-by-case issue. In many cases, it may be more practical to use a different mechanism for that flow control.<a href="#sub_3_10">10</a> </p>
 						<a id="3_2_2_asking_for_permission"><h4>3.2.2 Asking For Permission</h4></a>
 						<p>A somewhat simpler approach to back-pressure is to identify the resources we want to block on, those that cannot be made faster and are critical to your business and users. Lock these resources behind a module or procedure where a caller must ask for the right to make a request and use them. There’s plenty of variables that can be used: memory, CPU, overall load, a bounded number of calls, concurrency, response times, a combination of them, and so on.</p>
 						
-						<p>The SafetyValve 11 application is a system-wide framework that can be used when you know back-pressure is what you’ll need. </p>
-						<p>For more specific use cases having to do with service or system failures, there are plenty of circuit breaker applications available. Examples include breaky12 , fuse13, or Klarna’s circuit_breaker14.</p>
+						<p>The SafetyValve <a href="sub_3_11">11</a> application is a system-wide framework that can be used when you know back-pressure is what you’ll need. </p>
+						<p>For more specific use cases having to do with service or system failures, there are plenty of circuit breaker applications available. Examples include breaky<a href="sub_3_12">12</a> , fuse <a href="sub_3_13">13</a>, or Klarna’s circuit_breaker <a href="sub_3_14">14</a>.</p>
 						<p>Otherwise, ad-hoc solutions can be written using processes, ETS, or any other tool available. The important part is that the edge of the system (or subsystem) may block and ask for the right to process data, but the critical bottleneck in code is the one to determine whether that right can be granted or not. </p>
 						<p>The advantage of proceeding that way is that you may just avoid all the tricky stuff about timers and making every single layer of abstraction synchronous. You’ll instead put guards at the bottleneck and at a given edge or control point, and everything in between can be expressed in the most readable way possible.</p>
 						<a id="3_2_3_what_users_see"> <h4>3.2.2 What Users See</h4></a>
 						<p>The tricky part about back-pressure is reporting it. When back-pressure is done implicitly through synchronous calls, the only way to know it is at work due to overload is that the system becomes slower and less usable. Sadly, this is also going to be a potential symptom of bad hardware, bad network, unrelated overload, and possibly a slow client.</p>
 						<p>Trying to figure out that a system is applying back-pressure by measuring its responsiveness is equivalent to trying to diagnose which illness someone has by observing that person has a fever. It tells you something is wrong, but not what.</p>
-						<sub>10 In Erlang, using the value infinity will avoid 	creating a timer, avoiding some resources. If you do use this, remember to at least have a well-defined timeout somewhere in the sequence of calls.
-						<br/>11
-						https://github.com/jlouis/safetyvalve
-						<br/>12
-						https://github.com/mmzeeman/breaky
-						<br/>13
-						https://github.com/jlouis/fuse
-						<br/>14
-						https://github.com/klarna/circuit_breaker
+						<sub><p>10 In Erlang, using the value infinity will avoid 	creating a timer, avoiding some resources. If you do use this, remember to at least have a well-defined timeout somewhere in the sequence of calls.</p>
+						<p><a id="sub_3_11">11</a>	<a href="https://github.com/jlouis/safetyvalve">https://github.com/jlouis/safetyvalve</a></p>
+						<p><a id="sub_3_11">12</a>	<a href="https://github.com/mmzeeman/breaky">https://github.com/mmzeeman/breaky</a></p>
+						<p><a id="sub_3_11">13</a>	<a href="https://github.com/jlouis/fuse">https://github.com/jlouis/fuse</a></p>
+						<p><a id="sub_3_11">14</a> <a href="https://github.com/klarna/circuit_breaker">https://github.com/klarna/circuit_breaker</a></p>
 						</sub>
 						<p>Asking for permission, as a mechanism, will generally allow you to define your interface in such a way that you can explicitly report what is going on: the system as a whole is overloaded, or you’re hitting a limit into the rate at which you can perform an operation and adjust accordingly. </p>
 						
@@ -603,6 +599,7 @@ rebar.config
 						<p>Per-account limits, on the other hand, tend to be very fair, and allow fancy schemes such as having premium users who can go above the usual limits. This is extremely nice, but has the downside that the more users use your system, the higher the effective global system limit tends to move. Starting with 100 users that can do 100 requests a minute gives you a global 10000 requests per minute. Add 20 new users with that same rate allowed, and suddenly you may crash a lot more often.</p>
 						
 						<p>The safe margin of error you established when designing the system slowly erodes as more people use it. It’s important to consider the tradeoffs your business can tolerate from that point of view, because users will tend not to appreciate seeing their allowed usage go down all the time, possibly even more so than seeing the system go down entirely from time to time.</p>
+						
 						<a id="3_3_discarding_data"><h3>3.3 Discarding Data</h3></a>
 						<p>When nothing can slow down outside of your Erlang system and things can’t be scaled up, you must either drop data or crash (which drops data that was in flight, for most cases, but with more violence).</p>
 						<p>It’s a sad reality that nobody really wants to deal with. Programmers, software engineers, and computer scientists are trained to purge the useless data, and keep everything that’s useful. Success comes through optimization, not giving up.</p>
@@ -629,12 +626,12 @@ end.</code></pre>
 						<p>There is one ‘gotcha’ to this method, though: the random drop must ideally be done at the producer level rather than at the queue (the receiver) level. The best way to avoid overloading a queue is to not send data its way in the first place. Because there are no bounded mailboxes in Erlang, dropping in the receiving process only guarantees that this process will be spinning wildly, trying to get rid of messages, and fighting the schedulers to do actual work.</p>
 						<p>On the other hand, dropping at the producer level is guaranteed to distribute the work equally across all processes.</p>
 						
-						<p>This can give place to interesting optimizations where the working process or a given monitor process15 uses values in an ETS table or application:set_env/3 to dynamically increase and decrease the threshold to be used with the random number. This allows control over how many messages are dropped based on overload, and the configuration data can be fetched by any process rather efficiently by using application:get_env/2.</p>
+						<p>This can give place to interesting optimizations where the working process or a given monitor process <a href="#sub_3_15">15</a> uses values in an ETS table or application:set_env/3 to dynamically increase and decrease the threshold to be used with the random number. This allows control over how many messages are dropped based on overload, and the configuration data can be fetched by any process rather efficiently by using application:get_env/2.</p>
 						
 						<p>Similar techniques could also be used to implement different drop ratios for different message priorities, rather than trying to sort it all out at the consumer level.</p>
 						
-						<sub>15
-						Any process tasked with checking the load of specific processes using heuristics such as process_info(Pid, message_queue_len) could be a monitor
+						<sub><p><a id="sub_3_15">15</a>
+							Any process tasked with checking the load of specific processes using heuristics such as process_info(Pid, message_queue_len) could be a monitor</p>
 						</sub>
 						<a id="3_3_2_queue_buffers"> <h4>3.3.2 Queue Buffers</h4> </a>
 						<p>Queue buffers are a good alternative when you want more control over the messages you get rid of than with random drops, particularly when you expect overload to be coming in bursts rather than a constant stream in need of thinning.</p>
@@ -642,31 +639,30 @@ end.</code></pre>
 						
 						<ul>
 							<li>The regular process you’d work with (likely a gen_server);</li>
-							<li>A new process that will do nothing but buffer the messages. Messages from theoutside should go to this process.</li>
+							<li>A new process that will do nothing but buffer the messages. Messages from the outside should go to this process.</li>
 						</ul>
 						
-						<p>To make things work, the buffer process only has to remove all the messages it can from its mail box and put them in a queue data structure16 it manages on its own. Whenever the server is ready to do more work, it can ask the buffer process to send it a given number of messages that it can work on. The buffer process picks them from its queue, forwards them to the server, and goes back to accumulating data. </p>
+						<p>To make things work, the buffer process only has to remove all the messages it can from its mail box and put them in a queue data structure <a href="#sub_3_16">16</a> it manages on its own. Whenever the server is ready to do more work, it can ask the buffer process to send it a given number of messages that it can work on. The buffer process picks them from its queue, forwards them to the server, and goes back to accumulating data. </p>
 						
-						<p>Whenever the queue grows beyond a certain size17 and you receive a new message, you can then pop the oldest one and push the new one in there, dropping the oldest elements as you go.18 </p>
+						<p>Whenever the queue grows beyond a certain size <a href="#sub_3_17">17</a> and you receive a new message, you can then pop the oldest one and push the new one in there, dropping the oldest elements as you go. <a href="#sub_3_18">18</a> </p>
 						
 						<p>This should keep the entire number of messages received to a rather stable size and provide a good amount of resistance to overload, somewhat similar to the functional version of a ring buffer.</p>
 						
-						<p>The PO Box 19 library implements such a queue buffer.</p>
+						<p>The PO Box <a href="#sub_3_19">19</a> library implements such a queue buffer.</p>
 						
 						<a id="3_3_3_stack_buffers"> <h4>3.3.3 Stack Buffers </h4></a>
 						<p>Stack buffers are ideal when you want the amount of control offered by queue buffers, but you have an important requirement for low latency.</p>
 						
-						<p>To use a stack as a buffer, you’ll need two processes, just like you would with queue buffers, but a list20 will be used instead of a queue data structure.</p>
+						<p>To use a stack as a buffer, you’ll need two processes, just like you would with queue buffers, but a list <a href="#sub_3_20">20</a> will be used instead of a queue data structure.</p>
 						
 						<sub>
-						16
-						The queue module in Erlang provides a purely functional queue data structure that can work fine for such a buffer.
-						<br/>17 To calculate the length of a queue, it is preferable to use a counter that gets incremented and decremented on each message sent or received, rather than iterating over the queue every time. It takes slightly more memory, but will tend to distribute the load of counting more evenly, helping predictability and avoiding more sudden build-ups in the buffer’s mailbox
-						<br/>18 You can alternatively make a queue that pops the newest message and queues up the oldest ones if you feel previous data is more important to keep.
-						<br/>19 Available at: https://github.com/ferd/pobox, the library has been used in production for a long time in large scale products at Heroku and is considered mature
-						<br/>20 Erlang lists are stacks, for all we care. They provide push and pop operations that take O(1) complexity and are very fast
+						<p><a id="sub_3_16">16</a>	The queue module in Erlang provides a purely functional queue data structure that can work fine for such a buffer.</p>
+						<p><a id="sub_3_17">17</a> To calculate the length of a queue, it is preferable to use a counter that gets incremented and decremented on each message sent or received, rather than iterating over the queue every time. It takes slightly more memory, but will tend to distribute the load of counting more evenly, helping predictability and avoiding more sudden build-ups in the buffer’s mailbox</p>
+						<p><a id="sub_3_18">18</a> You can alternatively make a queue that pops the newest message and queues up the oldest ones if you feel previous data is more important to keep.</p>
+						<p><a id="sub_3_19">19</a> Available at: <a href="https://github.com/ferd/pobox">https://github.com/ferd/pobox</a>, the library has been used in production for a long time in large scale products at Heroku and is considered mature</p>
+						<p><a id="sub_3_20">20</a> Erlang lists are stacks, for all we care. They provide push and pop operations that take O(1) complexity and are very fast</p>
 						</sub>
-						<p>The reason the stack buffer is particularly good for low latency is related to issues similar to bufferbloat21. If you get behind on a few messages being buffered in a queue, all the messages in the queue get to be slowed down and acquire milliseconds of wait time. Eventually, they all get to be too old and the entire buffer needs to be discarded.</p>
+						<p>The reason the stack buffer is particularly good for low latency is related to issues similar to bufferbloat <a href="#sub_3_21">21</a>. If you get behind on a few messages being buffered in a queue, all the messages in the queue get to be slowed down and acquire milliseconds of wait time. Eventually, they all get to be too old and the entire buffer needs to be discarded.</p>
 						
 						<p>On the other hand, a stack will make it so only a restricted number of elements are kept waiting while the newer ones keep making it to the server to be processed in a timely manner.</p>
 						
@@ -689,7 +685,7 @@ end.</code></pre>
 						
 						<p>ETS tables are generally able to handle a ton more requests per second than a process, but the operations they support are a lot more basic. A single read, or adding or removing from a counter atomically is as fancy as you should expect things to get for the general case.</p>
 						
-						<sub>21 http://queue.acm.org/detail.cfm?id=2071893</sub>
+						<sub><a id="sub_3_21">21</a> http://queue.acm.org/detail.cfm?id=2071893</sub>
 						
 						<p>ETS tables will be required for both approaches.</p>
 						
@@ -697,24 +693,24 @@ end.</code></pre>
 						
 						<p>In practice, though, we want to avoid atoms generated dynamically, so I tend to prefer to register workers in an ETS table with read_concurrency set to true. It’s a bit more work, but it gives more flexibility when it comes to updating the number of workers later on.</p>
 						
-						<p>An approach similar to this one is used in the lhttpc22 library mentioned earlier, to split load balancers on a per-domain basis. </p>
+						<p>An approach similar to this one is used in the lhttpc <a href="#sub_3_22">22</a> library mentioned earlier, to split load balancers on a per-domain basis. </p>
 						
-						<p>For the second approach, using counters and locks, the same basic structure still remains (pick one of many options, send it a message), but before actually sending a message, you must atomically update an ETS counter23 . There is a known limit shared across all clients (either through their supervisor, or any other config or ETS value) and each request that can be made to a process needs to clear this limit first.</p>
+						<p>For the second approach, using counters and locks, the same basic structure still remains (pick one of many options, send it a message), but before actually sending a message, you must atomically update an ETS counter <a href="#sub_3_23">23</a> . There is a known limit shared across all clients (either through their supervisor, or any other config or ETS value) and each request that can be made to a process needs to clear this limit first.</p>
 						
-						<p>This approach has been used in dispcount24 to avoid message queues, and to guarantee low-latency responses to any message that won’t be handled so that you do not need to wait to know your request was denied. It is then up to the user of the library whether to give up as soon as possible, or to keep retrying with different workers. </p>
+						<p>This approach has been used in dispcount <a href="#sub_3_24">24</a> to avoid message queues, and to guarantee low-latency responses to any message that won’t be handled so that you do not need to wait to know your request was denied. It is then up to the user of the library whether to give up as soon as possible, or to keep retrying with different workers. </p>
 						<a id="3_3_6_how_to_drop"><h4>3.3.6 How Do You Drop</h4></a>
 						<p>Most of the solutions outlined here work based on message quantity, but it’s also possible to try and do it based on message size, or expected complexity, if you can predict it. When using a queue or stack buffer, instead of counting entries, all you may need to do is count their size or assign them a given load as a limit. </p>
-						<p>I’ve found that in practice, dropping without regard to the specifics of the message works rather well, but each application has its share of unique compromises that can be acceptable or not25. </p>
+						<p>I’ve found that in practice, dropping without regard to the specifics of the message works rather well, but each application has its share of unique compromises that can be acceptable or not <a href="#sub_3_25">25</a>. </p>
 						<sub>
-						22 The lhttpc_lb module in this library implements it.
+						<p><a id="sub_3_22">22</a> The <a href="https://github.com/ferd/lhttpc/blob/master/src/lhttpc_lb.erl">lhttpc_lb</a> module in this library implements it.</p>
 						
-						<br/>23 By using ets:update_counter/3.
+						<p><a id="sub_3_23">23</a> By using ets:update_counter/3.</p>
 						
-						<br/>24 https://github.com/ferd/dispcount
-						<br/>25 Old papers such as Hints for Computer System Designs by Butler W. Lampson recommend dropping messages: "Shed load to control demand, rather than allowing the system to become overloaded." The paper also mentions that "A system cannot be expected to function well if the demand for any resource exceeds two-thirds of the capacity, unless the load can be characterized extremely well." adding that "The only systems in which cleverness has worked are those with very well-known loads."
+						<p><a id="sub_3_24">24</a> <a href="https://github.com/ferd/dispcount">https://github.com/ferd/dispcount</a></p>
+						<p><a id="sub_3_25">25</a> Old papers such as <a href="http://research.microsoft.com/en-us/um/people/blampson/33-hints/webpage.html">Hints for Computer System Designs</a> by Butler W. Lampson recommend dropping messages: "Shed load to control demand, rather than allowing the system to become overloaded." The paper also mentions that "A system cannot be expected to function well if the demand for any resource exceeds two-thirds of the capacity, unless the load can be characterized extremely well." adding that "The only systems in which cleverness has worked are those with very well-known loads."</p>
 						</sub>
 						
-						<p>There are also cases where the data is sent to you in a "fire and forget" manner — the entire system is part of an asynchronous pipeline — and it proves difficult to provide feedback to the end-user about why some requests were dropped or are missing. If you can reserve a special type of message that accumulates dropped responses and tells the user "N messages were dropped for reason X", that can, on its own, make the compromise far more acceptable to the user. This is the choice that was made with Heroku’s logplex log routing system, which can spit out L10 errors, alerting the user that a part of the system can’t deal with all the volume right now.</p>
+						<p>There are also cases where the data is sent to you in a "fire and forget" manner — the entire system is part of an asynchronous pipeline — and it proves difficult to provide feedback to the end-user about why some requests were dropped or are missing. If you can reserve a special type of message that accumulates dropped responses and tells the user "N messages were dropped for reason X", that can, on its own, make the compromise far more acceptable to the user. This is the choice that was made with Heroku’s <a href="https://devcenter.heroku.com/articles/logplex">logplex</a> log routing system, which can spit out <a href="https://devcenter.heroku.com/articles/error-codes#l10-drain-buffer-overflow">L10 errors</a>, alerting the user that a part of the system can’t deal with all the volume right now.</p>
 						
 						<p>In the end, what is acceptable or not to deal with overload tends to depend on the humans that use the system. It is often easier to bend the requirements a bit than develop new technology, but sometimes it is just not avoidable. </p>
 						<a id="3_4_exercises"><h3>3.4 Exercises</h3></a>
@@ -737,25 +733,25 @@ end.</code></pre>
 							<li>What are the risks, for a user, when dropping or blocking a request? How can we prevent duplicate messages or missed ones?</li>
 							<li>What can you expect to happen to your API design if you forget to deal with overload, and suddenly need to add back-pressure or load-shedding to it?</li>
 						</ol>
-						<a id="part_ii"><h1>Part II</h1></a>
-						<h1>Diagnosing Applications</h1>
-						<a id="chapter_4"><h2>Chapter 4</h2> </a>
-						<h2>Connecting to Remote Nodes</h2>
-						<p>Interacting with a running server program is traditionally done in one of two ways. One is to do it through an interactive shell kept available by using a screen or tmux session that runs in the background and letting someone connect to it. The other is to program management functions or comprehensive configuration files that can be dynamically reloaded.</p>
+		<a id="part_ii"><h1>Part II</h1></a>
+		<h1>Diagnosing Applications</h1>
+			<a id="chapter_4"><h2>Chapter 4</h2> </a>
+			<h2>Connecting to Remote Nodes</h2>
+				<p>Interacting with a running server program is traditionally done in one of two ways. One is to do it through an interactive shell kept available by using a screen or tmux session that runs in the background and letting someone connect to it. The other is to program management functions or comprehensive configuration files that can be dynamically reloaded.</p>
 						
-						<p>The interactive session approach is usually okay for software that runs in a strict Read-Eval-Print-Loop (REPL). The programmed management and configuration approach requires careful planning in whatever tasks you think you’ll need to do, and hopefully getting it right. Pretty much all systems can try that approach, so I’ll skip it given I’m somewhat more interested in the cases where stuff is already bad and no function exists for it.</p>
+				<p>The interactive session approach is usually okay for software that runs in a strict Read-Eval-Print-Loop (REPL). The programmed management and configuration approach requires careful planning in whatever tasks you think you’ll need to do, and hopefully getting it right. Pretty much all systems can try that approach, so I’ll skip it given I’m somewhat more interested in the cases where stuff is already bad and no function exists for it.</p>
 						
-						<p>Erlang uses something closer to an "interactor" than a REPL. Basically, a regular Erlang virtual machine does not need a REPL, and will happily run byte code and stick with that, no shell needed. However, because of how it works with concurrency and multiprocessing, and good support for distribution, it is possible to have in-software REPLs that run as arbitrary Erlang processes.</p>
+				<p>Erlang uses something closer to an "interactor" than a REPL. Basically, a regular Erlang virtual machine does not need a REPL, and will happily run byte code and stick with that, no shell needed. However, because of how it works with concurrency and multiprocessing, and good support for distribution, it is possible to have in-software REPLs that run as arbitrary Erlang processes.</p>
 						
-						<p>This means that, unlike a single screen session with a single shell, it’s possible to have as many Erlang shells connected and interacting with one virtual machine as you want at a time1.</p>
-						<p>Most common usages will depend on a cookie being present on the two nodes you want to connect together2, but there are ways to do it that do not include it. Most usages will also require the use of named nodes, and all of them will require a priori measures to make sure you can contact the node.</p>
-						<sub>
-						1 More details on the mechanisms at http://ferd.ca/repl-a-bit-more-and-less-than-that.html
-						<br/>2 More details at  http://learnyousomeerlang.com/distribunomicon#cookies http://www.erlang.org/doc/reference_manual/distributed.html#id83619
-						</sub>
-						<a id="4_1_job_control_mode"><h3>4.1 Job Control Mode </h3></a>
+				<p>This means that, unlike a single screen session with a single shell, it’s possible to have as many Erlang shells connected and interacting with one virtual machine as you want at a time1.</p>
+				<p>Most common usages will depend on a cookie being present on the two nodes you want to connect together2, but there are ways to do it that do not include it. Most usages will also require the use of named nodes, and all of them will require a priori measures to make sure you can contact the node.</p>
+				<sub>
+					1 More details on the mechanisms at http://ferd.ca/repl-a-bit-more-and-less-than-that.html
+					<br/>2 More details at  http://learnyousomeerlang.com/distribunomicon#cookies http://www.erlang.org/doc/reference_manual/distributed.html#id83619
+				</sub>
+				<a id="4_1_job_control_mode"><h3>4.1 Job Control Mode </h3></a>
 						
-						<p>The Job Control Mode (JCL mode) is the menu you get when you press ˆG in the Erlang shell. From that menu, there is an option allowing you to connect to a remote shell:</p>
+					<p>The Job Control Mode (JCL mode) is the menu you get when you press ˆG in the Erlang shell. From that menu, there is an option allowing you to connect to a remote shell:</p>
 <pre>
 <code class="erlang">(somenode@ferdmbp.local)1>
 User switch command
@@ -772,26 +768,26 @@ q  - quit erlang
 --> c
 Eshell Vx.x.x (abort with ^G)
 (server@ferdmbp.local)1></code></pre>
-						<p>When that happens, the local shell runs all the line editing and job management locally, but the evaluation is actually done remotely. All output coming from said remote evaluation will be forwarded to the local shell.</p>
-						<p>To quit the shell, go back in the JCL mode with ˆG. This job management is, as I said, done locally, and it is thus safe to quit with ˆG q:</p>
+					<p>When that happens, the local shell runs all the line editing and job management locally, but the evaluation is actually done remotely. All output coming from said remote evaluation will be forwarded to the local shell.</p>
+					<p>To quit the shell, go back in the JCL mode with ˆG. This job management is, as I said, done locally, and it is thus safe to quit with ˆG q:</p>
 <pre>
 <code class="erlang">(server@ferdmbp.local)1>
 User switch command
 --> q
 </code>
 </pre>
-						<p>You may choose to start the initial shell in hidden mode (with the argument -hidden) to avoid connecting to an entire cluster automatically. </p>
-						<a id="4_2_remsh"><h3>4.2 Remsh</h3></a>
-						<p>There’s a mechanism entirely similar to the one available through the JCL mode, although	invoked in a different manner. The entire JCL mode sequence can by bypassed by starting	the shell as follows for long names: </p>
+					<p>You may choose to start the initial shell in hidden mode (with the argument -hidden) to avoid connecting to an entire cluster automatically. </p>
+			<a id="4_2_remsh"><h3>4.2 Remsh</h3></a>
+				<p>There’s a mechanism entirely similar to the one available through the JCL mode, although	invoked in a different manner. The entire JCL mode sequence can by bypassed by starting	the shell as follows for long names: </p>
 <pre><code class="erlang">erl -name local@domain.name -remsh remote@domain.name
 </code></pre>
-						<p>And as follows for short names:</p>
+				<p>And as follows for short names:</p>
 						
 <pre><code class="erlang">erl -sname local@domain -remsh remote@domain</code></pre>
-						<p>All other Erlang arguments (such as -hidden and -setcookie $COOKIE) are also valid. The underlying mechanisms are the same as when using JCL mode, but the initial shell is started remotely instead of locally (JCL is still local). ˆG remains the safest way to exit the remote shell. </p>
-												<a id="4_3_ssh_daemon"><h3>4.3 SSH Daemon</h3></a>
-						<p>Erlang/OTP comes shipped with an SSH implementation that can both act as a server and a client. Part of it is a demo application providing a remote shell working in Erlang.</p>
-						<p>To get this to work, you usually need to have your keys to have access to SSH stuff remotely in place already, but for quick test purposes, you can get things working by doing:</p>
+				<p>All other Erlang arguments (such as -hidden and -setcookie $COOKIE) are also valid. The underlying mechanisms are the same as when using JCL mode, but the initial shell is started remotely instead of locally (JCL is still local). ˆG remains the safest way to exit the remote shell. </p>
+				<a id="4_3_ssh_daemon"><h3>4.3 SSH Daemon</h3></a>
+					<p>Erlang/OTP comes shipped with an SSH implementation that can both act as a server and a client. Part of it is a demo application providing a remote shell working in Erlang.</p>
+					<p>To get this to work, you usually need to have your keys to have access to SSH stuff remotely in place already, but for quick test purposes, you can get things working by doing:</p>
 <pre>
 <code class="erlang">$ mkdir /tmp/ssh
 $ ssh-keygen -t rsa -f /tmp/ssh/ssh_host_rsa_key
@@ -804,9 +800,9 @@ $ erl
 2>  {user_dir, "/home/ferd/.ssh"}]).
 {ok,<0.52.0>}
 </code></pre>
-						<p>I’ve only set a few options here, namely system_dir, which is where the host files are, and user_dir, which contains SSH configuration files. There are plenty of other options available to allow for specific passwords, customize handling of public keys, and so on3 .</p>
+					<p>I’ve only set a few options here, namely system_dir, which is where the host files are, and user_dir, which contains SSH configuration files. There are plenty of other options available to allow for specific passwords, customize handling of public keys, and so on3 .</p>
 						
-						<p>To connect to the daemon, any SSH client will do:</p>
+					<p>To connect to the daemon, any SSH client will do:</p>
 <pre>
 <code class="erlang">$ ssh -p 8989 ferd@127.0.0.1
 Eshell Vx.x.x (abort with ^G)

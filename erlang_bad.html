@@ -353,8 +353,11 @@ dispcount_supersup, dispcount_watcher, watchers_sup]}
 						<h2>Building Open Source Erlang	Software</h2>
 						<p>Most Erlang books tend to explain how to build Erlang/OTP applications, but few of them go very much in depth about how to integrate with the Erlang community doing Open Source work. Some of them even avoid the topic on purpose. This chapter dedicates itself to doing a quick tour of the state of affairs in Erlang.</p>
 						<p>OTP applications are the vast majority of the open source code people will encounter. In fact, many people who would need to build an OTP release would do so as one umbrella OTP application.</p>
-						<p>If what you’re writing is a stand-alone piece of code that could be used by someone building a product, it’s likely an OTP application. If what you’re building is a product that stands on its own and should be deployed by users as-is (or with a little  configuration), what you should be building is an OTP release.</p>
+						<p>If what you’re writing is a stand-alone piece of code that could be used by someone building a product, it’s likely an OTP application. If what you’re building is a product that stands on its own and should be deployed by users as-is (or with a little  configuration), what you should be building is an OTP release. <a href="#sub_2_1">1</a></p>
 						<p>The main build tools supported are rebar and erlang.mk. The former is a portable Erlang script that will be used to wrap around a lot of standard functionality and add its own, while the latter is a very fancy makefile that does a bit less, but tends to be faster when it comes to compiling. In this chapter, I’ll mostly focus on using rebar to build things, given it’s the ad-hoc standard, is well-established, and erlang.mk applications tend to also be supported by rebar as dependencies.</p>
+						<sub>
+							<p><a id="sub_2_1">1</a> The details of how to build an OTP application or release is left up to the Erlang introduction book you have at hand.</p>
+						</sub>
 						<a id="2_1_project_structure"><h3>2.1 Project Structure</h3></a>
 						<p>The structures of OTP applications and of OTP releases are different. An OTP application can be expected to have one top-level supervisor (if any) and possibly a bunch of dependencies that sit below it. An OTP release will usually be composed of multiple OTP applications, which may or may not depend on each other. This will lead to two major ways to lay out applications.</p>
 						<a id="2_1_1_otp_applications"><h4>2.1.1 OTP Applications</h4></a>
@@ -368,27 +371,27 @@ dispcount_supersup, dispcount_watcher, watchers_sup]}
 7 README.md
 8 rebar.config</code></pre>
 						<p>What’s new in this one is the deps/ directory, which is fairly useful to have, but that
-						will be generated automatically by rebar2 if necessary. That’s because there is no canonical package management in Erlang. People instead adopted rebar, which fetches dependencies locally, on a per-project basis. This is fine and removes a truckload of conflicts, but means that each project you have may have to download its own set of dependencies</p>
+						will be generated automatically by rebar <a href="#sub_2_2">2</a>  if necessary. That’s because there is no canonical package management in Erlang. People instead adopted rebar, which fetches dependencies locally, on a per-project basis. This is fine and removes a truckload of conflicts, but means that each project you have may have to download its own set of dependencies</p>
 						<p>This is accomplished with rebar by adding a few config lines to rebar.config:</p>
 						
 <pre><code class="erlang">1 {deps,
 2 [{application_name, "1.0.*",
-3 {git, "git://github.com/user/myapp.git", {branch,"master"}}},
+3  {git, "git://github.com/user/myapp.git", {branch,"master"}}},
 4 {application_name, "2.0.1",
-5 {git, "git://github.com/user/hisapp.git", {tag,"2.0.1"}}},
+5  {git, "git://github.com/user/hisapp.git", {tag,"2.0.1"}}},
 6 {application_name, "",
-7 {git, "https://bitbucket.org/user/herapp.git", "7cd0aef4cd65"}},
+7  {git, "https://bitbucket.org/user/herapp.git", "7cd0aef4cd65"}},
 8 {application_name, "my regex",
-9 		{hg, "https://bitbucket.org/user/theirapp.hg" {branch, "stable"}}}]}.</code></pre>
+9  {hg, "https://bitbucket.org/user/theirapp.hg" {branch, "stable"}}}]}.</code></pre>
 						<sub>
-						2A lot of people package rebar directly in their application. This was initially done to help people who had never used rebar before use libraries and projects in a boostrapped manner. Feel free to install rebar globally on your system, or keep a local copy if you require a specific version to build your system.
+							<a id="sub_2_2">2</a> A lot of people package <!a>rebar directly in their application. This was initially done to help people who had never used rebar before use libraries and projects in a boostrapped manner. Feel free to install rebar globally on your system, or keep a local copy if you require a specific version to build your system.
 						</sub>
 						<p>Applications are fetched directly from a git (or hg, or svn) source, recursively. They can then be compiled, and specific compile options can be added with the {erl_opts, List}.
-						option in the config file3.</p>
+						option in the config file <a href="#sub_2_3">3</a>.</p>
 						<p>Within these directories, you can do your regular development of an OTP application. To compile them, call rebar get-deps compile, which will download all dependencies, and then build them and your app at once.</p>
 						<p>When making your application public to the world, distribute it without the dependencies. It’s quite possible that other developers’ applications depend on the same applications yours do, and it’s no use shipping them all multiple times. The build system in place (in this case, rebar) should be able to figure out duplicated entries and fetch everything necessary only once.</p>
 						<a id="2_1_2_otp_releases4"><h4>2.1.2 OTP Releases</h4></a>
-						<p>For releases, the structure should be a bit different4. Releases are collections of applications, and their structures should reflect that</p>
+						<p>For releases, the structure should be a bit different <a href="#sub2_4">4</a>. Releases are collections of applications, and their structures should reflect that</p>
 						<p>Instead of having a top-level app, applications should be nested one level deeper and  divided into two categories: apps and deps. The apps directory contains your applications’ source code (say, internal business code), and the deps directory contains independently managed dependency applications.</p>
 <pre><code class="erlang">apps/
 doc/
@@ -397,7 +400,7 @@ LICENSE.txt
 README.md
 rebar.config
 </code></pre>
-						<p>This structure lends itself to generating releases. Tools such as Systool and Reltool have been covered before5, and can allow the user plenty of power. An easier tool that recently appeared is relx6.</p>
+						<p>This structure lends itself to generating releases. Tools such as Systool and Reltool have been covered before <a href="#sub_2_5">5</a>, and can allow the user plenty of power. An easier tool that recently appeared is relx <a href="#sub_2_6">6</a>.</p>
 						<p>A relx configuration file for the directory structure above would look like:</p>
 <pre>
 <code class="erlang">1 {paths, ["apps", "deps"]}.
@@ -410,10 +413,10 @@ rebar.config
 8 ...
 9 	recon]}.</code></pre>
 						<sub>
-						<br/>3More details by calling rebar help compile
-						<br/>4I say should because many Erlang developers put their final system under a single top-level application (in src) and a bunch of follower ones as dependencies (in deps), which is less than ideal for distribution purposes and conflicts with assumptions on directory structures made by OTP. People who do that tend to build from source on the production servers and run custom commands to boot their applications.
-						<br/>5http://learnyousomeerlang.com/release-is-the-word
-						<br/>6https://github.com/erlware/relx/wiki
+							<p><a id="sub_2_3">3</a> More details by calling rebar help compile</p>
+							<p><a id="sub_2_4">4</a> I say should because many Erlang developers put their final system under a single top-level application (in src) and a bunch of follower ones as dependencies (in deps), which is less than ideal for distribution purposes and conflicts with assumptions on directory structures made by OTP. People who do that tend to build from source on the production servers and run custom commands to boot their applications.</p>
+							<p><a id="sub_2_4">5</a> <a href="http://learnyousomeerlang.com/release-is-the-word">http://learnyousomeerlang.com/release-is-the-word</a></p>
+							<p><a id="sub_2_6">6</a> <a href="https://github.com/erlware/relx/wiki">https://github.com/erlware/relx/wiki</a></p>
 						</sub>
 						<p>Calling ./relx (if the executable is in the current directory) will build a release, to be found in the _rel/ directory. If you really like using rebar, you can build a release as part of the project’s compilation by using a rebar hook in rebar.config:</p>
 <pre><code>1 {post_hooks,[{compile, "./relx"}]}.</code></pre>
@@ -421,23 +424,25 @@ rebar.config
 						And every time rebar compile will be called, the release will be generated.
 						</p>
 						<a id="2_2_supervisors_and_start_link_semantics"><h3>2.2 Supervisors and start_link Semantics</h3></a>
-							<p>In complex production systems, most faults and errors are transient, and retrying an operation is a good way to do things — Jim Gray’s paper7 quotes Mean Times Between Failures (MTBF) of systems handling transient bugs being better by a factor of 4 when doing this. Still, supervisors aren’t just about restarting</p>
+							<p>In complex production systems, most faults and errors are transient, and retrying an operation is a good way to do things — Jim Gray’s paper <a href="#sub_2_7">7</a> quotes Mean Times Between Failures (MTBF) of systems handling transient bugs being better by a factor of 4 when doing this. Still, supervisors aren’t just about restarting.</p>
 							<p>One very important part of Erlang supervisors and their supervision trees is that their start phases are synchronous. Each OTP process has the potential to prevent its siblings and cousins from booting. If the process dies, it’s retried again, and again, until it works, or fails too often.</p>
 							<p>That’s where people make a very common mistake. There isn’t a backoff or cooldown period before a supervisor restarts a crashed child. When a network-based application tries to set up a connection during its initialization phase and the remote service is down, the application fails to boot after too many fruitless restarts. Then the system may shut down.</p>
 							<p>Many Erlang developers end up arguing in favor of a supervisor that has a cooldown period. I strongly oppose the sentiment for one simple reason: it’s all about the guarantees.</p>
 						<a id="2_2_1_its_about_the_guarantees"><h4>2.2.1 It’s About the Guarantees</h4></a>
 							<p>Restarting a process is about bringing it back to a stable, known state. From there, things can be retried. When the initialization isn’t stable, supervision is worth very little. An initialized process should be stable no matter what happens. That way, when its siblings and cousins get started later on, they can be booted fully knowing that the rest of the system that came up before them is healthy.</p>
-							<sub>7http://mononcqc.tumblr.com/post/35165909365/why-do-computers-stop</sub>
+							<sub>
+								<p><a id="sub_2_7"> 7</a> <a href="http://mononcqc.tumblr.com/post/35165909365/why-do-computers-stop">http://mononcqc.tumblr.com/post/35165909365/why-do-computers-stop</a></p>
+							</sub>
 							<p>If you don’t provide that stable state, or if you were to start the entire system asynchronously, you would get very little benefit from this structure that a try ... catch in a loop wouldn’t provide.</p>
 							<p>Supervised processes provide guarantees in their initialization phase, not a best effort. This means that when you’re writing a client for a database or service, you shouldn’t need a connection to be established as part of the initialization phase unless you’re ready to say it will always be available no matter what happens.</p>
 							<p>You could force a connection during initialization if you know the database is on the same host and should be booted before your Erlang system, for example. Then a restart should work. In case of something incomprehensible and unexpected that breaks these guarantees, the node will end up crashing, which is desirable: a pre-condition to starting your system hasn’t been met. It’s a system-wide assertion that failed.</p>
-							<p>If, on the other hand, your database is on a remote host, you should expect the connection to fail. It’s just a reality of distributed systems that things go down.8 In this case, the only guarantee you can make in the client process is that your client will be able to handle requests, but not that it will communicate to the database. It could return {error, not_connected} on all calls during a net split, for example.</p>
+							<p>If, on the other hand, your database is on a remote host, you should expect the connection to fail. It’s just a reality of distributed systems that things go down.<a href="#sub_2_8">8</a> In this case, the only guarantee you can make in the client process is that your client will be able to handle requests, but not that it will communicate to the database. It could return {error, not_connected} on all calls during a net split, for example.</p>
 							<p>The reconnection to the database can then be done using whatever cooldown or backoff strategy you believe is optimal, without impacting the stability of the system. It can be attempted in the initialization phase as an optimization, but the process should be able to reconnect later on if anything ever disconnects.</p>
 							<p>If you expect failure to happen on an external service, do not make its presence a guarantee of your system. We’re dealing with the real world here, and failure of external dependencies is always an option.</p>
 						<a id="2_2_2_side_effects"><h4>2.2.2 Side Effects</h4></a>
 							<p>Of course, the libraries and processes that call such a client will then error out if they don’t expect to work without a database. That’s an entirely different issue in a different problem space, one that depends on your business rules and what you can or can’t do to a client, but one that is possible to work around. For example, consider a client for a service that stores operational metrics — the code that calls that client could very well ignore the errors without adverse effects to the system as a whole.</p>
 							<p>The difference in both initialization and supervision approaches is that the client’s callers make the decision about how much failure they can tolerate, not the client itself. That’s a very important distinction when it comes to designing fault-tolerant systems. Yes, supervisors are about restarts, but they should be about restarts to a stable known state.</p>
-							<sub>8Or latency shoots up enough that it is impossible to tell the difference from failure.</sub>
+							<sub><p><a id="sub_2_8">8</a> Or latency shoots up enough that it is impossible to tell the difference from failure.</p></sub>
 						<a id="2_2_3_example_initializing"> <h4>2.2.3 Example: Initializing without guaranteeing connections</h4></a>
 							<p>The following code attempts to guarantee a connection as part of the process’ state:</p>
 <pre>
@@ -502,12 +507,14 @@ rebar.config
 						</ol>
 						<a href="chapter_3"> <h2>Chapter 3</h2></a>
 						<h2>Planning for Overload</h2>
-						<p>By far, the most common cause of failure I’ve encountered in real-world scenarios is due	to the node running out of memory. Furthermore, it is usually related to message queues going out of bounds.1 There are plenty of ways to deal with this, but knowing which one to use will require a decent understanding of the system you’re working on.</p>
+						<p>By far, the most common cause of failure I’ve encountered in real-world scenarios is due	to the node running out of memory. Furthermore, it is usually related to message queues going out of bounds. <a href="#sub_3_1">1</a> There are plenty of ways to deal with this, but knowing which one to use will require a decent understanding of the system you’re working on.</p>
 						<p>To oversimplify things, most of the projects I end up working on can be visualized as a very large bathroom sink. User and data input are flowing from the faucet. The Erlang system itself is the sink and the pipes, and wherever the output goes (whether it’s a database, an external API or service, and so on) is the sewer system.</p>
 						<img src="images/sink.png">
 						<p>When an Erlang node dies because of a queue overflowing, figuring out who to blame is crucial. Did someone put too much water in the sink? Are the sewer systems backing up ? Did you just design too small a pipe?</p>
 						
-						<sub>1Figuring out that a message queue is the problem is explained in Chapter 6, specifically in Section 6.2</sub>
+						<sub>
+							<p><a id="sub_3_1">1</a> Figuring out that a message queue is the problem is explained in <a href="#chapter_6">Chapter 6</a>, specifically in <a href="6_2_full_mailboxes">Section 6.2</a></p>
+						</sub>
 						<p>Determining what queue blew up is not necessarily hard. This is information that can be found in a crash dump. Finding out why it blew up is trickier. Based on the role of the process or run-time inspection, it’s possible to figure out whether causes include fast flooding, blocked processes that won’t process messages fast enough, and so on.</p>
 						<p>The most difficult part is to decide how to fix it. When the sink gets clogged up by too much waste, we will usually start by trying to make the bathroom sink itself larger (the part of our program that crashed, at the edge). Then we figure out the sink’s drain is too small, and optimize that. Then we find out the pipes themselves are too narrow, and optimize that. The overload gets pushed further down the system, until the sewers can’t take it anymore. At that point, we may try to add sinks or add bathrooms to help with the global input level.</p>
 						<p>Then there’s a point where things can’t be improved anymore at the bathroom’s level. There are too many logs sent around, there’s a bottleneck on databases that need the consistency, or there’s simply not enough knowledge or manpower in your organization to improve things there.</p>
@@ -518,7 +525,7 @@ rebar.config
 						<a id="3_1_common_overload_sources"><h3>3.1 Common Overload Sources</h3></a>
 						<p>There are a few common causes of queues blowing up and overload in Erlang systems that most people will encounter sooner or later, no matter how they approach their system. They’re usually symptomatic of having your system grow up and require some help scaling up, or of an unexpected type of failure that ends up cascading much harder than it should have.</p>
 						<a id="3_1_1_error_logger_explodes"></a> <h4>3.1.1. error_logger Explodes</h4>
-						<p>Ironically, the process in charge of error logging is one of the most fragile ones. In a defaultErlang install, the error_logger2 process will take its sweet time to log things to disk orover the network, and will do so much more slowly than errors can be generated.</p>
+						<p>Ironically, the process in charge of error logging is one of the most fragile ones. In a defaultErlang install, the error_logger <a href="#sub_3_2">2</a> process will take its sweet time to log things to disk orover the network, and will do so much more slowly than errors can be generated.</p>
 						<p>This is especially true of user-generated log messages (not for errors), and for crashes in large processes. For the former, this is because error_logger doesn’t really expect arbitrary levels of messages coming in continually. It’s for exceptional cases only and doesn’t expect lots of traffic. For the latter, it’s because the entire state of processes (including their mailboxes) gets copied over to be logged. It only takes a few messages to cause memory to bubble up a lot, and if that’s not enough to cause the node to run Out Of Memory (OOM), it may slow the logger enough that additional messages will.</p>
 						<p>The best solution for this at the time of writing is to use lager as a substitute logging library.</p>
 						<p>While lager will not solve all your problems, it will truncate voluminous log messages, optionally drop OTP-generated error messages when they go over a certain threshold, and will automatically switch between asynchronous and synchronous modes for user-submitted messages in order to self-regulate.</p>
@@ -527,26 +534,26 @@ rebar.config
 						
 						<p>Locking and blocking operations will often be problematic when they’re taking unexpectedly long to execute in a process that’s constantly receiving new tasks.</p>
 						<p>One of the most common examples I’ve seen is a process blocking while accepting a connection or waiting for messages with TCP sockets. During blocking operations of this kind, messages are free to pile up in the message queue.</p>
-						<p>One particularly bad example was in a pool manager for HTTP connections that I had written in a fork of the lhttpc library. It worked fine in most test cases we had, and we even had a connection timeout set to 10 milliseconds to be sure it never took too long3. After a few weeks of perfect uptime, the HTTP client pool caused an outage when one of the remote servers went down.</p>
+						<p>One particularly bad example was in a pool manager for HTTP connections that I had written in a fork of the lhttpc library. It worked fine in most test cases we had, and we even had a connection timeout set to 10 milliseconds to be sure it never took too long <a href="#sub_3_3">3</a>. After a few weeks of perfect uptime, the HTTP client pool caused an outage when one of the remote servers went down.</p>
 						<p>The reason behind this degradation was that when the remote server would go down, all of a sudden, all connecting operations would take at least 10 milliseconds, the time before which the connection attempt is given up on. With around 9,000 messages per second to the central process, each usually taking under 5 milliseconds, the impact became similar to roughly 18,000 messages a second and things got out of hand.</p>
 						<sub>
-						<br/>2Defined at http://www.erlang.org/doc/man/error_logger.html
+						<p><a id="sub_3_2">2</a> Defined at <a href="http://www.erlang.org/doc/man/error_logger.html">http://www.erlang.org/doc/man/error_logger.html</a></p>
 						
-						<br/>310 milliseconds is very short, but was fine for collocated servers used for real-time bidding.
+						<p><a id="sub_3_3">3</a> 10 milliseconds is very short, but was fine for collocated servers used for real-time bidding.</p>
 						</sub>
 						<p>The solution we came up with was to leave the task of connecting to the caller process, and enforce the limits as if the manager had done it on its own. The blocking operations were now distributed to all users of the library, and even less work was required to be done by the manager, now free to accept more requests.</p>
-						<p>When there is any point of your program that ends up being a central hub for receiving messages, lengthy tasks should be moved out of there if possible. Handling predictable overload4 situations by adding more processes — which either handle the blocking operations or instead act as a buffer while the "main" process blocks — is often a good idea.</p>
+						<p>When there is any point of your program that ends up being a central hub for receiving messages, lengthy tasks should be moved out of there if possible. Handling predictable overload <a href="#sub_3_4">4</a> situations by adding more processes — which either handle the blocking operations or instead act as a buffer while the "main" process blocks — is often a good idea.</p>
 						<p>There will be increased complexity in managing more processes for activities that aren’t intrinsically concurrent, so make sure you need them before programming defensively.</p>
-						<p>Another option is to transform the blocking task into an asynchronous one. If the type of work allows it, start the long-running job and keep a token that identifies it uniquely, along with the original requester you’re doing work for. When the resource is available, have it send a message back to the server with the aforementioned token. The server will eventually get the message, match the token to the requester, and answer back, without being blocked by other requests in the mean time.5</p>
+						<p>Another option is to transform the blocking task into an asynchronous one. If the type of work allows it, start the long-running job and keep a token that identifies it uniquely, along with the original requester you’re doing work for. When the resource is available, have it send a message back to the server with the aforementioned token. The server will eventually get the message, match the token to the requester, and answer back, without being blocked by other requests in the mean time.<a href="#sub_3_5">5</a></p>
 						<p>This option tends to be more obscure than using many processes and can quickly devolve into callback hell, but may use fewer resources.</p>
 						<a id="3_1_3_unexpected_messages"> <h4>3.1.3 Unexpected Messages</h4></a>
 						<p>Messages you didn’t know about tend to be rather rare when using OTP applications. Because OTP behaviours pretty much expect you to handle anything with some clause in handle_info/2, unexpected messages will not accumulate much.</p>
-						<p>However, all kinds of OTP-compliant systems end up having processes that may not implement a behaviour, or processes that go in a non-behaviour stretch where it overtakes message handling. If you’re lucky enough, monitoring tools6 will show a constant memory increase, and inspecting for large queue sizes7 will let you find which process is at fault. You can then fix the problem by handling the messages as required.</p>
+						<p>However, all kinds of OTP-compliant systems end up having processes that may not implement a behaviour, or processes that go in a non-behaviour stretch where it overtakes message handling. If you’re lucky enough, monitoring tools <a href="#sub_3_6">6</a> will show a constant memory increase, and inspecting for large queue sizes <a href="#sub_3_6">7</a> will let you find which process is at fault. You can then fix the problem by handling the messages as required.</p>
 						<sub>
-						<br/>4Something you know for a fact gets overloaded in production
-						<br/>5The redo application is an example of a library doing this, in its redo_block module. The [underdocumented] module turns a pipelined connection into a blocking one, but does so while maintaining pipeline aspects to the caller — this allows the caller to know that only one call failed when a timeout occurs, not all of the in-transit ones, without having the server stop accepting requests.
-						<br/>6See Section 5.1
-						<br/>7See Subsection 5.2.1
+						<p><a id="sub_3_4">4</a> Something you know for a fact gets overloaded in production</p>
+						<p><a id="sub_3_5">5</a> The redo application is an example of a library doing this, in its redo_block module. The [underdocumented] module turns a pipelined connection into a blocking one, but does so while maintaining pipeline aspects to the caller — this allows the caller to know that only one call failed when a timeout occurs, not all of the in-transit ones, without having the server stop accepting requests.</p>
+						<p><a id="sub_3_6">6</a> See <a href="#5_1_global_view">Section 5.1</a></p>
+						<p><a id="sub_3_5">7</a> See <a href="#5_2_1_processes">Subsection 5.2.1</a></p>
 						</sub>
 						<a id="3_2_restricting_input"> <h3>3.2 Restricting Input</h3> </a>
 						
@@ -554,15 +561,15 @@ rebar.config
 						<p>The most common way to restrict data input is to make calls to a process whose queue would grow in uncontrollable ways synchronously. By requiring a response before moving on to the next request, you will generally ensure that the direct source of the problem will be slowed down.</p>
 						<p>The difficult part for this approach is that the bottleneck causing the queue to grow is usually not at the edge of the system, but deep inside it, which you find after optimizing nearly everything that came before. Such bottlenecks will often be database operations, disk operations, or some service over the network.</p>
 						
-						<p>This means that when you introduce synchronous behaviour deep in the system, you’ll possibly need to handle back-pressure, level by level, until you end up at the system’s edges and can tell the user, "please slow down." Developers that see this pattern will often try to put API limits per user8 on the system entry points. This is a valid approach, especially since it can guarantee a basic quality of service (QoS) to the system and allows one to allocate resources as fairly (or unfairly) as desired. </p>
+						<p>This means that when you introduce synchronous behaviour deep in the system, you’ll possibly need to handle back-pressure, level by level, until you end up at the system’s edges and can tell the user, "please slow down." Developers that see this pattern will often try to put API limits per user <a href="#sub_3_8">8</a> on the system entry points. This is a valid approach, especially since it can guarantee a basic quality of service (QoS) to the system and allows one to allocate resources as fairly (or unfairly) as desired. </p>
 						<a id="3_2_1_how_long_should_timeout_be"><h4>3.2.1 How Long Should a Time Out Be</h4></a>
 						<p>What’s particularly tricky about applying back-pressure to handle overload via synchronous calls is having to determine what the typical operation should be taking in terms of time, or rather, at what point the system should time out. </p>
 						<p>The best way to express the problem is that the first timer to be started will be at the edge of the system, but the critical operations will be happening deep within it. This means that the timer at the edge of the system will need to have a longer wait time that those within, unless you plan on having operations reported as timing out at the edge even though they succeeded internally. </p>
-						<p>An easy way out of this is to go for infinite timeouts. Pat Helland9 has an interesting answer to this: </p>
+						<p>An easy way out of this is to go for infinite timeouts. Pat Helland <a href="#sub_3_9">9</a> has an interesting answer to this: </p>
 						
 						<div>Some application developers may push for no timeout and argue it is OK to wait indefinitely. I typically propose they set the timeout to 30 years. That, in turn, generates a response that I need to be reasonable and not silly. Why is 30 years silly but infinity is reasonable? I have yet to see a messaging application that really wants to wait for an unbounded period of time. . . </div>
 						
-						<sub>8
+						<sub>
 						There’s a tradeoff between slowing down all requests equally or using rate-limiting, both of which are valid. Rate-limiting per user would mean you’d still need to increase capacity or lower the limits of all users when more new users hammer your system, whereas a synchronous system that indiscriminately blocks should adapt to any load with more ease, but possibly unfairly.
 						<br/>9 Idempotence is Not a Medical Condition, April 14, 2012
 						</sub>

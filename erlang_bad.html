@@ -1891,7 +1891,8 @@ undefined</code></pre>
 	your code, and to monitoring the scheduler’s work if it might be anywhere else (but also
 	your code).</p>
 
-	<a id="8_1_profiling_and_reduction_counts"><h3>Profiling and Reduction Counts</h3></a>
+	<a id="8_1_profiling_and_reduction_counts"><h3>8.1 Profiling and Reduction Counts</h3></a>
+
 		<p>To pin issues to specific pieces of Erlang code, as mentioned earlier, there are two main
 		approaches. One will be to do the old standard profiling routine, likely using one of the
 		following applications:2</p>
@@ -1902,12 +1903,14 @@ undefined</code></pre>
 			</ol>
 		</sub>
 		<ul>
-			<li>eprof,3 the oldest Erlang profiler around. It will give general percentage values and will mostly report in terms of time taken.</li>
-			<li>fprof,4 a more powerful replacement of eprof. It will support full concurrency and generate in-depth reports. In fact, the reports are so deep that they are usually considered opaque and hard to read.</li>
-			<li>eflame,5 the newest kid on the block. It generates flame graphs to show deep call sequences and hot-spots in usage on a given piece of code. It allows one to quickly find issues with a single look at the final result.</li>
+			<li><span class="code">eprof</span>,3 the oldest Erlang profiler around. It will give general percentage values and will mostly report in terms of time taken.</li>
+			<li><span class="code">fprof</span>,4 a more powerful replacement of eprof. It will support full concurrency and generate in-depth reports. In fact, the reports are so deep that they are usually considered opaque and hard to read.</li>
+			<li><span class="code">eflame</span>,5 the newest kid on the block. It generates flame graphs to show deep call sequences and hot-spots in usage on a given piece of code. It allows one to quickly find issues with a single look at the final result.</li>
 		</ul>
+		
 		<p>It will be left to the reader to thoroughly read each of these application’s documentation.
-		The other approach will be to run recon:proc_window/3 as introduced in Subsection 5.2.1:</p>
+		The other approach will be to run <span class="code">recon:proc_window/3</span> as introduced in Subsection 5.2.1:</p>
+
 <pre><code class="erlang">1> recon:proc_window(reductions, 3, 500).
 [{<0.46.0>,51728,
   [{current_function,{queue,in,2}},
@@ -1918,9 +1921,13 @@ undefined</code></pre>
  {<0.43.0>,650,
   [{current_function,{timer,sleep,1}},
 {initial_call,{erlang,apply,2}}]}]</code></pre>
+
 		<p>The reduction count has a direct link to function calls in Erlang, and a high count is usually the synonym of a high amount of CPU usage.</p>
-		<p>What’s interesting with this function is to try it while a system is already rather busy,6 with a relatively short interval. Repeat it many times, and you should hopefully see a pattern emerge where the same processes (or the same kind of processes) tend to always come up on top.</p>
+
+		<p>What’s interesting with this function is to try it while a system is already rather busy,6 with a relatively short interval. Repeat it many times, and you should hopefully see a pattern emerge where the same processes (or the same <span class="it">kind</span> of processes) tend to always come up on top.</p>
+
 		<p>Using the code locations7 and current functions being run, you should be able to identify what kind of code hogs all your schedulers.</p>
+	
 	<a id="8_2_system_monitors"><h3>8.2 System Monitors</h3></a>
 		<p>If nothing seems to stand out through either profiling or checking reduction counts, it’s possible some of your work ends up being done by NIFs, garbage collections, and so on.</p>
 		<sub>
@@ -1929,11 +1936,14 @@ undefined</code></pre>
 				<il>4http://www.erlang.org/doc/man/fprof.html</il>
 				<il>5https://github.com/proger/eflame</il>
 				<il>6See Subsection 5.1.2</il>
-				<il>7Call recon:info(PidTerm, location) or process_info(Pid, current_stacktrace) to get this information.</il>
+				<il>7Call <span class="code">recon:info(PidTerm, location)</span> or <span class="code">process_info(Pid, current_stacktrace)</span> to get this information.</il>
 			</ol>
 		</sub>
+		
 		<p>These kinds of work may not always increment their reductions count correctly, so they won’t show up with the previous methods, only through long run times.</p>
-		<p>To find about such cases, the best way around is to use erlang:system_monitor/2, and look for long_gc and long_schedule. The former will show whenever garbage collection ends up doing a lot of work (it takes time!), and the latter will likely catch issues with busy processes, either through NIFs or some other means, that end up making them hard to de-schedule.8</p>
+		
+		<p>To find about such cases, the best way around is to use <span class="code">erlang:system_monitor/2</span>, and look for <span class="code">long_gc</span> and <span class="code">long_schedule</span>. The former will show whenever garbage collection ends up doing a lot of work (it takes time!), and the latter will likely catch issues with busy processes, either through NIFs or some other means, that end up making them hard to de-schedule.8</p>
+		
 		<p>We’ve seen how to set such a system monitor In Garbage Collection in 7.1.5, but here’s a different pattern9 I’ve used before to catch long-running items:</p>
 <pre><code class="erlang">1> F = fun(F) ->
 receive
@@ -1955,18 +1965,26 @@ monitor=long_schedule pid=<0.54.0> info=[{timeout,1102},
                                          {in,{some_module,some_function,3}},
                                          {out,{some_module,some_function,3}}]
 </code></pre>
-		<p>Be sure to set the long_schedule and long_gc values to large-ish values that might be reasonable to you. In this example, they’re set to 1000 milliseconds. You can either kill the monitor by calling exit(whereis(temp_sys_monitor), kill) (which will in turn kill the shell because it’s linked), or just disconnect from the node (which will kill the process because it’s linked to the shell.)</p>
+		
+		<p>Be sure to set the <span class="code">long_schedule</span> and <span class="code">long_gc</span> values to large-ish values that might be reasonable to you. In this example, they’re set to 1000 milliseconds. You can either kill the monitor by calling <span class="code">exit(whereis(temp_sys_monitor), kill)</span> (which will in turn kill the shell because it’s linked), or just disconnect from the node (which will kill the process because it’s linked to the shell.)</p>
+		
 		<p>This kind of code and monitoring can be moved to its own module where it reports to a long-term logging storage, and can be used as a canary for performance degradation or overload detection.</p>
+		
 		<sub>
 			<ol>
 				<il>8Long garbage collections count towards scheduling time. It is very possible that a lot of your long schedules will be tied to garbage collections depending on your system.</il>
 				<il>9If you’re on 17.0 or newer versions, the shell functions can be made recursive far more simply by using their named form, but to have the widest compatibility possible with older versions of Erlang, I’ve let them as is.</il>
 			</ol>
 		</sub>
+		
 		<a id="8_2_1_suspended_ports"><h4>8.2.1 Suspended Ports</h4></a>
+		
 			<p>An interesting part of system monitors that didn’t fit anywhere but may have to do with scheduling is regarding ports. When a process sends too many message to a port and the port’s internal queue gets full, the Erlang schedulers will forcibly de-schedule the sender until space is freed. This may end up surprising a few users who didn’t expect that implicit back-pressure from the VM.</p>
-			<p>This kind of event can be monitored by passing in the atom busy_port to the system monitor. Specifically for clustered nodes, the atom busy_dist_port can be used to find when a local process gets de-scheduled when contacting a process on a remote node whose inter-node communication was handled by a busy port.</p>
-			<p>If you find out you’re having problems with these, try replacing your sending functions where in critical paths with erlang:port_command(Port, Data, [nosuspend]) for ports, and erlang:send(Pid, Msg, [nosuspend]) for messages to distributed processes. They will then tell you when the message could not be sent and you would therefore have been descheduled.</p>
+		
+			<p>This kind of event can be monitored by passing in the atom <span class="code">busy_port</span> to the system monitor. Specifically for clustered nodes, the atom <span class="code">busy_dist_port</span> can be used to find when a local process gets de-scheduled when contacting a process on a remote node whose inter-node communication was handled by a busy port.</p>
+		
+			<p>If you find out you’re having problems with these, try replacing your sending functions where in critical paths with <span class="code">erlang:port_command(Port, Data, [nosuspend])</span> for ports, and <span class="code">erlang:send(Pid, Msg, [nosuspend])</span> for messages to distributed processes. They will then tell you when the message could not be sent and you would therefore have been descheduled.</p>
+
 	<a id="8_3_exercises"><h3>8.3 Exercises</h3></a>
 		<h4>Review Questions</h4>
 			<ol>
@@ -1979,7 +1997,9 @@ monitor=long_schedule pid=<0.54.0> info=[{timeout,1102},
 				<il>If you find that a process doing very little work with reductions ends up being scheduled for long periods of time, what can you guess about it or the code it runs?</il>
 				<il>Can you set up a system monitor and then trigger it with regular Erlang code? Can you use it to find out for how long processes seem to be scheduled on average? You may need to manually start random processes from the shell that are more aggressive in their work than those provided by the existing system.</il>
 			</ol>
+
 <a id="chapter_9"><h2>Chapter 9</h2></a>
+
 <h2>Tracing</h2>
 	<p>One of the lesser known and absolutely under-used features of Erlang and the BEAM virtual machine is just about how much tracing you can do on there.</p>
 	<p>Forget your debuggers, their use is too limited.1 Tracing makes sense in Erlang at all steps of your system’s life cycle, whether it’s for development or for diagnosing a running production system.</p>

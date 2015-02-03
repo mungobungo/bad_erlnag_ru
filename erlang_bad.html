@@ -597,7 +597,7 @@ rebar.config
 						<a id="3_2_1_how_long_should_timeout_be"><h4>3.2.1 How Long Should a Time Out Be</h4></a>
 						<p>What’s particularly tricky about applying back-pressure to handle overload via synchronous calls is having to determine what the typical operation should be taking in terms of time, or rather, at what point the system should time out. </p>
 						<p>The best way to express the problem is that the first timer to be started will be at the edge of the system, but the critical operations will be happening deep within it. This means that the timer at the edge of the system will need to have a longer wait time that those within, unless you plan on having operations reported as timing out at the edge even though they succeeded internally. </p>
-						<p>An easy way out of this is to go for infinite timeouts. Pat Helland <sup><a href="#sub_3_9">9</a><sup> has an interesting answer to this: </p>
+						<p>An easy way out of this is to go for infinite timeouts. Pat Helland <sup><a href="#sub_3_9">9</a></sup> has an interesting answer to this: </p>
 						
 						<div>Some application developers may push for no timeout and argue it is OK to wait indefinitely. I typically propose they set the timeout to 30 years. That, in turn, generates a response that I need to be reasonable and not silly. <span class="it">Why is 30 years silly but infinity is reasonable?</span> I have yet to see a messaging application that really wants to wait for an unbounded period of time. . . </div>
 						
@@ -1373,15 +1373,15 @@ Attaching to /tmp/erl_pipe (^D to exit)
 							<a id="chapter_6"><h2>Chapter 6</h2></a>
 							<h2>Reading Crash Dumps</h2>
 							
-							<p>Whenever an Erlang node crashes, it will generate a crash dump1.</p>
+							<p>Whenever an Erlang node crashes, it will generate a crash dump<sup><a href="#sub_6_1">1</a></sup>.</p>
 							
-							<p>The format is mostly documented in Erlang’s official documentation2, and anyone willing to dig deeper inside of it will likely be able to figure out what data means by looking at that documentation. There will be specific data that is hard to understand without also understanding the part of the VM they refer to, but that might be too complex for this document</p>
+							<p>The format is mostly documented in Erlang’s official documentation<sup><a href="#sub_6_2">2</a></sup>, and anyone willing to dig deeper inside of it will likely be able to figure out what data means by looking at that documentation. There will be specific data that is hard to understand without also understanding the part of the VM they refer to, but that might be too complex for this document</p>
 							
-							<p>The crash dump is going to be named <span class="code">erl_crash.dump</span> and be located wherever the Erlang process was running by default. This behaviour (and the file name) can be overridden by specifying the <span class="code">ERL_CRASH_DUMP</span> environment variable3.</p>
+							<p>The crash dump is going to be named <span class="code">erl_crash.dump</span> and be located wherever the Erlang process was running by default. This behaviour (and the file name) can be overridden by specifying the <span class="code">ERL_CRASH_DUMP</span> environment variable <sup><a href="#sub_6_3">3</a></sup>.</p>
 							
 							<a id="6_1_general_view"><h3>6.1 General View</h3></a>
 							
-							<p>Reading the crash dump will be useful to figure out possible reasons for a node to die <span class="it">a posteriori</span>. One way to get a quick look at things is to use recon’s <span class="code">erl_crashdump_analyzer.sh</span>4 and run it on a crash dump:</p>
+							<p>Reading the crash dump will be useful to figure out possible reasons for a node to die <span class="it">a posteriori</span>. One way to get a quick look at things is to use recon’s <span class="code">erl_crashdump_analyzer.sh</span><sup><a href="#sub_6_4">4</a></sup> and run it on a crash dump:</p>
 
 <pre><code class="erlang">$ ./recon/script/erl_crashdump_analyzer.sh erl_crash.dump
 analyzing erl_crash.dump, generated on: Thu Apr 17 18:34:53 2014
@@ -1442,24 +1442,24 @@ Process States when crashing (sum):
  36421 Waiting
 </code></pre>
 							<sub>
-							1If it isn’t killed by the OS for violating ulimits while dumping or didn’t segfault.
-							<br/> 2http://www.erlang.org/doc/apps/erts/crash_dump.html
-							<br/>3Heroku’s Routing and Telemetry teams use the heroku_crashdumps app to set the path and name of the crash dumps. It can be added to a project to name the dumps by boot time and put them in a pre-set location
-							<br/>4https://github.com/ferd/recon/blob/master/script/erl_crashdump_analyzer.sh
+								<p><a id="sub_6_1">1</a> If it isn’t killed by the OS for violating ulimits while dumping or didn’t segfault.</p>
+								<p><a id="sub_6_2">2</a> http://www.erlang.org/doc/apps/erts/crash_dump.html</p>
+								<p><a id="sub_6_3">3</a> Heroku’s Routing and Telemetry teams use the heroku_crashdumps app to set the path and name of the crash dumps. It can be added to a project to name the dumps by boot time and put them in a pre-set location</p>
+								<p><a id="sub_6_4">4</a> https://github.com/ferd/recon/blob/master/script/erl_crashdump_analyzer.sh</p>
 							</sub>
 							<p>This data dump won’t point out a problem directly to your face, but will be a good clue as to where to look. For example, the node here ran out of memory and had 11079 Mb out of 15 Gb used (I know this because that’s the max instance size we were using!) This can be a symptom of:</p>
 							
 							<ul>
 								<li>memory fragmentation;</li>
 								<li>memory leaks in C code or drivers;</li>
-								<li>lots of memory that got to be garbage-collected before generating the crash dump5.</li>
+								<li>lots of memory that got to be garbage-collected before generating the crash dump <sup><a href="#sub_6_5">5</a></sup> .</li>
 							</ul>
 							
 							<p>More generally, look for anything surprising for memory there. Correlate it with the number of processes and the size of mailboxes. One may explain the other.</p>
 							
 							<p>In this particular dump, one process had 5 million messages in its mailbox. That’s telling. Either it doesn’t match on all it can get, or it is getting overloaded. There are also dozens of processes with hundreds of messages queued up — this can point towards overload or contention. It’s hard to have general advice for your generic crash dump, but there still are a few pointers to help figure things out.</p>
 							
-							<sub>5Notably here is reference-counted binary memory, which sits in a global heap, but ends up being garbage-collected before generating the crash dump. The binary memory can therefore be underreported. See Chapter 7 for more details</sub>
+							<sub> <p><a id="sub_6_5">5</a> Notably here is reference-counted binary memory, which sits in a global heap, but ends up being garbage-collected before generating the crash dump. The binary memory can therefore be underreported. See <a href="#chapter_7"> Chapter 7</a> for more details</p></sub>
 							
 							<a id="6_2_full_mailboxes"><h3>6.2 Full Mailboxes</h3></a>
 							
@@ -1480,7 +1480,7 @@ Process States when crashing (sum):
 
 							<a id="6_3_too_many_processes"><h3>6.3 Too Many (or too few) Processes</h3></a>
 							
-							<p>The process count is mostly useful when you know your node’s usual average count6, in order to figure if it’s abnormal or not.</p>
+							<p>The process count is mostly useful when you know your node’s usual average count <sup><a href="#sub_6_6">6</a></sup>, in order to figure if it’s abnormal or not.</p>
 							
 							<p>A count that is higher than normal may reveal a specific leak or overload, depending on applications.</p>
 							
@@ -1491,16 +1491,21 @@ Process States when crashing (sum):
 							({application_terminated, <AppName>, shutdown})</code></pre>
 								<p>In such a case, the issue is that a specific application <span class="code">(&ltAppName&gt</span>) has reached its maximal restart frequency within its supervisors, and that prompted the node to shut down. Error logs that led to the cascading failure should be combed over to figure things out.</p>
 								
-								<sub>6See subsection  5.1.3 for details</sub>
+								<sub>
+									<p><a id="sub_6_6">6</a> See subsection <a href="#5_1_3_processes">5.1.3 Processes</a> for details</p>
+								</sub>
 									
 									<a id="6_4_too_many_ports"><h3>6.4. Too Many Ports</h3></a>
-									<p>Similarly to the process count, the port count is simple and mostly useful when you know your usual values7.</p>
+									<p>Similarly to the process count, the port count is simple and mostly useful when you know your usual values<sup><a href="#sub_6_7">7</a></sup>.</p>
 									
 									<p>A high count may be the result of overload, Denial of Service attacks, or plain old resource leaks. Looking at the type of port leaked (TCP, UDP, or files) can also help reveal if there was contention on specific resources, or if the code using them is just wrong.</p>
 									
+									<sub>
+										<p><a id="sub_6_7">7</a> See subsection <a href="#5_1_4_ports">5.1.4 Ports</a> for details</p>
+									</sub>
 									<a id="6_5_cant_allocate_memory"><h3>6.5 Can’t Allocate Memory</h3></a>
 									
-									<p>These are by far the most common types of crashes you are likely to see. There’s so much to cover, that Chapter 7 is dedicated to understanding them and doing the required debugging on live systems.</p>
+									<p>These are by far the most common types of crashes you are likely to see. There’s so much to cover, that <a href="#chapter_7">Chapter 7</a> is dedicated to understanding them and doing the required debugging on live systems.</p>
 									
 									<p>In any case, the crash dump will help figure out what the problem was after the fact. The process mailboxes and individual heaps are usually good indicators of issues. If you’re running out of memory without any mailbox being outrageously large, look at the processes heap and stack sizes as returned by the recon script.</p>
 									
@@ -1516,14 +1521,16 @@ Process States when crashing (sum):
 										<li>What should you look for if the process count is suspiciously low?</li>
 										<li>If you find the node died with a process having a lot of memory, what could you do to find out which one it was?</li>
 									</ol>
-									<sub>7See subsection 5.1.4 for details</sub>
+									
+									
+									
 									<h4>Hands-On</h4>
 									<p>Using the analysis of a crash dump in Section 6.1:</p>
 									<ol>
 										<li>What are specific outliers that could point to an issue?</li>
 										<li>Does it look like repeated errors are the issue? If not, what could it be?</li>
 									</ol>
-									<a id="chapter_7"><h2>Chapter 7</h2></a>
+<a id="chapter_7"><h2>Chapter 7</h2></a>
 <h2>Memory Leaks</h2>
 
 <p>There are truckloads of ways for an Erlang node to bleed memory. They go from extremely simple to astonishingly hard to figure out (fortunately, the latter type is also rarer), and it’s possible you’ll never encounter any problem with them.</p>

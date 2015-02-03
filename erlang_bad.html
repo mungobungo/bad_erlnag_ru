@@ -2075,19 +2075,19 @@ monitor=long_schedule pid=<0.54.0> info=[{timeout,1102},
 <h2>Tracing</h2>
 	<p>One of the lesser known and absolutely under-used features of Erlang and the BEAM virtual machine is just about how much tracing you can do on there.</p>
 	
-	<p>Forget your debuggers, their use is too limited.1 Tracing makes sense in Erlang at all steps of your system’s life cycle, whether it’s for development or for diagnosing a running production system.</p>
+	<p>Forget your debuggers, their use is too limited.<sup><a href="#sub_9_1">1</a></sup> Tracing makes sense in Erlang at all steps of your system’s life cycle, whether it’s for development or for diagnosing a running production system.</p>
 	
 	<p>There are a few options available to trace Erlang programs:</p>
 		<ul>
-			<li><span class="code">sys</span>2 comes standard with OTP and allows the user to set custom tracing functions, log all kinds of events, and so on. It’s generally complete and fine to use for development. It suffers a bit in production because it doesn’t redirect IO to remote shells, and doesn’t have rate-limiting capabilities for trace messages. It is still recommended to read the documentation for the module.</li>
+			<li><span class="code">sys</span><sup><a href="#sub_9_2">2</a></sup> comes standard with OTP and allows the user to set custom tracing functions, log all kinds of events, and so on. It’s generally complete and fine to use for development. It suffers a bit in production because it doesn’t redirect IO to remote shells, and doesn’t have rate-limiting capabilities for trace messages. It is still recommended to read the documentation for the module.</li>
 			
-			<li><span class="code">dbg</span>3 also comes standard with Erlang/OTP. Its interface is a bit clunky in terms of usability, but it’s entirely good enough to do what you need. The problem with it is that you <span class="it">have to know what you’re doing</span>, because <span class="code">dbg</span> can log absolutely everything on the node and kill one in under two seconds.</li>
+			<li><span class="code">dbg</span><sup><a href="#sub_9_3">3</a></sup> also comes standard with Erlang/OTP. Its interface is a bit clunky in terms of usability, but it’s entirely good enough to do what you need. The problem with it is that you <span class="it">have to know what you’re doing</span>, because <span class="code">dbg</span> can log absolutely everything on the node and kill one in under two seconds.</li>
 			
 			<li><span class="it">tracing BIFs</span> are available as part of the <span class="code">erlang</span> module. They’re mostly the raw blocks used by all the applications mentioned in this list, but their lower level of abstraction makes them rather difficult to use.</li>
 			
-			<li><span class="code">redbug</span>4 is a production-safe tracing library, part of the <span class="code">eper</span>5 suite. It has an internalrate-limiter, and a nice usable interface. To use it, you must however be willing to add in all of <span class="code">eper</span>’s dependencies. The toolkit is fairly comprehensive and can be a very interesting install.</li>
+			<li><span class="code">redbug</span><sup><a href="#sub_9_4">4</a></sup> is a production-safe tracing library, part of the <span class="code">eper</span><sup><a href="#sub_9_5">5</a></sup> suite. It has an internalrate-limiter, and a nice usable interface. To use it, you must however be willing to add in all of <span class="code">eper</span>’s dependencies. The toolkit is fairly comprehensive and can be a very interesting install.</li>
 			
-			<li><span class="code">recon_trace</span>6 is <span class="code">recon</span>’s take on tracing. The objective was to allow the same levels of safety as with <span class="code">redbug</span>, but without the dependencies. The interface is different, and the rate-limiting options aren’t entirely identical. It can also only trace function calls, and not messages.7</li>
+			<li><span class="code">recon_trace</span><sup><a href="#sub_9_6">6</a></sup> is <span class="code">recon</span>’s take on tracing. The objective was to allow the same levels of safety as with <span class="code">redbug</span>, but without the dependencies. The interface is different, and the rate-limiting options aren’t entirely identical. It can also only trace function calls, and not messages.<sup><a href="#sub_9_7">7</a></sup></li>
 		</ul>
 		
 		<p>This chapter will focus on tracing with <span class="code">recon_trace</span>, but the terminology and the concepts used mostly carry over to any other Erlang tracing tool that can be used.</p>
@@ -2100,11 +2100,11 @@ monitor=long_schedule pid=<0.54.0> info=[{timeout,1102},
 		
 		<a id="9_1_tracing_principles"><h3>9.1 Tracing Principles</h3></a>
 		
-			<p>The Erlang Trace BIFs allow to trace any Erlang code at all8. They work in two parts: <span class="it">pid specifications</span>, and <span class="it">trace patterns</span>.</p>
+			<p>The Erlang Trace BIFs allow to trace any Erlang code at all<sup><a href="#sub_9_8">8</a></sup>. They work in two parts: <span class="it">pid specifications</span>, and <span class="it">trace patterns</span>.</p>
 		
 			<p>Pid specifications lets the user decide which processes to target. They can be specific pids, <span class="code">all</span> pids, <span class="code">existing</span> pids, or <span class="code">new</span> pids (those not spawned at the time of the function call).</p>
 		
-			<p>The trace patterns represent functions. Functions can be specified in two parts: specifying the modules, functions, and arity, and then with Erlang match specifications9 to add constraints to arguments.</p>
+			<p>The trace patterns represent functions. Functions can be specified in two parts: specifying the modules, functions, and arity, and then with Erlang match specifications<sup><a href="#sub_9_9">9</a></sup> to add constraints to arguments.</p>
 		
 			<p>What defines whether a specific function call gets traced or not is the intersection of both, as seen in Figure 9.1.</p>
 		
@@ -2132,7 +2132,7 @@ monitor=long_schedule pid=<0.54.0> info=[{timeout,1102},
 			
 				<p>The most basic form is <span class="code">{Mod, Fun, Arity}</span>, where Mod is a literal module, <span class="code">Fun</span> is a function name, and <span class="code">Arity</span> is the number of arguments of the function to trace. Any of these may also be replaced by wildcards (’_’). Recon will forbid forms that match too widely on everything (such as {’_’,’_’,’_’}), as they could be plain dangerous to run in production.</p>
 			
-				<p>A fancier form will be to replace the arity by a function to match on lists of arguments. The function is limited to those usable by match specifications similar to what is available in ETS10. Finally, multiple patterns can be put into a list to broaden the matching scope.</p>
+				<p>A fancier form will be to replace the arity by a function to match on lists of arguments. The function is limited to those usable by match specifications similar to what is available in ETS<sup><a href="#sub_9_10">10</a></sup>. Finally, multiple patterns can be put into a list to broaden the matching scope.</p>
 			
 				<p>It will also be possible to rate limit based on two manners: a static count, or a number of matches per time interval.</p>
 			

@@ -2002,44 +2002,68 @@ monitor=long_schedule pid=<0.54.0> info=[{timeout,1102},
 
 <h2>Tracing</h2>
 	<p>One of the lesser known and absolutely under-used features of Erlang and the BEAM virtual machine is just about how much tracing you can do on there.</p>
+	
 	<p>Forget your debuggers, their use is too limited.1 Tracing makes sense in Erlang at all steps of your system’s life cycle, whether it’s for development or for diagnosing a running production system.</p>
+	
 	<p>There are a few options available to trace Erlang programs:</p>
 		<ul>
-			<li>sys2 comes standard with OTP and allows the user to set custom tracing functions, log all kinds of events, and so on. It’s generally complete and fine to use for development. It suffers a bit in production because it doesn’t redirect IO to remote shells, and doesn’t have rate-limiting capabilities for trace messages. It is still recommended to read the documentation for the module.</li>
-			<li>dbg3 also comes standard with Erlang/OTP. Its interface is a bit clunky in terms of usability, but it’s entirely good enough to do what you need. The problem with it is that you have to know what you’re doing, because dbg can log absolutely everything on the node and kill one in under two seconds.</li>
-			<li>tracing BIFs are available as part of the erlang module. They’re mostly the raw blocks used by all the applications mentioned in this list, but their lower level of abstraction makes them rather difficult to use.</li>
-			<li>redbug4 is a production-safe tracing library, part of the eper5 suite. It has an internalrate-limiter, and a nice usable interface. To use it, you must however be willing to add in all of eper’s dependencies. The toolkit is fairly comprehensive and can be a very interesting install.</li>
-			<li>recon_trace6 is recon’s take on tracing. The objective was to allow the same levels of safety as with redbug, but without the dependencies. The interface is different, and the rate-limiting options aren’t entirely identical. It can also only trace function calls, and not messages.7</li>
+			<li><span class="code">sys</span>2 comes standard with OTP and allows the user to set custom tracing functions, log all kinds of events, and so on. It’s generally complete and fine to use for development. It suffers a bit in production because it doesn’t redirect IO to remote shells, and doesn’t have rate-limiting capabilities for trace messages. It is still recommended to read the documentation for the module.</li>
+			
+			<li><span class="code">dbg</span>3 also comes standard with Erlang/OTP. Its interface is a bit clunky in terms of usability, but it’s entirely good enough to do what you need. The problem with it is that you <span class="it">have to know what you’re doing</span>, because <span class="code">dbg</span> can log absolutely everything on the node and kill one in under two seconds.</li>
+			
+			<li><span class="it">tracing BIFs</span> are available as part of the <span class="code">erlang</span> module. They’re mostly the raw blocks used by all the applications mentioned in this list, but their lower level of abstraction makes them rather difficult to use.</li>
+			
+			<li><span class="code">redbug</span>4 is a production-safe tracing library, part of the <span class="code">eper</span>5 suite. It has an internalrate-limiter, and a nice usable interface. To use it, you must however be willing to add in all of <span class="code">eper</span>’s dependencies. The toolkit is fairly comprehensive and can be a very interesting install.</li>
+			
+			<li><span class="code">recon_trace</span>6 is <span class="code">recon</span>’s take on tracing. The objective was to allow the same levels of safety as with <span class="code">redbug</span>, but without the dependencies. The interface is different, and the rate-limiting options aren’t entirely identical. It can also only trace function calls, and not messages.7</li>
 		</ul>
-		<p>This chapter will focus on tracing with recon_trace, but the terminology and the concepts used mostly carry over to any other Erlang tracing tool that can be used.</p>
+		
+		<p>This chapter will focus on tracing with <span class="code">recon_trace</span>, but the terminology and the concepts used mostly carry over to any other Erlang tracing tool that can be used.</p>
+		
 		<sub>
 			<p>1One common issue with debuggers that let you insert break points and step through a program is that they are incompatible with many Erlang programs: put a break point in one process and the ones around keep going. In practice, this turns debugging into a very limited activity because as soon as a process needs to interact with the one you’re debugging, its calls start timing out and crashing, possibly taking down the entire node with it. Tracing, on the other hand, doesn’t interfere with program execution, but still gives you all the data you need.</p>
 			<p>2http://www.erlang.org/doc/man/sys.html</p>
 			<p>3http://www.erlang.org/doc/man/dbg.html</p>
 		</sub>
+		
 		<a id="9_1_tracing_principles"><h3>9.1 Tracing Principles</h3></a>
-			<p>The Erlang Trace BIFs allow to trace any Erlang code at all8. They work in two parts: pid specifications, and trace patterns.</p>
-			<p>Pid specifications lets the user decide which processes to target. They can be specific pids, all pids, existing pids, or new pids (those not spawned at the time of the function call).</p>
+		
+			<p>The Erlang Trace BIFs allow to trace any Erlang code at all8. They work in two parts: <span class="it">pid specifications</span>, and <span class="it">trace patterns</span>.</p>
+		
+			<p>Pid specifications lets the user decide which processes to target. They can be specific pids, <span class="code">all</span> pids, <span class="code">existing</span> pids, or <span class="code">new</span> pids (those not spawned at the time of the function call).</p>
+		
 			<p>The trace patterns represent functions. Functions can be specified in two parts: specifying the modules, functions, and arity, and then with Erlang match specifications9 to add constraints to arguments.</p>
+		
 			<p>What defines whether a specific function call gets traced or not is the intersection of both, as seen in Figure 9.1.</p>
+		
 			<p>If either the pid specification excludes a process or a trace pattern excludes a given call, no trace will be received.</p>
-			<p>Tools like dbg (and trace BIFs) force you to work with this Venn diagram in mind. You specify sets of matching pids and sets of trace patterns independently, and whatever happens to be at the intersection of both sets gets to be displayed.</p>
-			<p>Tools like redbug and recon_trace, on the other hand, abstract this away.</p>
+		
+			<p>Tools like <span class="code">dbg</span> (and trace BIFs) force you to work with this Venn diagram in mind. You specify sets of matching pids and sets of trace patterns independently, and whatever happens to be at the intersection of both sets gets to be displayed.</p>
+		
+			<p>Tools like <span class="code">redbug</span> and <span class="code">recon_trace</span>, on the other hand, abstract this away.</p>
+			
 			<sub>
 				<p>4https://github.com/massemanet/eper/blob/master/doc/redbug.txt</p>
 				<p>5https://github.com/massemanet/eper</p>
 				<p>6http://ferd.github.io/recon/recon_trace.html</p>
 				<p>7Messages may be supported in future iterations of the library. In practice, the author hasn’t found the need when using OTP, given behaviours and matching on specific arguments allows the user to get something roughly equivalent.</p>
-				<p>8In cases where processes contain sensitive information, data can be forced to be kept private by calling process_flag(sensitive, true)</p>
+				<p>8In cases where processes contain sensitive information, data can be forced to be kept private by calling <span class="code">process_flag(sensitive, true)</span></p>
 				<p>9http://www.erlang.org/doc/apps/erts/match_spec.html</p>
 			</sub>
+			
 			<img src="images/trace.png">
 			<p>Figure 9.1: What gets traced is the result of the intersection between the matching pidsand the matching trace patterns</p>
+			
 			<a id="9_2_tracing_with_recon"><h3>9.2 Tracing with Recon</h3></a>
+			
 				<p>Recon, by default, will match all processes. This will often be good enough for a lotof debugging cases. The interesting part you’ll want to play with most of the time is specification of trace patterns. Recon support a few basic ways to declare them.</p>
-				<p>The most basic form is {Mod, Fun, Arity}, where Mod is a literal module, Fun is a function name, and Arity is the number of arguments of the function to trace. Any of these may also be replaced by wildcards (’_’). Recon will forbid forms that match too widely on everything (such as {’_’,’_’,’_’}), as they could be plain dangerous to run in production.</p>
+			
+				<p>The most basic form is <span class="code">{Mod, Fun, Arity}</span>, where Mod is a literal module, <span class="code">Fun</span> is a function name, and <span class="code">Arity</span> is the number of arguments of the function to trace. Any of these may also be replaced by wildcards (’_’). Recon will forbid forms that match too widely on everything (such as {’_’,’_’,’_’}), as they could be plain dangerous to run in production.</p>
+			
 				<p>A fancier form will be to replace the arity by a function to match on lists of arguments. The function is limited to those usable by match specifications similar to what is available in ETS10. Finally, multiple patterns can be put into a list to broaden the matching scope.</p>
+			
 				<p>It will also be possible to rate limit based on two manners: a static count, or a number of matches per time interval.</p>
+			
 				<sub>10http://www.erlang.org/doc/man/ets.html#fun2ms-1</sub>
 					<p>Rather than going more in details, here’s a list of examples and how to trace for them.</p>
 <pre><code class="erlang">%% All calls from the queue module, with 10 calls printed at most:
@@ -2072,38 +2096,54 @@ recon_trace:calls({Mod,handle_call,3}, {1,100}, [{pid, [{via, gproc, Name}, new]
 recon_trace:calls({Mod,Fun,fun(_) -> return_trace() end}, Max, Opts)
 recon_trace:calls({Mod,Fun,[{’_’, [], [{return_trace}]}]}, Max, Opts)
 </code></pre>
-					<p>Each call made will override the previous one, and all calls can be cancelled withrecon_trace:clear/0.</p>
+					<p>Each call made will override the previous one, and all calls can be cancelled with <span class="code">recon_trace:clear/0</span>.</p>
 					<p>There’s a few more combination possible, with more options:</p>
-					<p>{pid, PidSpec}</p>
-					<p>Which processes to trace. Valid options is any of all, new, existing, or a process descriptor ({A,B,C}, "<A.B.C>", an atom representing a name, {global, Name},{via, Registrar, Name}, or a pid). It’s also possible to specify more than one by putting them in a list.</p>
-					<p>{timestamp, formatter | trace}</p>
-					<p>By default, the formatter process adds timestamps to messages received. If accurate timestamps are required, it’s possible to force the usage of timestamps within trace messages by adding the option {timestamp, trace}.</p>
-					<p>{args, arity | args}</p>
+					
+					<p><span class="code">{pid, PidSpec}</span></p>
+					
+					<p>Which processes to trace. Valid options is any of <span class="code">all</span>, <span class="code">new</span>, <span class="code">existing</span>, or a process descriptor (<span class="code">{A,B,C}</span>, <span class="code">"<A.B.C>"</span>, an atom representing a name, <span class="code">{global, Name},{via, Registrar, Name}</span>, or a pid). It’s also possible to specify more than one by putting them in a list.</p>
+					
+					<p><span class="code">{timestamp, formatter | trace}</span></p>
+					
+					<p>By default, the formatter process adds timestamps to messages received. If accurate timestamps are required, it’s possible to force the usage of timestamps within trace messages by adding the option <span class="code">{timestamp, trace}</span>.</p>
+					
+					<p><span class="code">{args, arity | args}</span></p>
+					
 					<p>Whether to print the arity in function calls or their (by default) literal representation.</p>
-					<p>{scope, global | local}</p>
-					<p>By default, only ’global’ (fully qualified function calls) are traced, not calls made internally. To force tracing of local calls, pass in {scope, local}. This is useful whenever you want to track the changes of code in a process that isn’t called with Module:Fun(Args), but just Fun(Args).</p>
+					
+					<p><span class="code">{scope, global | local}</span></p>
+					
+					<p>By default, only ’global’ (fully qualified function calls) are traced, not calls made internally. To force tracing of local calls, pass in <span class="code">{scope, local}</span>. This is useful whenever you want to track the changes of code in a process that isn’t called with <span class="code">Module:Fun(Args)</span>, but just <span class="code">Fun(Args)</span>.</p>
+					
 					<p>With these options, the multiple ways to pattern match on specific calls for specific functions and whatnot, a lot of development and production issues can more quickly be diagnosed. If the idea ever comes to say "hm, maybe I should add more logging there to see what could cause that funny behaviour", tracing can usually be a very fast shortcut to get the data you need without deploying any code or altering its readability.</p>
+				
 				<a id="9_3_example_sessions"><h3>9.3 Example Sessions</h3></a>
 					<p>First let’s trace the queue:new functions in any process:</p>
 <pre><code class="erlang">1> recon_trace:calls({queue, new, ’_’}, 1).
 1
 13:14:34.086078 <0.44.0> queue:new()
 Recon tracer rate limit tripped.</code></pre>
+
 					<p>The limit was set to 1 trace message at most, and recon let us know when that limit was reached.</p>
-					<p>Let’s instead look for all the queue:in/2 calls, to see what it is we’re inserting in queues:</p>
+
+					<p>Let’s instead look for all the <span class="code">queue:in/2</span> calls, to see what it is we’re inserting in queues:</p>
+
 <pre><code class="erlang">2> recon_trace:calls({queue, in, 2}, 1).
 1
 13:14:55.365157 <0.44.0> queue:in(a, {[],[]})
 Recon tracer rate limit tripped.
 </code></pre>
-					<p>In order to see the content we want, we should change the trace patterns to use a fun that matches on all arguments in a list (_) and returns return_trace(). This last part will generate a second trace for each call that includes the return value:</p>
+					<p>In order to see the content we want, we should change the trace patterns to use a fun that matches on all arguments in a list (_) and returns <span class="code">return_trace()</span>. This last part will generate a second trace for each call that includes the return value:</p>
+
 <pre><code class="erlang">3> recon_trace:calls({queue, in, fun(_) -> return_trace() end}, 3).
 1
 13:15:27.655132 <0.44.0> queue:in(a, {[],[]})
 13:15:27.655467 <0.44.0> queue:in/2 --> {[a],[]}
 13:15:27.757921 <0.44.0> queue:in(a, {[],[]})
 Recon tracer rate limit tripped.</code></pre>
+
 					<p>Matching on argument lists can be done in a more complex manner:</p>
+
 <pre><code class="erlang">4> recon_trace:calls(
 4>   {queue, ’_’,
 4>    fun([A,_]) when is_list(A); is_integer(A) andalso A > 1 ->
@@ -2119,29 +2159,33 @@ Recon tracer rate limit tripped.</code></pre>
 5> recon_trace:clear().
 ok
 </code></pre>
+					
 					<p>Note that in the pattern above, no specific function (’_’) was matched against. Instead,the fun used restricted functions to those having two arguments, the first of which is eithera list or an integer greater than 1.</p>
-					<p>Be aware that extremely broad patterns with lax rate-limitting (or very high absolutelimits) may impact your node’s stability in ways recon_trace cannot easily help you with.Similarly, tracing extremely large amounts of function calls (all of them, or all of io for example) can be risky if more trace messages are generated than any process on the nodecould ever handle, despite the precautions taken by the library.</p>
+
+					<p>Be aware that extremely broad patterns with lax rate-limitting (or very high absolutelimits) may impact your node’s stability in ways <span class="code">recon_trace</span> cannot easily help you with.Similarly, tracing extremely large amounts of function calls (all of them, or all of <span class="code">io</span> for example) can be risky if more trace messages are generated than any process on the nodecould ever handle, despite the precautions taken by the library.</p>
+					
 					<p>In doubt, start with the most restrictive tracing possible, with low limits, and progressivelyincrease your scope.</p>
+
 		<a id="9_4_exercises"><h3>9.4 Exercises</h3></a>
 			<h4>Review Questions</h4>
 				<ol>
 					<il>Why is debugger use generally limited on Erlang?</il>
 					<il>What are the options you can use to trace OTP processes?</il>
 					<il>What determines whether a given set of functions or processes get traced?</il>
-					<il>How can you stop tracing with recon_trace? With other tools?</il>
+					<il>How can you stop tracing with <span class="code">recon_trace</span>? With other tools?</il>
 					<il>How can you trace non-exported function calls?</il>
 				</ol>
 			<h4>Open-ended Questions</h4>
 				<ol>
 					<il>When would you want to move time stamping of traces to the VM’s trace mechanismsdirectly? What would be a possible downside of doing this?</il>
-					<il>Imagine that traffic sent out of a node does so over SSL, over a multi-tenant system.However, due to wanting to validate data sent (following a customer complain), youneed to be able to inspect what was seen clear text. Can you think up a plan to be able to snoop in the data sent to their end through the ssl socket, without snooping on the data sent to any other customer?</il>
+					<il>Imagine that traffic sent out of a node does so over SSL, over a multi-tenant system.However, due to wanting to validate data sent (following a customer complain), youneed to be able to inspect what was seen clear text. Can you think up a plan to be able to snoop in the data sent to their end through the <span class="code">ssl</span> socket, without snooping on the data sent to any other customer?</il>
 				</ol>
 			<h4>Hands-On</h4>
 				<p>Using the code at https://github.com/ferd/recon_demo (these may require a decent understanding of the code there):</p>
 				<ol>
-					<il>Can chatty processes (council_member) message themselves? (hint: can this work with registered names? Do you need to check the chattiest process and see if it messages itself?)</il>
+					<il>Can chatty processes (<span class="code">council_member</span>) message themselves? (<span class="it">hint: can this work with registered names? Do you need to check the chattiest process and see if it messages itself?</span>)</il>
 					<il>Can you estimate the overall frequency at which messages are sent globally?</il>
-					<il>Can you crash a node using any of the tracing tools? (hint: dbg makes it easier due to its greater flexibility)</il>
+					<il>Can you crash a node using any of the tracing tools? (<span class="it">hint: dbg makes it easier due to its greater flexibility</span>)</il>
 				</ol>
 <a id="conclusion"><h2>Conclusion</h2></a>
 	<p>Maintaining and debugging software never ends. New bugs and confusing behaviours will keep popping up around the place all the time. There would probably be enough stuff out there to fill out dozens of manuals like this one, even when dealing with the cleanest of all systems.</p>

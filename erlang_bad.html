@@ -1,8 +1,9 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
+		<link rel="stylesheet" href="css/main.css" type="text/css">
 		<link rel="stylesheet" href="css/monokai_sublime.css" type="text/css">
-		<script type="text/javascript" src="js/highlight.pack.js"></script>
+<!--		<script type="text/javascript" src="js/highlight.pack.js"></script> -->
 		<script>hljs.initHighlightingOnLoad();</script>
 	</head>
 	<body>
@@ -231,8 +232,8 @@
 			<p>There are three main types of Erlang code bases you’ll encounter in the wild: raw Erlang code bases, OTP applications, and OTP releases. In this chapter, we’ll look at each of these and try to provide helpful tips on navigating them.</p>
 			<a id="raw_erlang"><h3>1.1. Raw Erlang</h3></a>
 			<p>If you encounter a raw Erlang code base, you’re pretty much on your own. These rarely follow any specific standard, and you have to dive in the old way to figure out whatever happens in there.</p>
-			<p>This means hoping for a <b>README.md</b> file or something similar that can point to an entry point in the application, and going from there, or hoping for some contact information that can be used to ask questions to the author(s) of the library.</p>
-			<p>Fortunately, you should rarely encounter raw Erlang in the wild, and they are often beginner projects, or awesome projects that were once built by Erlang beginners and now need a serious rewrite. In general, the advent of tools such as <a href="https://github.com/rebar/rebar/">rebar</a> <a href="#sub_1_1">1</a> made it so most people use OTP Applications.</p>
+			<p>This means hoping for a <span class="code">README.md</span> file or something similar that can point to an entry point in the application, and going from there, or hoping for some contact information that can be used to ask questions to the author(s) of the library.</p>
+			<p>Fortunately, you should rarely encounter raw Erlang in the wild, and they are often beginner projects, or awesome projects that were once built by Erlang beginners and now need a serious rewrite. In general, the advent of tools such as <a href="https://github.com/rebar/rebar/"><span class="code">rebar</span></a> <a href="#sub_1_1">1</a> made it so most people use OTP Applications.</p>
 			<sub>
 			  <a id="sub_1_1">1</a> <a href="https://github.com/rebar/rebar/">https://github.com/rebar/rebar/</a> — a build tool briefly introduced in <a href="#chapter_2">Chapter 2</a>
 			</sub>
@@ -248,7 +249,7 @@ README.md
 rebar.config</code>
 </pre>
 			<p>There might be slight differences, but the general structure will be the same.</p>
-			<p>Each OTP application should contain an app file, either ebin/<AppName>.app or more often, src/<AppName>.app.src <a href="#sub_1_2">2</a>. There are two main varieties of app files:</p>
+			<p>Each OTP application should contain an <span class="it">app file</span>, either <span class="code">ebin/&ltAppName&gt.app</span> or more often, <span class="code">src/&ltAppName&gt.app.src</span> <a href="#sub_1_2">2</a>. There are two main varieties of <span class="code">app</span> files:</p>
 <pre>
 <code class="erlang">{application, useragent, [
 {description, "Identify browsers & OSes from useragent strings"},
@@ -273,59 +274,59 @@ dispcount_supersup, dispcount_watcher, watchers_sup]}
 ]}.
 </code>
 </pre>
-					<p>This first case is called a <i>library application</i>, while the second case is a regular <i>application</i>.</p>
+					<p>This first case is called a <span class="it">library application</span>, while the second case is a regular <span class="it">application</span>.</p>
 					<sub>
-						<a id="sub_1_2">2</a> A build system generates the final file that goes in ebin. Note that in these cases, many src/<AppName>.app.src files do not specify modules and let the build system take care of it.
+						<a id="sub_1_2">2</a> A build system generates the final file that goes in <span class="code">ebin</span>. Note that in these cases, many <span class="code">src/&ltAppName&gt.app.src</span> files do not specify modules and let the build system take care of it.
 					</sub>
 					<a id="1_2_1_library_applications"><h4>1.2.1 Library Applications</h4></a>
-						<p>Library applications will usually have modules named appname _something, and one module named appname . This will usually be the interface module that’s central to the library and contains a quick way into most of the functionality provided.</p>
-						<p>	By looking at the source of the module, you can figure out how it works with little effort: If the module adheres to any given behaviour (gen_server, gen_fsm, etc.), you’re most likely expected to start a process under one of your own supervisors and call it that way. If no behaviour is included, then you probably have a functional, stateless library on your hands. For this case, the module’s exported functions should give you a quick way to understand its purpose.</p>
+						<p>Library applications will usually have modules named <span class="it">appname</span> <span class="code">_something</span>, and one module named <span class="it">appname</span> . This will usually be the interface module that’s central to the library and contains a quick way into most of the functionality provided.</p>
+						<p>	By looking at the source of the module, you can figure out how it works with little effort: If the module adheres to any given behaviour (<span class="code">gen_server</span>, <span class="code">gen_fsm</span>, etc.), you’re most likely expected to start a process under one of your own supervisors and call it that way. If no behaviour is included, then you probably have a functional, stateless library on your hands. For this case, the module’s exported functions should give you a quick way to understand its purpose.</p>
 					<a id="1_2_2_regular_applications"><h4>1.2.2 Regular Applications</h4></a>
 						<p>For a regular OTP application, there are two potential modules that act as the entry point:</p>
 						<ol>
-							<li>appname</li>
-							<li>appname _app</li>
+							<li><span class="it">appname</span></li>
+							<li><span class="it">appname</span> <span class="code">_app</span></li>
 						</ol>
 						<p>The first file should be similar in use to what we had in a library application (an entry point), while the second one will implement the application behaviour, and will represent the top of the application’s process hierarchy. In some cases the first file will play both roles at once.</p>
-						<p>If you plan on simply adding the application as a dependency to your own app, then look inside appname for details and information. If you need to maintain and/or fix the application, go for appname _app instead.</p>
-						<p>The application will start a top-level supervisor and return its pid. This top-level supervisor will then contain the specifications of all the child processes it will start on its own <a href="#sub_1_3">3</a>.</p>
+						<p>If you plan on simply adding the application as a dependency to your own app, then look inside <span class="it">appname</span> for details and information. If you need to maintain and/or fix the application, go for <span class="it">appname</span> <span class="code">_app</span> instead.</p>
+						<p>The application will start a top-level supervisor and return its <span class="code">pid</span>. This top-level supervisor will then contain the specifications of all the child processes it will start on its own <a href="#sub_1_3">3</a>.</p>
 						<p>The higher a process resides in the tree, the more likely it is to be vital to the survival of the application. You can also estimate how important a process is by the order it is started (all children in the supervision tree are started in order, depth-first). If a process is started later in the supervision tree, it probably depends on processes that were started earlier.</p>
 						<p>Moreover, worker processes that depend on each other within the same application (say, a process that buffers socket communications and relays them to a finite-state machine in charge of understanding the protocol) are likely to be regrouped under the same supervisor and to fail together when something goes wrong. This is a deliberate choice, as it is usually simpler to start from a blank slate, restarting both processes, rather than trying to figure out how to recuperate when one or the other loses or corrupts its state.</p>
 						<sub>
-							<a id="sub_1_3">3</a> In some cases, the supervisor specifies no children: they will either be started dynamically by some function of the API or in a start phase of the application, or the supervisor is only there to allow OTP environment variables (in the env tuple of the app file) to be loaded.
+							<a id="sub_1_3">3</a> In some cases, the supervisor specifies no children: they will either be started dynamically by some function of the API or in a start phase of the application, or the supervisor is only there to allow OTP environment variables (in the <span class="code">env</span> tuple of the app file) to be loaded.
 						</sub>
 						<p>The supervisor restart strategy reflects the relationship between processes under a supervisor:</p>
 						<ul>
 							<li>
-								<b>one_for_one</b> and <b>simple_one_for_one</b> are used for processes that are not dependent upon each other directly, although their failures will collectively be counted towards total application shutdown <a href="#sub_1_4">4</a>.
+								<span class="code">one_for_one</span> and <span class="code">simple_one_for_one </span> are used for processes that are not dependent upon each other directly, although their failures will collectively be counted towards total application shutdown <a href="#sub_1_4">4</a>.
 							</li>
-							<li><b>rest_for_one</b> will be used to represent processes that depend on each other in a linear manner.</li>
-							<li><b>one_for_all</b> is used for processes that entirely depend on each other.</li>
+							<li><span class="code">rest_for_one</span> will be used to represent processes that depend on each other in a linear manner.</li>
+							<li><span class="code">one_for_all</span> is used for processes that entirely depend on each other.</li>
 						</ul>
 						<p>This structure means it is easiest to navigate OTP applications in a top-down manner by exploring supervision subtrees.</p>
 						<p>For each worker process supervised, the behaviour it implements will give a good clue about its purpose:</p>
 						<ul>
-							<li>a <b>gen_server</b> holds resources and tends to follow client/server patterns (or more generally, request/response patterns)</li>
-							<li>a <b>gen_fsm</b> will deal with a sequence of events or inputs and react depending on them, as a Finite State Machine. It will often be used to implement protocols.</li>
-							<li>a <b>gen_event</b> will act as an event hub for callbacks, or as a way to deal with notifications of some sort.</li>
+							<li>a <span class="code">gen_server</span> holds resources and tends to follow client/server patterns (or more generally, request/response patterns)</li>
+							<li>a <span class="code">gen_fsm</span> will deal with a sequence of events or inputs and react depending on them, as a Finite State Machine. It will often be used to implement protocols.</li>
+							<li>a <span class="code">gen_event</span> will act as an event hub for callbacks, or as a way to deal with notifications of some sort.</li>
 						</ul>
 						<p>All of these modules will contain the same kind of structure: exported functions that
 						represent the user-facing interface, exported functions for the callback module, and private functions, usually in that order.</p>
 						<p>Based on their supervision relationship and the typical role of each behaviour, looking at the interface to be used by other modules and the behaviours implemented should reveal a lot of information about the program you’re diving into.</p>
 						<a id="1_2_3_dependencies"><h4>1.2.3 Dependencies</h4></a>
 						<p>All applications have dependencies <a href="#sub_1_5">5</a>, and these dependencies will have their own dependencies. OTP applications usually share no state between them, so it’s possible to know what bits of code depend on what other bits of code by looking at the app file only, assuming the developer wrote them in a mostly correct manner. <a href="#figure_1_1"> Figure 1.1 </a> shows a diagram that can be generated from looking at app files to help understand the structure of OTP applications.</p>
-						<p>Using such a hierarchy and looking at each application’s short description might be helpful to draw a rough, general map of where everything is located. To generate a similar diagram, find recon’s script directory and call escript script/app_deps.erl <a href="#sub_1_6">6</a>. Similar hierarchies can be found using the observer <a href="#sub_1_7">7</a> application, but for individual supervision trees. Put together, you may get an easy way to find out what does what in the code base.</p>
+						<p>Using such a hierarchy and looking at each application’s short description might be helpful to draw a rough, general map of where everything is located. To generate a similar diagram, find <span class="code">recon</span>’s script directory and call <span class="code">escript script/app_deps.erl</span> <a href="#sub_1_6">6</a>. Similar hierarchies can be found using the observer <a href="#sub_1_7">7</a> application, but for individual supervision trees. Put together, you may get an easy way to find out what does what in the code base.</p>
 						<sub>
-							<p><a id="sub_1_4">4</a> Some developers will use one_for_one supervisors when rest_for_one is more appropriate. They require strict ordering to boot correctly, but forget about said order when restarting or if a predecessor dies.</p>
-							<p><a id="sub_1_5">5</a> At the very least on the kernel and stdlib applications</p>
+							<p><a id="sub_1_4">4</a> Some developers will use <span class="code">one_for_one</span> supervisors when <span class="code">rest_for_one</span> is more appropriate. They require strict ordering to boot correctly, but forget about said order when restarting or if a predecessor dies.</p>
+							<p><a id="sub_1_5">5</a> At the very least on the <span class="code">kernel</span> and <span class="code">stdlib</span> applications</p>
 							<p><a id="sub_1_6">6</a> This script depends on graphviz</p>
 							<p><a id="sub_1_7">7</a> <a href="http://www.erlang.org/doc/apps/observer/observer_ug.html">http://www.erlang.org/doc/apps/observer/observer_ug.html</a></p>
 						</sub>
 						<a id="figure_1_1"><img src="images/riak_arc.png"></a>
 						<p>Figure 1.1: Dependency graph of riak_cs, Basho’s open source cloud library. The graph ignores dependencies on common applications like kernel and stdlib. Ovals are applications, rectangles are library applications.</p>
 						<a id="1_3_otp_releases"><h3>1.3 OTP Releases</h3></a>
-						<p>OTP releases are not a lot harder to understand than most OTP applications you’ll encounter in the wild. A release is a set of OTP applications packaged in a production-ready manner so it boots and shuts down without needing to manually call application:start/2 for any app. Of course there’s a bit more to releases than that, but generally, the same discovery process used for individual OTP applications will be applicable here.</p>
-						<p>You’ll usually have a file similar to the configuration files used by systools or reltool, which will state all applications part of the release and a few <a href="#sub_1_8">8</a> options regarding their packaging. To understand them, I recommend reading existing documentation on them. If you’re lucky, the project may be using relx<a href="#sub_1_9">9</a>, an easier tool that was officially released in early 2014.</p>
+						<p>OTP releases are not a lot harder to understand than most OTP applications you’ll encounter in the wild. A release is a set of OTP applications packaged in a production-ready manner so it boots and shuts down without needing to manually call <span class="code">application:start/2</span> for any app. Of course there’s a bit more to releases than that, but generally, the same discovery process used for individual OTP applications will be applicable here.</p>
+						<p>You’ll usually have a file similar to the configuration files used by <span class="code">systools</span> or <span class="code">reltool</span>, which will state all applications part of the release and a few <a href="#sub_1_8">8</a> options regarding their packaging. To understand them, I recommend reading existing documentation on them. If you’re lucky, the project may be using <span class="code">relx</span><a href="#sub_1_9">9</a>, an easier tool that was officially released in early 2014.</p>
 						<sub>
 							<p><a id="sub_1_8">8</a> A lot</p>
 							<p><a id="sub_1_9">9</a> <a href="https://github.com/erlware/relx/wiki">https://github.com/erlware/relx/wiki</a></p>
@@ -335,8 +336,8 @@ dispcount_supersup, dispcount_watcher, watchers_sup]}
 						<ol>
 							<li>How do you know if a code base is an application? A release?</li>
 							<li>What differentiates an application from a library application?</li>
-							<li>What can be said of processes under a one_for_all scheme for supervision?</li>
-							<li>Why would someone use a gen_fsm behaviour over a gen_server?</li>
+							<li>What can be said of processes under a <span class="code">one_for_all</span> scheme for supervision?</li>
+							<li>Why would someone use a <span class="code">gen_fsm</span> behaviour over a <span class="code">gen_server</span>?</li>
 						</ol>
 						<a id="1_4_hands_on"><h4>Hands-on</h4></a>
 						<p>Download the code at <a href="https://github.com/ferd/recon_demo">https://github.com/ferd/recon_demo</a>. This will be used as a test bed for exercises throughout the book. Given you are not familiar with the code base yet, let’s see if you can use the tips and tricks mentioned in this chapter to get an  understanding of it.</p>
@@ -344,9 +345,9 @@ dispcount_supersup, dispcount_watcher, watchers_sup]}
 							<li>Is this application meant to be used as a library? A standalone system?</li>
 							<li>What does it do?</li>
 							<li>Does it have any dependencies? What are they?</li>
-							<li>The app’s README mentions being non-deterministic. Can you prove if this is true? How?</li>
+							<li>The app’s <span class="code">README</span> mentions being non-deterministic. Can you prove if this is true? How?</li>
 							<li>Can you express the dependency chain of applications in there? Generate a diagram of them?</li>
-							<li>Can you add more processes to the main application than those described in the README?</li>
+							<li>Can you add more processes to the main application than those described in the <span class="code">README</span>?</li>
 						</ol>
 						
 						<a id="chapter_2"><h2>Chapter 2</h2></a>
@@ -955,7 +956,7 @@ Attaching to /tmp/erl_pipe (^D to exit)
 						
 						<p>The result being that there is a decent chunk of CPU usage that would be mostly free for scheduling actual Erlang work (assuming the schedulers are busy waiting more than trying to select tasks to run), but is being reported as busy by the OS.</p>
 						
-						<p>Another interesting behaviour possible is that the scheduler usage may show a higher rate (1.0) than what the OS will report. Schedulers waiting for os resources are considered utilized as they cannot handle more work. If the OS itself is holding up on non-CPU tasks it is still possible for Erlang’s schedulers not to be able to do more work and report a full ratio.</p>
+						<p>Anotehr interesting behaviour possible is that the scheduler usage may show a higher rate (1.0) than what the OS will report. Schedulers waiting for os resources are considered utilized as they cannot handle more work. If the OS itself is holding up on non-CPU tasks it is still possible for Erlang’s schedulers not to be able to do more work and report a full ratio.</p>
 						
 						<p>These behaviours may especially be important to consider when doing capacity planning, and can be better indicators of headroom than looking at CPU usage or load.</p>
 						

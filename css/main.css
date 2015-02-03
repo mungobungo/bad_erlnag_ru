@@ -93,11 +93,30 @@ textarea {
     padding: 0.2em 0;
 }
 
+
 /* ==========================================================================
    Author's custom styles
    ========================================================================== */
+.code  {
 
+    font-family: "consolas",monospace !important;
+    font-size: 16px !important;
+    color: #666 !important;
+    font-style: bold !important;
+    background: none repeat scroll 0% 0% #EFC;
+    border-bottom: 1px dotted #AD9;
+    color: #555;
+}
 
+  
+.it  {
+
+    font-family: "consolas",monospace !important;
+    font-size: 16px !important;
+    color: #666 !important;
+    font-style: italic !important;
+    
+}
 
 
 

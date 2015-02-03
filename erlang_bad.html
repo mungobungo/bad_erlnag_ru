@@ -1550,7 +1550,7 @@ Process States when crashing (sum):
 										<li>Are the crashes cyclical? How predictable are they? What else tends to happen at around the same time and could it be related?</li>
 										<li>Do crashes coincide with peaks in load on your systems, or do they seem to happen at more or less any time? Crashes that happen especially <span class="it">during</span> peak times are often due to bad overload management (see Chapter 3). Crashes that happen at any time, even when load goes down following a peak are more likely to be actual memory issues.</li>
 									</ul>
-		<p>If all of this seems to point towards a memory leak, install one of the metrics libraries mentioned in Chapter 5 and/or <span class="code">recon</span> and get ready to dive in.1</p>
+		<p>If all of this seems to point towards a memory leak, install one of the metrics libraries mentioned in <a href="#chapter_5">Chapter 5</a> and/or <span class="code">recon</span> and get ready to dive in.<sup><a href="#sub_7_1">1</a></sup></p>
 
 		<p>The first thing to look at in any of these cases is trends. Check for all types of memory using <span class="code">erlang:memory()</span> or some variant of it you have in a library or metrics system. Check for the following points:</p>
 									<ul>
@@ -1564,24 +1564,24 @@ Process States when crashing (sum):
 				
 				<p><span class="it">Don’t use dynamic atoms!</span> Atoms go in a global table and are cached forever. Look for places where you call <span class="code">erlang:binary_to_term/1</span> and <span class="code">erlang:list_to_atom/1</span>, and consider switching to safer variants (<span class="code">erlang:binary_to_term(Bin, [safe]</span>) and <span class="code">erlang:list_to_existing_atom/1</span>).</p>
 			
-				<p>If you use the <span class="code">xmerl</span> library that ships with Erlang, consider open source alternatives2 or figuring the way to add your own SAX parser that can be safe3.</p>
+				<p>If you use the <span class="code">xmerl</span> library that ships with Erlang, consider open source alternatives<sup><a href="#sub_7_2">2</a></sup> or figuring the way to add your own SAX parser that can be safe<sup><a href="#sub_7_3">3</a></sup>.</p>
 			
-				<p>If you do none of this, consider what you do to interact with the node. One specific case that bit me in production was that some of our common tools used random names to connect to nodes remotely, or generated nodes with random names that connected to each other from a central server.4 Erlang node names are converted to atoms, so just having this was enough to slowly but surely exhaust space on atom tables. Make sure you generate them from a fixed set, or slowly enough that it won’t be a problem in the long run.</p>
+				<p>If you do none of this, consider what you do to interact with the node. One specific case that bit me in production was that some of our common tools used random names to connect to nodes remotely, or generated nodes with random names that connected to each other from a central server.<sup><a href="#sub_7_4">4</a></sup> Erlang node names are converted to atoms, so just having this was enough to slowly but surely exhaust space on atom tables. Make sure you generate them from a fixed set, or slowly enough that it won’t be a problem in the long run.</p>
 			
 			<a id="7_1_2_binary"><h4>7.1.2 Binary</h4></a>
-				<p>See Section 7.2.</p>
+				<p>See Section <a href="#7_2_binaries">7.2 Binaries</a></p>
 			
 			<a id="7_1_3_code"><h4>7.1.3. Code</h4></a>
 				<p>The code on an Erlang node is loaded in memory in its own area, and sits there until it is garbage collected. Only two copies of a module can coexist at one time, so looking for very large modules should be easy-ish.</p>
 
 				<sub>
-					1See Chapter 4 if you need help to connect to a running node
-					<br/>2I don’t dislike <span class="code">exml</span> or <span class="code">erlsom</span>
-					<br/>3See Ulf Wiger at http://erlang.org/pipermail/erlang-questions/2013-July/074901.html
-					<br/>4This is a common approach to figuring out how to connect nodes together: have one or two central nodes with fixed names, and have every other one log to them. Connections will then propagate automatically.
+					<p><a id="sub_7_1">1</a> See <a href="#chapter_4">Chapter 4</a> if you need help to connect to a running node </p>
+					<p><a id="sub_7_2">2</a> I don’t dislike <span class="code">exml</span> or <span class="code">erlsom</span></p>
+					<p><a id="sub_7_3">3</a> See Ulf Wiger at http://erlang.org/pipermail/erlang-questions/2013-July/074901.html</p>
+					<p><a id="sub_7_4">4</a> This is a common approach to figuring out how to connect nodes together: have one or two central nodes with fixed names, and have every other one log to them. Connections will then propagate automatically.</p>
 				</sub>
 				
-				<p>If none of them stand out, look for code compiled with HiPE5. HiPE code, unlike regular BEAM code, is native code and cannot be garbage collected from the VM when new versions are loaded. Memory can accumulate, usually very slowly, if many or large modules are native-compiled and loaded at run time.</p>
+				<p>If none of them stand out, look for code compiled with HiPE<sup><a href="#sub_7_5">5</a></sup>. HiPE code, unlike regular BEAM code, is native code and cannot be garbage collected from the VM when new versions are loaded. Memory can accumulate, usually very slowly, if many or large modules are native-compiled and loaded at run time.</p>
 				
 				<p>Alternatively, you may look for weird modules you didn’t load yourself on the node and panic if someone got access to your system!</p>
 			<a id="7_1_4_ets"><h4>7.1.4 ETS</h4></a>
@@ -1590,7 +1590,7 @@ Process States when crashing (sum):
 				
 				<p>In the rare cases you’re actually leaking ETS data, call the undocumented <span class="code">ets:i()</span> function in the shell. It will print out information regarding number of entries (<span class="code">size</span>) and how much memory they take (<span class="code">mem</span>). Figure out if anything is bad.</p>
 				
-				<p>It’s entirely possible all the data there is legit, and you’re facing the difficult problem of needing to shard your data set and distribute it over many nodes. This is out of scope for this book, so best of luck to you. You can look into compression of your tables if you need to buy time, however.6</p>
+				<p>It’s entirely possible all the data there is legit, and you’re facing the difficult problem of needing to shard your data set and distribute it over many nodes. This is out of scope for this book, so best of luck to you. You can look into compression of your tables if you need to buy time, however.<sup><a href="#sub_7_6">6</a></sup></p>
 			
 			<a id="7_1_5_processes"><h4>7.1.5 Processes</h4></a>
 				<h5>Links and Monitors</h5>
@@ -1604,8 +1604,8 @@ Process States when crashing (sum):
 []==Ls, []==Ms].</code></pre>
 
 					<sub>
-						5http://www.erlang.org/doc/man/HiPE_app.html
-						<br/>6See the <span class="code">compressed</span> option for <span class="code">ets:new/2</span>
+						<p><a id="sub_7_5">5</a> http://www.erlang.org/doc/man/HiPE_app.html</p>
+						<p><a id="sub_7_6">6</a> See the <span class="code">compressed</span> option for <span class="code">ets:new/2</span></p>
 					</sub>
 					
 					<p>This will return a list of processes with neither. For supervisors, just fetching <span class="code">supervisor:count_children(SupervisorPidOrName)</span> and seeing what looks normal can be a good pointer.</p>
@@ -1633,14 +1633,15 @@ Process States when crashing (sum):
 					<p>Attributes that may be interesting to check other than memory may be any other fields in Subsection 5.2.1, including <span class="code">message_queue_len</span>, but <span class="code">memory</span> will usually encompass all other types.</p>
 
 				<h5>Garbage Collections</h5>
+					
 					<p>It is very well possible that a process uses lots of memory, but only for short periods of time. For long-lived nodes with a large overhead for operations, this is usually not a problem, but whenever memory starts being scarce, such spiky behaviour might be something you want to get rid of.</p>
 									
-					<p>Monitoring all garbage collections in real-time from the shell would be costly. Instead, setting up Erlang’s system monitor7 might be the best way to go at it.</p>
+					<p>Monitoring all garbage collections in real-time from the shell would be costly. Instead, setting up Erlang’s system monitor<sup><a href="#sub_7_7">7</a></sup> might be the best way to go at it.</p>
 									
 					<p>Erlang’s system monitor will allow you to track information such as long garbage collection periods and large process heaps, among other things. A monitor can temporarily be set up as follows:</p>
 									
 					<sub>
-						7http://www.erlang.org/doc/man/erlang.html#system_monitor-2
+						<p><a id="sub_7_7">7</a> http://www.erlang.org/doc/man/erlang.html#system_monitor-2</p>
 					</sub>
 <pre><code class="erlang">1> erlang:system_monitor().
 undefined
@@ -1672,7 +1673,7 @@ undefined</code></pre>
 			<p>If nothing seems to stand out in the preceding material, binary leaks (Section 7.2) and memory fragmentation (Section 7.3) may be the culprits. If nothing there fits either, it’s possible a C driver, NIF, or even the VM itself is leaking. Of course, a possible scenario is that load on the node and memory usage were proportional, and nothing specifically ended up being leaky or modified. The system just needs more resources or nodes.</p>
 									
 	<a id="7_2_binaries"><h3>7.2 Binaries</h3></a>
-		<p>Erlang’s binaries are of two main types: ProcBins and Refc binaries8. Binaries up to 64 bytes are allocated directly on the process’s heap, and their entire life cycle is spent in there. Binaries bigger than that get allocated in a global heap for binaries only, and each process to use one holds a local reference to it in its local heap. These binaries are referencecounted, and the deallocation will occur only once all references are garbage-collected from all processes that pointed to a specific binary.</p>
+		<p>Erlang’s binaries are of two main types: ProcBins and Refc binaries<sup><a href="#sub_7_8">8</a></sup>. Binaries up to 64 bytes are allocated directly on the process’s heap, and their entire life cycle is spent in there. Binaries bigger than that get allocated in a global heap for binaries only, and each process to use one holds a local reference to it in its local heap. These binaries are referencecounted, and the deallocation will occur only once all references are garbage-collected from all processes that pointed to a specific binary.</p>
 									
 		<p>In 99% of the cases, this mechanism works entirely fine. In some cases, however, the process will either:</p>
 		<ol>
@@ -1703,13 +1704,15 @@ undefined</code></pre>
    {initial_call,{proc_lib,init_p,5}}]}]
 </code></pre>
 			
-			<sub>8http://www.erlang.org/doc/efficiency_guide/binaryhandling.html#id65798</sub>
+			<sub>
+				<p><a id="sub_7_8">8</a> http://www.erlang.org/doc/efficiency_guide/binaryhandling.html#id65798</p>
+			</sub>
 			
 			<p>This will show how many individual binaries were held and then freed by each process as a delta. The value <span class="code">-5580</span> means there were 5580 fewer refc binaries after the call than before.</p>
 			
 			<p>It is normal to have a given amount of them stored at any point in time, and not all numbers are a sign that something is bad. If you see the memory used by the VM go down drastically after running this call, you may have had a lot of idling refc binaries.</p>
 			
-			<p>Similarly, if you instead see some processes hold impressively large numbers of them9, that might be a good sign you have a problem.</p>
+			<p>Similarly, if you instead see some processes hold impressively large numbers of them<sup><a href="#sub_7_9">9</a></sup>, that might be a good sign you have a problem.</p>
 			
 			<p>You can further validate the top consumers in total binary memory by using the special <span class="code">binary_memory</span> attribute supported in <span class="code">recon</span>:</p>
 
@@ -1736,11 +1739,15 @@ undefined</code></pre>
 			<ul>
 				<li>call garbage collection manually at given intervals (icky, but somewhat efficient);</li>
 				<li>stop using binaries (often not desirable);</li>
-				<li>use <span class="code">binary:copy/1-2</span>10 if keeping only a small fragment (usually less than 64 bytes) of a larger binary;11</li>
+				<li>use <span class="code">binary:copy/1-2</span><sup><a href="#sub_7_10">10</a></sup> if keeping only a small fragment (usually less than 64 bytes) of a larger binary;<sup><a href="#sub_7_11">11</a></sup></li>
 				<li>move work that involves larger binaries to temporary one-off processes that will die when they’re done (a lesser form of manual GC!);</li>
 				<li>or add hibernation calls when appropriate (possibly the cleanest solution for inactiveprocesses).</li>
 			</ul>
-			<sub>9We’ve seen some processes hold hundreds of thousands of them during leak investigations at Heroku!</sub>
+			
+			<sub>
+				<p><a id="sub_7_9">9</a> We’ve seen some processes hold hundreds of thousands of them during leak investigations at Heroku!</p>
+			</sub>
+			
 			<p>The first two options are frankly not agreeable and should not be attempted before all else failed. The last three options are usually the best ones to be used.</p>
 			<h5>Routing Binaries</h5>
 				<p>There’s a specific solution for a specific use case some Erlang users have reported. The problematic use case is usually having a middleman process routing binaries from one process to another one. That middleman process will therefore acquire a reference to every binary passing through it and risks being a common major source of refc binaries leaks.</p>
@@ -1749,7 +1756,7 @@ undefined</code></pre>
 		
 		<a id="7_3_memory_fragmentation"><h3>7.3 Memory Fragmentation</h3></a>
 			
-			<p>Memory fragmentation issues are intimately related to Erlang’s memory model, as describedin Section 7.3.2. It is by far one of the trickiest issues of running long-lived Erlang nodes(often when individual node uptime reaches many months), and will show up relatively rarely.</p>
+			<p>Memory fragmentation issues are intimately related to Erlang’s memory model, as described in <a href="#7_3_2_erlang_memory_model">Section 7.3.2 Erlang's memory model</a>. It is by far one of the trickiest issues of running long-lived Erlang nodes(often when individual node uptime reaches many months), and will show up relatively rarely.</p>
 			
 			<p>The general symptoms of memory fragmentation are large amounts of memory beingallocated during peak load, and that memory not going away after the fact. Thedamning factor will be that the node will internally report much lower usage (through <span class="code">erlang:memory()</span>) than what is reported by the operating system.</p>
 
@@ -1757,8 +1764,8 @@ undefined</code></pre>
 				<p>The <span class="code">recon_alloc</span> module was developed specifically to detect and help point towards the resolution of such issues.</p>
 				
 				<sub>
-					<br/>10http://www.erlang.org/doc/man/binary.html#copy-1
-					<br/>11It might be worth copying even a larger fragment of a refc binary. For example, copying 10 megabytes off a 2 gigabytes binary should be worth the short-term overhead if it allows the 2 gigabytes binary to be garbage-collected while keeping the smaller fragment longer.
+					<p><a id="sub_7_10">10</a> http://www.erlang.org/doc/man/binary.html#copy-1</p>
+					<p><a id="sub_7_11">11</a> It might be worth copying even a larger fragment of a refc binary. For example, copying 10 megabytes off a 2 gigabytes binary should be worth the short-term overhead if it allows the 2 gigabytes binary to be garbage-collected while keeping the smaller fragment longer.</p>
 				</sub>
 				
 				<h5>Check Allocated Memory</h5>
@@ -1768,17 +1775,17 @@ undefined</code></pre>
 					<ol>
 						<li>call <span class="code">recon_alloc:memory(usage)</span>. This will return a value between 0 and 1 representinga percentage of memory that is being actively used by Erlang terms versus the memory that the Erlang VM has obtained from the OS for such purposes. If the usage is close to 100%, you likely do not have memory fragmentation issues. You’re just using a lot of it.</li>
 						
-						<li>check if <span class="code">recon_alloc:memory(allocated)</span> matches what the OS reports.12 It should match it fairly closely if the problem is really about fragmentation or a memory leak from Erlang terms.</li>
+						<li>check if <span class="code">recon_alloc:memory(allocated)</span> matches what the OS reports.<sup><a href="#sub_7_12">12</a></sup> It should match it fairly closely if the problem is really about fragmentation or a memory leak from Erlang terms.</li>
 					</ol>
 					
 					<p>That should confirm if memory seems to be fragmented or not.</p>
 				
 				<h5>Find the Guilty Allocator</h5>
-					<p>Call <span class="code">recon_alloc:memory(allocated_types)</span> to see which type of util allocator (see Section 7.3.2) is allocating the most memory. See if one looks like an obvious culprit when you compare the results with <span class="code">erlang:memory()</span>.</p>
+					<p>Call <span class="code">recon_alloc:memory(allocated_types)</span> to see which type of util allocator (see <a href="#7_3_2_erlang_memory_model">Section 7.3.2 Erlang's memory model</a>) is allocating the most memory. See if one looks like an obvious culprit when you compare the results with <span class="code">erlang:memory()</span>.</p>
 					
-					<p>Try recon_alloc:fragmentation(current). The resulting data dump will show different allocators on the node with various usage ratios.13</p>
+					<p>Try <span class="code">recon_alloc:fragmentation(current)</span>. The resulting data dump will show different allocators on the node with various usage ratios.<sup><a href="#sub_7_13">13</a></sup></p>
 					
-					<p>If you see very low ratios, check if they differ when calling recon_alloc:fragmentation(max), which should show what the usage patterns were like under your max memory load.</p>
+					<p>If you see very low ratios, check if they differ when calling <span class="code"> recon_alloc:fragmentation(max)</span>, which should show what the usage patterns were like under your max memory load.</p>
 					
 					<p>If there is a big difference, you are likely having issues with memory fragmentation for a few specific allocator types following usage spikes.</p>
 			<a id="7_3_2_erlang_memory_model"><h4>Erlang’s Memory Model</h4></a>
@@ -1788,15 +1795,15 @@ undefined</code></pre>
 						<p>To understand where memory goes, one must first understand the many allocators being used. Erlang’s memory model, for the entire virtual machine, is hierarchical. As shown in Figure 7.1, there are two main allocators, and a bunch of sub-allocators (numbered 1-9)</p>
 						
 						<sub>
-							12You can call <span class="code">recon_alloc:set_unit(Type)</span> to set the values reported by <span class="code">recon_alloc</span> in bytes, kilobytes, megabytes, or gigabytes
-							<br/>13More information is available at http://ferd.github.io/recon/recon_alloc.html
+							<p><a id="sub_7_12">12</a> You can call <span class="code">recon_alloc:set_unit(Type)</span> to set the values reported by <span class="code">recon_alloc</span> in bytes, kilobytes, megabytes, or gigabytes</p>
+							<p><a id="sub_7_13">13</a> More information is available at http://ferd.github.io/recon/recon_alloc.html</p>
 						</sub>
 						
 						<img src="images/memory_allocators.png">
 						
 						<p>Figure 7.1: Erlang’s Memory allocators and their hierarchy. Not shown is the special <span class="it">super carrier</span>, optionally allowing to pre-allocate (and limit) all memory available to the Erlang VM since R16B03.</p>
 						
-						<p>The sub-allocators are the specific allocators used directly by Erlang code and the VM for most data types:14</p>
+						<p>The sub-allocators are the specific allocators used directly by Erlang code and the VM for most data types:<sup><a href="#sub_7_14">14</a></sup></p>
 						
 						<ol>
 							<li><span class="code">temp_alloc</span>: does temporary allocations for short use cases (such as data living within a single C function call).</li>
@@ -1817,18 +1824,19 @@ undefined</code></pre>
 						
 						<p>Each of these sub-allocators will request memory from <span class="code">mseg_alloc</span> and <span class="code">sys_alloc</span> depending on the use case, and in two possible ways. The first way is to act as a multiblock carrier (<span class="code">mbcs</span>), which will fetch chunks of memory that will be used for many Erlang terms at once. For each <span class="code">mbc</span>, the VM will set aside a given amount of memory (about 8MB by default in our case, which can be configured by tweaking VM options), and each term allocated will be free to go look into the many multiblock carriers to find some decent space in which to reside.</p>
 
-						<p>Whenever the item to be allocated is greater than the single block carrier threshold (<span class="code">sbct</span>)15, the allocator switches this allocation into a single block carrier (<span class="code">sbcs</span>). A single block carrier will request memory directly from <span class="code">mseg_alloc</span> for the first <span class="code">mmsbc</span>16 entries, and then switch over to <span class="code">sys_alloc</span> and store the term there until it’s deallocated.</p>
+						<p>Whenever the item to be allocated is greater than the single block carrier threshold (<span class="code">sbct</span>)<sup><a href="#sub_7_15">15</a></sup>, the allocator switches this allocation into a single block carrier (<span class="code">sbcs</span>). A single block carrier will request memory directly from <span class="code">mseg_alloc</span> for the first <span class="code">mmsbc</span><sup><a href="#sub_7_12">16</a></sup> entries, and then switch over to <span class="code">sys_alloc</span> and store the term there until it’s deallocated.</p>
 
 						<p>So looking at something such as the binary allocator, we may end up with something similar to Figure 7.2</p>
 
-						<sub>15http://erlang.org/doc/man/erts_alloc.html#M_sbct
-							<br/>16http://erlang.org/doc/man/erts_alloc.html#M_mmsbc
+						<sub>
+							<p><a id="sub_7_15">15</a> http://erlang.org/doc/man/erts_alloc.html#M_sbct</p>
+							<p><a id="sub_7_16">16</a> http://erlang.org/doc/man/erts_alloc.html#M_mmsbc</p>
 						</sub>
 						
 						<img src="images/memory_allocators3.png">
 						<p>Example memory allocated in a specific sub-allocator</p>
 						
-						<p>Whenever a multiblock carrier (or the first <span class="code">mmsbc</span>17 single block carriers) can be reclaimed, <span class="code">mseg_alloc</span> will try to keep it in memory for a while so that the next allocation spike that hits your VM can use pre-allocated memory rather than needing to ask the system for more each time.</p>
+						<p>Whenever a multiblock carrier (or the first <span class="code">mmsbc</span><sup><a href="#sub_7_17">17</a> single block carriers) can be reclaimed, <span class="code">mseg_alloc</span> will try to keep it in memory for a while so that the next allocation spike that hits your VM can use pre-allocated memory rather than needing to ask the system for more each time.</p>
 						
 						<p>You then need to know the different memory allocation strategies of the Erlang virtual machine:</p>
 						
@@ -1842,13 +1850,13 @@ undefined</code></pre>
 							<li>A fit (<span class="code">af</span>)</li>
 						</ol>
 						
-						<p>Each of these strategies can be configured individually for each <span class="code">alloc_util</span> allocator18</p>
+						<p>Each of these strategies can be configured individually for each <span class="code">alloc_util</span> allocator<sup><a href="#sub_7_18">18</a></sup></p>
 						
 						<p>For <span class="it">best fit</span> (<span class="code">bf</span>), the VM builds a balanced binary tree of all the free blocks’ sizes, and will try to find the smallest one that will accommodate the piece of data and allocate it there. In Figure 7.3, having a piece of data that requires three blocks would likely end in area 3.</p>
 						
 						<sub>
-							17http://erlang.org/doc/man/erts_alloc.html#M_mmsbc
-							<br/>18http://erlang.org/doc/man/erts_alloc.html#M_as
+							<p><a id="sub_7_17">17</a> http://erlang.org/doc/man/erts_alloc.html#M_mmsbc</p>
+							<p><a id="sub_7_18">18</a> http://erlang.org/doc/man/erts_alloc.html#M_as</p>
 						</sub>
 						
 						<img src="images/memory_allocators4.png">
@@ -1862,15 +1870,15 @@ undefined</code></pre>
 						
 						<p><span class="it">Address order first fit carrier address order best fit</span> (<span class="code">aoffcaobf</span>) will be similar to <span class="code">aoffcbf</span>, but if multiple areas within a carrier have the same size, it will favor the one with the smallest address between the two rather than leaving it unspecified.</p>
 						
-						<p><span class="it">Good fit</span> (<span class="code">gf</span>) is a different kind of allocator; it will try to work like best fit (<span class="code">bf</span>), but will only search for a limited amount of time. If it doesn’t find a perfect fit there and then,it will pick the best one encountered so far. The value is configurable through the <span class="code">mbsd</span>19 VM argument.</p>
+						<p><span class="it">Good fit</span> (<span class="code">gf</span>) is a different kind of allocator; it will try to work like best fit (<span class="code">bf</span>), but will only search for a limited amount of time. If it doesn’t find a perfect fit there and then,it will pick the best one encountered so far. The value is configurable through the <span class="code">mbsd</span><sup><a href="#sub_7_19">19</a></sup> VM argument.</p>
 						
 						<p><span class="it">A fit</span> (<span class="code">af</span>), finally, is an allocator behaviour for temporary data that looks for a single existing memory block, and if the data can fit, af uses it. If the data can’t fit, af allocates a new one.</p>
 						
 						<p>Each of these strategies can be applied individually to every kind of allocator, so that the heap allocator and the binary allocator do not necessarily share the same strategy.</p>
 						
-						<p>Finally, starting with Erlang version 17.0, each <span class="code">alloc_util</span> allocator on each scheduler has what is called a <span class="code">mbcs</span> <span class="it">pool</span>. The <span class="code">mbcs</span> pool is a feature used to fight against memory fragmentation on the VM. When an allocator gets to have one of its multiblock carriers become mostly empty,20 the carrier becomes <span class="it">abandoned</span>.</p>
+						<p>Finally, starting with Erlang version 17.0, each <span class="code">alloc_util</span> allocator on each scheduler has what is called a <span class="code">mbcs</span> <span class="it">pool</span>. The <span class="code">mbcs</span> pool is a feature used to fight against memory fragmentation on the VM. When an allocator gets to have one of its multiblock carriers become mostly empty,<sup><a href="#sub_7_20">20</a></sup> the carrier becomes <span class="it">abandoned</span>.</p>
 						
-						<p>This abandoned carrier will stop being used for new allocations, until new multiblock carriers start being required. When this happens, the carrier will be fetched from the <span class="code">mbcs</span> pool. This can be done across multiple <span class="code">alloc_util</span> allocators of the same type across schedulers. This allows the VM to cache mostly-empty carriers without forcing deallocation of their memory.21 It also enables the migration of carriers across schedulers when they contain little data, according to their needs.</p>
+						<p>This abandoned carrier will stop being used for new allocations, until new multiblock carriers start being required. When this happens, the carrier will be fetched from the <span class="code">mbcs</span> pool. This can be done across multiple <span class="code">alloc_util</span> allocators of the same type across schedulers. This allows the VM to cache mostly-empty carriers without forcing deallocation of their memory.<sup><a href="#sub_7_21">21</a></sup> It also enables the migration of carriers across schedulers when they contain little data, according to their needs.</p>
 						
 						<h5>The Process Level</h5>
 
@@ -1888,10 +1896,10 @@ undefined</code></pre>
 <pre><code class="erlang">[heap     ||      stack]</code></pre>
 						
 						<sub>
-							<p>19http://www.erlang.org/doc/man/erts_alloc.html#M_mbsd
+							<p><a id="sub_7_19">19</a> http://www.erlang.org/doc/man/erts_alloc.html#M_mbsd
 							</p>
-							<p>20The threshold is configurable through http://www.erlang.org/doc/man/erts_alloc.html#M_acul</p>
-							<p>21In cases this consumes too much memory, the feature can be disabled with the options <span class="code">+MBacul 0</span>.</p>
+							<p><a id="sub_7_20">20</a> The threshold is configurable through http://www.erlang.org/doc/man/erts_alloc.html#M_acul</p>
+							<p><a id="sub_7_21">21</a> In cases this consumes too much memory, the feature can be disabled with the options <span class="code">+MBacul 0</span>.</p>
 						</sub>
 						
 						<p>The space is allocated more and more up until either the stack or the heap can’t fit in anymore. This triggers a minor GC. The minor GC moves the data that can be kept into the old heap. It then collects the rest, and may end up reallocating more space.</p>
@@ -1904,7 +1912,7 @@ undefined</code></pre>
 
 				<p>Tweaking your VM’s options for memory allocation may help.</p>
 
-				<p>You will likely need to have a good understanding of what your type of memory load and usage is, and be ready to do a lot of in-depth testing. The <span class="code">recon_alloc</span> module contains a few helper functions to provide guidance, and the module’s documentation22 should be read at this point.</p>
+				<p>You will likely need to have a good understanding of what your type of memory load and usage is, and be ready to do a lot of in-depth testing. The <span class="code">recon_alloc</span> module contains a few helper functions to provide guidance, and the module’s documentation<sup><a href="#sub_7_22">22</a></sup> should be read at this point.</p>
 				
 				<p>You will need to figure out what the average data size is, the frequency of allocation and deallocation, whether the data fits in <span class="code">mbcs</span> or <span class="code">sbcs</span>, and you will then need to try playing with a bunch of the options mentioned in <span class="code">recon_alloc</span>, try the different strategies, deploy them, and see if things improve or if they impact times negatively.</p>
 				
@@ -1920,7 +1928,9 @@ undefined</code></pre>
 				<li>How could code itself cause a leak?</li>
 				<li>How can you find out if garbage collections are taking too long to run?</li>
 			</ol>
-<sub>22http://ferd.github.io/recon/recon_alloc.html</sub>
+		<sub>
+			<p><a id="sub_7_22">22</a> http://ferd.github.io/recon/recon_alloc.html</p>
+		</sub>
 		<h4>Open-ended Questions</h4>
 			<ol>
 				<li>How could you verify if a leak is caused by forgetting to kill processes, or by processes using too much memory on their own?</li>

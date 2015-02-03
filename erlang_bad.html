@@ -856,7 +856,7 @@ Attaching to /tmp/erl_pipe (^D to exit)
 						
 			<p>However, these features aren’t all in one place, and can make it too easy to shoot yourself in the foot within a production system. They also tend to be closer to building blocks than usable tools.</p>
 						
-			<p>Therefore, to make the text lighter and to be more usable, common operations have been regrouped in the recon2 library, and are generally production-safe.</p>
+			<p>Therefore, to make the text lighter and to be more usable, common operations have been regrouped in the <span class="code">recon</span>2 library, and are generally production-safe.</p>
 						
 						<sub>
 						1 Making sure your automated processes don’t run away and go overboard with whatever corrective actions they take is more complex
@@ -868,16 +868,16 @@ Attaching to /tmp/erl_pipe (^D to exit)
 						
 						<p>For these cases, using existing Erlang metrics applications is useful. Common options are:</p>
 						<ul>
-							<li> folsom3 to store metrics in memory within the VM, whether global or app-specific</li>
-							<li>vmstats4 and statsderl5, sending node metrics over to graphite through statsd6 .</li>
-							<li>exometer7, a fancy-pants metrics system that can integrate with folsom (among other things), and a variety of back-ends (graphite, collectd, statsd, Riak, SNMP, etc.). It’s the newest player in town</li>
-							<li>ehmon8 for output done directly to standard output, to be grabbed later through specific agents, splunk, and so on.</li>
+							<li> <span class="code">folsom</span>3 to store metrics in memory within the VM, whether global or app-specific</li>
+							<li><span class="code">vmstats</span>4 and <span class="code">statsderl</span>5, sending node metrics over to graphite through <span class="code">statsd</span>6 .</li>
+							<li><span class="code">exometer</span>7, a fancy-pants metrics system that can integrate with <span class="code">folsom</span> (among other things), and a variety of back-ends (graphite, collectd, <span class="code">statsd</span>, Riak, SNMP, etc.). It’s the newest player in town</li>
+							<li><span class="code">ehmon</span>8 for output done directly to standard output, to be grabbed later through specific agents, splunk, and so on.</li>
 							<li>custom hand-rolled solutions, generally using ETS tables and processes periodically dumping the data.9</li>
 							<li> or if you have nothing and are in trouble, a function printing stuff in a loop in a shell10.</li>
 						</ul>
 						<p>It is generally a good idea to explore them a bit, pick one, and get a persistence layer that will let you look through your metrics over time. </p>
 						<a id="5_1_1_memory"><h4>5.1.1 Memory</h4></a>
-						<p>The memory reported by the Erlang VM in most tools will be a variant of what is reported by erlang:memory():</p>
+						<p>The memory reported by the Erlang VM in most tools will be a variant of what is reported by <span class="code">erlang:memory()</span>:</p>
 <pre><code class="erlang">
 1> erlang:memory().
 [{total,13772400},
@@ -897,23 +897,23 @@ Attaching to /tmp/erl_pipe (^D to exit)
 						<br/>6 https://github.com/etsy/statsd/
 						<br/>7 https://github.com/Feuerlabs/exometer
 						<br/>8 https://github.com/heroku/ehmon
-						<br/>9 Common patterns may fit the ectr application, at https://github.com/heroku/ectr
-						<br/>10 The recon application has the function recon:node_stats_print/2 to do this if you’re in a pinch
+						<br/>9 Common patterns may fit the <span class="code">ectr</span> application, at https://github.com/heroku/ectr
+						<br/>10 The <span class="code">recon</span> application has the function <span class="code">recon:node_stats_print/2</span> to do this if you’re in a pinch
 						</sub>
 						<p>This requires some explaining.</p>
-						<p>First of all, all the values returned are in bytes, and they represent memory allocated (memory actively used by the Erlang VM, not the memory set aside by the operating system for the Erlang VM). It will sooner or later look much smaller than what the operating system reports.</p>
+						<p>First of all, all the values returned are in bytes, and they represent memory <span class="it">allocated</span> (memory actively used by the Erlang VM, not the memory set aside by the operating system for the Erlang VM). It will sooner or later look much smaller than what the operating system reports.</p>
 						
-						<p>The total field contains the sum of the memory used for processes and system (which is incomplete, unless the VM is instrumented!). processes is the memory used by Erlang processes, their stacks and heaps. system is the rest: memory used by ETS tables, atoms in the VM, refc binaries11 , and some of the hidden data I mentioned was missing.</p>
+						<p>The <span class="code">total</span> field contains the sum of the memory used for <span class="code">processes</span> and <span class="code">system</span> (which is incomplete, unless the VM is instrumented!). <span class="code">processes</span> is the memory used by Erlang processes, their stacks and heaps. <span class="code">system</span> is the rest: memory used by ETS tables, atoms in the VM, refc binaries11 , and some of the hidden data I mentioned was missing.</p>
 						
-						<p>If you want the total amount of memory owned by the virtual machine, as in the amount that will trip system limits (ulimit), this value is more difficult to get from within the VM. If you want the data without calling top or htop, you have to dig down into the VM’s memory allocators to find things out.12 </p>
+						<p>If you want the total amount of memory owned by the virtual machine, as in the amount that will trip system limits (<span class="code">ulimit</span>), this value is more difficult to get from within the VM. If you want the data without calling <span class="code">top</span> or <span class="code">htop</span>, you have to dig down into the VM’s memory allocators to find things out.12 </p>
 						
-						<p>Fortunately, recon has the function recon_alloc:memory/1 to figure it out, where the argument is:</p>
+						<p>Fortunately, recon has the function <span class="code">recon_alloc:memory/1</span> to figure it out, where the argument is:</p>
 						
 						<ul>
-							<li>used reports the memory that is actively used for allocated Erlang data;</li>
-							<li>allocated reports the memory that is reserved by the VM. It includes the memory used, but also the memory yet-to-be-used but still given by the OS. This is the amount you want if you’re dealing with ulimit and OS-reported values.</li>
-							<li>unused reports the amount of memory reserved by the VM that is not being allocated. Equivalent to allocated - used.</li>
-							<li>usage returns a percentage (0.0 .. 1.0) of used over allocated memory ratios.</li>
+							<li><span class="code">used</span> reports the memory that is actively used for allocated Erlang data;</li>
+							<li><span class="code">allocated</span> reports the memory that is reserved by the VM. It includes the memory used, but also the memory yet-to-be-used but still given by the OS. This is the amount you want if you’re dealing with <span class="code">ulimit</span> and OS-reported values.</li>
+							<li><span class="code">unused</span> reports the amount of memory reserved by the VM that is not being allocated. Equivalent to <span class="code">allocated - used</span>.</li>
+							<li><span class="code">usage</span> returns a percentage (0.0 .. 1.0) of used over allocated memory ratios.</li>
 						</ul>
 						<p>There are additional options available, but you’ll likely only need them when investigating memory leaks in chapter 7</p>
 						<a id="5_1_2_cpu"><h4>5.1.2 CPU</h4></a>
@@ -926,14 +926,14 @@ Attaching to /tmp/erl_pipe (^D to exit)
 						
 						<ul>
 							<li>The VM does a lot of work unrelated to processes when it comes to scheduling — high scheduling work and high amounts of work done by the Erlang processes are hard to characterize.</li>
-							<li> The VM internally uses a model based on reductions, which represent an arbitrary number of work actions. Every function call, including BIFs, will increment a process reduction counter. After a given number of reductions, the process gets descheduled.</li>
-							<li>To avoid going to sleep when work is low, the threads that control the Erlang schedulers will do busy looping. This ensures the lowest latency possible for sudden load spikes. The VM flag +sbwt none|very_short|short|medium|long|very_long can be used to change this value. </li>
+							<li> The VM internally uses a model based on <span class="it">reductions</span>, which represent an arbitrary number of work actions. Every function call, including BIFs, will increment a process reduction counter. After a given number of reductions, the process gets descheduled.</li>
+							<li>To avoid going to sleep when work is low, the threads that control the Erlang schedulers will do busy looping. This ensures the lowest latency possible for sudden load spikes. The VM flag <span class="code">+sbwt none|very_short|short|medium|long|very_long</span> can be used to change this value. </li>
 						</ul>
 						<p>These factors combine to make it fairly hard to find a good absolute measure of how busy your CPU is actually running Erlang code. It will be common for Erlang nodes in production to do a moderate amount of work and use a lot of CPU, but to actually fit a lot of work in the remaining place when the workload gets higher.</p>
 						
 						<p>The most accurate representation for this data is the scheduler wall time. It’s an optional metric that needs to be turned on by hand on a node, and polled at regular intervals. It will reveal the time percentage a scheduler has been running processes and normal Erlang code, NIFs, BIFs, garbage collection, and so on, versus the amount of time it has spent idling or trying to schedule processes.</p>
 						
-						<p>The value here represents scheduler utilization rather than CPU utilization. The higher the ratio, the higher the workload.</p>
+						<p>The value here represents <span class="it">scheduler utilization</span> rather than CPU utilization. The higher the ratio, the higher the workload.</p>
 						
 						<p>While the basic usage is explained in the Erlang/OTP reference manual13 , the value can be obtained by calling recon:</p>
 <pre><code class="erlang">
@@ -943,7 +943,7 @@ Attaching to /tmp/erl_pipe (^D to exit)
  {3,1.9294092120138725e-5},
  {4,1.2087551402238991e-5}]
 </code></pre>
-						<p>The function recon:scheduler_usage(N) will poll for N milliseconds (here, 1 second) and output the value of each scheduler. In this case, the VM has two very loaded schedulers (at 99.2% and 93.7% repectively), and two mostly unused ones at far below 1%. Yet, a tool like htop would report something closer to this for each core: </p>
+						<p>The function <span class="code">recon:scheduler_usage(N)</span> will poll for N milliseconds (here, 1 second) and output the value of each scheduler. In this case, the VM has two very loaded schedulers (at 99.2% and 93.7% repectively), and two mostly unused ones at far below 1%. Yet, a tool like htop would report something closer to this for each core: </p>
 <pre><code class="erlang">
 1 [||||||||||||||||||||||||| 70.4%]
 2 [|||||||                   20.6%]
@@ -960,7 +960,7 @@ Attaching to /tmp/erl_pipe (^D to exit)
 						<p>These behaviours may especially be important to consider when doing capacity planning, and can be better indicators of headroom than looking at CPU usage or load.</p>
 						
 						<a id="5_1_3_processes"><h4>5.1.3 Processes</h4></a>
-						<p>Trying to get a global view of processes is helpful when trying to assess how much work is being done in the VM in terms of tasks. A general good practice in Erlang is to use processes for truly concurrent activities — on web servers, you will usually get one process per request or connection, and on stateful systems, you may add one process per-user — and therefore the number of processes on a node can be used as a metric for load.</p>
+						<p>Trying to get a global view of processes is helpful when trying to assess how much work is being done in the VM in terms of <span class="it">tasks</span>. A general good practice in Erlang is to use processes for truly concurrent activities — on web servers, you will usually get one process per request or connection, and on stateful systems, you may add one process per-user — and therefore the number of processes on a node can be used as a metric for load.</p>
 						
 						<p>Most tools mentioned in section 5.1 will track them in one way or another, but if the process count needs to be done manually, calling the following expression is enough:</p>
 <pre><code class="erlang">1> length(processes()).
@@ -969,9 +969,9 @@ Attaching to /tmp/erl_pipe (^D to exit)
 						<p>Tracking this value over time can be extremely helpful to try and characterize load or detect process leaks, along with other metrics you may have around. </p>
 						<a id="5_1_4_ports"<h4>5.1.14 Ports</h4>
 							
-							<p>In a manner similar to processes, Ports should be considered. Ports are a datatype that encompasses all kinds of connections and sockets opened to the outside world: TCP sockets, UDP sockets, SCTP sockets, file descriptors, and so on.</p>
+							<p>In a manner similar to processes, <span class="it">Ports</span> should be considered. Ports are a datatype that encompasses all kinds of connections and sockets opened to the outside world: TCP sockets, UDP sockets, SCTP sockets, file descriptors, and so on.</p>
 							
-							<p>There is a general function (again, similar to processes) to count them: length(erlang:ports()). However, this function merges in all types of ports into a single entity. Instead, one can use recon to get them sorted by type:</p>
+							<p>There is a general function (again, similar to processes) to count them: <span class="code">length(erlang:ports())</span>. However, this function merges in all types of ports into a single entity. Instead, one can use <span class="code">recon</span> to get them sorted by type:</p>
 <pre><code class="erlang">1> recon:port_types().
 [{"tcp_inet",21480},
  {"efile",2},
@@ -981,8 +981,8 @@ Attaching to /tmp/erl_pipe (^D to exit)
  {"inet_gethost 4 ",1}]
 </code></pre>
 							<p>This list contains the types and the count for each type of port. The type name is a string and is defined by the Erlang VM itself.</p>
-							<p>All the *_inet ports are usually sockets, where the prefix is the protocol used (TCP, UDP, SCTP). The efile type is for files, while "0/1" and "2/2" are file descriptors for standard I/O channels (stdin and stdout) and standard error channels (stderr ), respectively.</p>
-							<p>Most other types will be given names of the driver they’re talking to, and will be examples of port programs 14 or port drivers 15.</p>
+							<p>All the <span class="code">*_inet</span> ports are usually sockets, where the prefix is the protocol used (TCP, UDP, SCTP). The <span class="code">efile</span> type is for files, while "0/1" and "2/2" are file descriptors for standard I/O channels (<span class="it">stdin</span> and <span class="code">stdout</span>) and standard error channels (<span class="code">stderr</span> ), respectively.</p>
+							<p>Most other types will be given names of the driver they’re talking to, and will be examples of <span class="it">port programs</span> 14 or <span class="it">port drivers</span> 15.</p>
 							<p>Again, tracking these can be useful to assess load or usage of a system, detect leaks, and so on.</p>
 							<a id="5_2_digging_in"><h3>5.2 Digging In</h3></a>
 							<p>Whenever some ’in the large’ view (or logging, maybe) has pointed you towards a potential cause for an issue you’re having, it starts being interesting to dig around with a purpose. Is a process in a weird state? Maybe it needs tracing16 ! Tracing is great whenever you have a specific function call or input or output to watch for, but often, before getting there, a lot more digging is required. </p>
@@ -997,32 +997,33 @@ Attaching to /tmp/erl_pipe (^D to exit)
 							<br/>16 See <a href="#chapter_9">Chapter 9</a>
 							</sub>
 							
-							<p>All the values can be obtained by calling process_info(Pid, Key) or process_info(Pid, [Keys])17 . Here are the commonly used keys18 :</p>
+							<p>All the values can be obtained by calling <span class="code">process_info(Pid, Key)</span> or <span class="code">process_info(Pid, [Keys])</span>17 . Here are the commonly used keys18 :</p>
 							<h5>Meta</h5>
-							<p>dictionary returns all the entries in the process dictionary19 . Generally safe to use, because people shouldn’t be storing gigabytes of arbitrary data in there.</p>
+							<p><span class="code">dictionary</span> returns all the entries in the process dictionary19 . Generally safe to use, because people shouldn’t be storing gigabytes of arbitrary data in there.</p>
 							
-							<p>group_leader the group leader of a process defines where IO (files, output of io:format/1-3) goes.20 </p>
-							<p>registered_name if the process has a name (as registered with erlang:register/2), it is given here.</p>
-							<p>status the nature of the process as seen by the scheduler. The possible values are:</p>
+							<p><span class="code">group_leader</span> the group leader of a process defines where IO (files, output of <span class="code">io:format/1-3</span>) goes.20 </p>
+							
+							<p><span class="code">registered_name</span> if the process has a name (as registered with <span class="code">erlang:register/2</span>), it is given here.</p>
+							<p><span class="code">status</span> the nature of the process as seen by the scheduler. The possible values are:</p>
 							<ul>
-								<li>exiting the process is done, but not fully cleared yet;</li>
-								<li>waiting the process is waiting in a receive ... end;</li>
-								<li>running self-descriptive;</li>
-								<li>runnable ready to run, but not scheduled yet because another process is running;</li>
-								<li>garbage_collecting self-descriptive;</li>
-								<li>suspended whenever it is suspended by a BIF, or as a back-pressure mechanism because a socket or port buffer is full. The process only becomes runnable again once the port is no longer busy.
+								<li><span class="code">exiting</span> the process is done, but not fully cleared yet;</li>
+								<li><span class="code">waiting</span> the process is waiting in a <span class="code">receive ... end</span>;</li>
+								<li><span class="code">running</span> self-descriptive;</li>
+								<li><span class="code">runnable</span> ready to run, but not scheduled yet because another process is running;</li>
+								<li><span class="code">garbage_collecting</span> self-descriptive;</li>
+								<li><span class="code">suspended</span> whenever it is suspended by a BIF, or as a back-pressure mechanism because a socket or port buffer is full. The process only becomes runnable again once the port is no longer busy.
 								</li>
 							</ul>
 							<h5>Signals</h5>
-							<p>links will show a list of all the links a process has towards other processes and also ports (sockets, file descriptors). Generally safe to call, but to be used with care on large supervisors that may return thousands and thousands of entries. </p>
-							<p>monitored_by gives a list of processes that are monitoring the current process (through the use of erlang:monitor/2).</p>
+							<p><span class="code">links</span> will show a list of all the links a process has towards other processes and also ports (sockets, file descriptors). Generally safe to call, but to be used with care on large supervisors that may return thousands and thousands of entries. </p>
+							<p><span class="code">monitored_by</span> gives a list of processes that are monitoring the current process (through the use of erlang:monitor/2).</p>
 							
-							<p>monitors kind of the opposite of monitored_by; it gives a list of all the processes being monitored by the one polled here.</p>
-							<p>trap_exit has the value true if the process is trapping exits, false otherwise.</p>
+							<p><span class="code">monitors</span> kind of the opposite of monitored_by; it gives a list of all the processes being monitored by the one polled here.</p>
+							<p><span class="code">trap_exit</span> has the value <span class="code">true</span> if the process is trapping exits, <span class="code">false</span> otherwise.</p>
 							<sub>
-							17 In cases where processes contain sensitive information, data can be forced to be kept private by calling process_flag(sensitive, true)
+							17 In cases where processes contain sensitive information, data can be forced to be kept private by calling <span class="code">process_flag(sensitive, true)</span>
 							
-							<br/>18 For all options, look at http://www.erlang.org/doc/man/erlang.html#process_info-2
+							<br/>18 For <span class="it">all</span> options, look at http://www.erlang.org/doc/man/erlang.html#process_info-2
 							
 							<br/>19 See http://www.erlang.org/course/advanced.html#dict and http://ferd.ca/on-the-use-of-the-process-dictionary-in-erlang.html
 							
@@ -1030,30 +1031,36 @@ Attaching to /tmp/erl_pipe (^D to exit)
 							</sub>
 							<h5>Location</h5>
 							
-							<p>current_function displays the current running function, as a tuple of the form {Mod, Fun, Arity}.</p>
-							<p>current_location displays the current location within a module, as a tuple of the form {Mod, Fun, Arity, [{File, FileName}, {line, Num}]}.</p>
-							<p>current_stacktrace more verbose form of the preceding option; displays the current stacktrace as a list of ’current locations’.</p>
+							<p><span class="code">current_function</span> displays the current running function, as a tuple of the form <span class="code">{Mod, Fun, Arity}</span>.</p>
 							
-							<p>initial_call shows the function that the process was running when spawned, of the form {Mod, Fun, Arity}. This may help identify what the process was spawned as, rather than what it’s running right now. </p>
+							<p><span class="code">current_location</span> displays the current location within a module, as a tuple of the form <span class="code">{Mod, Fun, Arity, [{File, FileName}, {line, Num}]}</span>.</p>
+							
+							<p><span class="code">current_stacktrace</span> more verbose form of the preceding option; displays the current stacktrace as a list of ’current locations’.</p>
+							
+							<p><span class="code">initial_call</span> shows the function that the process was running when spawned, of the form <span class="code">{Mod, Fun, Arity}</span>. This may help identify what the process was spawned as, rather than what it’s running right now. </p>
 							
 							<h5>Memory Used</h5>
 							
-							<p>binary Displays the all the references to refc binaries21 along with their size. Can be unsafe to use if a process has a lot of them allocated.</p>
+							<p><span class="code">binary</span> Displays the all the references to refc binaries21 along with their size. Can be unsafe to use if a process has a lot of them allocated.</p>
 							
-							<p>garbage_collection contains information regarding garbage collection in the process. The content is documented as ’subject to change’ and should be treated as such. The information tends to contains entries such as the number of garbage collections the process has went through, options for full-sweep garbage collections, and heap sizes.</p>
+							<p><span class="code">garbage_collection</span> contains information regarding garbage collection in the process. The content is documented as ’subject to change’ and should be treated as such. The information tends to contains entries such as the number of garbage collections the process has went through, options for full-sweep garbage collections, and heap sizes.</p>
 							
-							<p>heap_size A typical Erlang process contains an ’old’ heap and a ’new’ heap, and goes through generational garbage collection. This entry shows the process’ heap size for the newest generation, and it usually includes the stack size. The value returned is in words. </p>
-							<p>memory Returns, in bytes, the size of the process, including the call stack, the heaps, and internal structures used by the VM that are part of a process. </p>
-							<p>message_queue_len Tells you how many messages are waiting in the mailbox of a process. </p>
-							<p>messages Returns all of the messages in a process’ mailbox. This attribute is extremely dangerous to request in production because mailboxes can hold millions of messages if you’re debugging a process that managed to get locked up. Always call for the message_queue_len first to make sure it’s safe to use.</p>
+							<p><span class="code">heap_size</span> A typical Erlang process contains an ’old’ heap and a ’new’ heap, and goes through generational garbage collection. This entry shows the process’ heap size for the newest generation, and it usually includes the stack size. The value returned is in <span class="it">words</span>. </p>
+
+							<p><span class="code">memory</span> Returns, in <span class="it">bytes</span>, the size of the process, including the call stack, the heaps, and internal structures used by the VM that are part of a process. </p>
 							
-							<p>total_heap_size Similar to heap_size, but also contains all other fragments of the heap, including the old one. The value returned is in words.</p>
+							<p><span class="code">message_queue_len</span> Tells you how many messages are waiting in the mailbox of a process. </p>
+							
+							<p><span class="code">messages</span> Returns all of the messages in a process’ mailbox. This attribute is <span class="it">extremely</span> dangerous to request in production because mailboxes can hold millions of messages if you’re debugging a process that managed to get locked up. <span class="it">Always</span> call for the <span class="code">message_queue_len</span> first to make sure it’s safe to use.</p>
+							
+							<p><span class="code">total_heap_size</span> Similar to <span class="code">heap_size</span>, but also contains all other fragments of the heap, including the old one. The value returned is in <span class="it">words</span>.</p>
+							
 							<h5>Work</h5>
 							
-							<p>reductions The Erlang VM does scheduling based on reductions, an arbitrary unit of work that allows rather portable implementations of scheduling (time-based scheduling is usually hard to make work efficiently on as many OSes as Erlang runs on). The higher the reductions, the more work, in terms of CPU and function calls, a process is doing.</p>
+							<p><span class="code">reductions</span> The Erlang VM does scheduling based on <span class="it">reductions</span>, an arbitrary unit of work that allows rather portable implementations of scheduling (time-based scheduling is usually hard to make work efficiently on as many OSes as Erlang runs on). The higher the reductions, the more work, in terms of CPU and function calls, a process is doing.</p>
 							
 							<sub>21 See Section 7.2</sub>
-							<p>Fortunately, for all the common ones that are also safe, recon contains the recon:info/1 function to help:</p>
+							<p>Fortunately, for all the common ones that are also safe, recon contains the <span class="code">recon:info/1</span> function to help:</p>
 <pre><code class="erlang">
 1> recon:info("<0.12.0>").
 [{meta,[{registered_name,rex},
@@ -1080,14 +1087,14 @@ Attaching to /tmp/erl_pipe (^D to exit)
 {minor_gcs,0}]}]},
  {work,[{reductions,35}]}]
 </code></pre>
-							<p>For the sake of convenience, recon:info/1 will accept any pid-like first argument and handle it: literal pids, strings ("<0.12.0>"), registered atoms, global names ({global, Atom}), names registered with a third-party registry (e.g. with gproc: {via, gproc, Name}), or tuples ({0,12,0}). The process just needs to be local to the node you’re debugging.</p>
+							<p>For the sake of convenience, <span class="code">recon:info/1</span> will accept any pid-like first argument and handle it: literal pids, strings ("<0.12.0>"), registered atoms, global names (<span class="code">{global, Atom}</span>), names registered with a third-party registry (e.g. with <span class="code">gproc: {via, gproc, Name}</span>), or tuples (<span class="code">{0,12,0}</span>). The process just needs to be local to the node you’re debugging.</p>
 							
 							<p>If only a category of information is wanted, the category can be used directly:</p>
 <pre>
 <code class="erlang">2> recon:info(self(), work).
 {work,[{reductions,11035}]}
 </code></pre>
-							<p>or can be used in exactly the same way as process_info/2:</p>
+							<p>or can be used in exactly the same way as <span class="code">process_info/2</span>:</p>
 <pre>
 <code class="erlang">3> recon:info(self(), [memory, status]).
 [{memory,10600},{status,running}]
@@ -1096,7 +1103,7 @@ Attaching to /tmp/erl_pipe (^D to exit)
 							
 							<p>With all this data, it’s possible to find out all we need to debug a system. The challenge then is often to figure out, between this per-process data, and the global one, which process(es) should be targeted. </p>
 							
-							<p>When looking for high memory usage, for example it’s interesting to be able to list all of a node’s processes and find the top N consumers. Using the attributes above and the recon:proc_count(Attribute, N) function, we can get these results:</p>
+							<p>When looking for high memory usage, for example it’s interesting to be able to list all of a node’s processes and find the top N consumers. Using the attributes above and the <span class="code">recon:proc_count(Attribute, N)</span> function, we can get these results:</p>
 <pre>
 <code class="erlang">4> recon:proc_count(memory, 3).
 [{<0.26.0>,831448,
@@ -1113,20 +1120,20 @@ Attaching to /tmp/erl_pipe (^D to exit)
 </code></pre>
 							<p>Any of the attributes mentioned earlier can work, and for nodes with long-lived processes that can cause problems, it’s a fairly useful function.</p>
 							
-							<p>There is however a problem when most processes are short-lived, usually too short to inspect through other tools, or when a moving window is what we need (for example, what processes are busy accumulating memory or running code right now ).</p>
+							<p>There is however a problem when most processes are short-lived, usually too short to inspect through other tools, or when a moving window is what we need (for example, what processes are busy accumulating memory or running code <span class="it">right now )</span>.</p>
 							
-							<p>For this use case, Recon has the recon:proc_window(Attribute, Num, Milliseconds)function.</p>
+							<p>For this use case, Recon has the <span class="code">recon:proc_window(Attribute, Num, Milliseconds)</span> function.</p>
 							
 							<p>It is important to see this function as a snapshot over a sliding window. A program’s timeline during sampling might look like this:</p>
 <pre>
 <code class="erlang">--w---- [Sample1] ---x-------------y----- [Sample2] ---z--->
 </code></pre>
 							
-							<p>The function will take two samples at an interval defined by Milliseconds.</p>
+							<p>The function will take two samples at an interval defined by <span class="code">Milliseconds</span>.</p>
 							
-							<p>Some processes will live between w and die at x, some between y and z, and some between x and y. These samples will not be too significant as they’re incomplete. </p>
+							<p>Some processes will live between <span class="code">w </span>and die at <span class="code">x</span>, some between <span class="code">y</span> and <span class="code">z</span>, and some between x and y. These samples will not be too significant as they’re incomplete. </p>
 							
-							<p>If the majority of your processes run between a time interval x to y (in absolute terms), you should make sure that your sampling time is smaller than this so that for many processes, their lifetime spans the equivalent of w and z. Not doing this can skew the results: long-lived processes that have 10 times the time to accumulate data (say reductions) will look like huge consumers when they’re not one.22</p>
+							<p>If the majority of your processes run between a time interval <span class="code">x</span> to <span class="code">y</span> (in absolute terms), you should make sure that your sampling time is smaller than this so that for many processes, their lifetime spans the equivalent of <span class="code">w</span> and <span class="code">z</span>. Not doing this can skew the results: long-lived processes that have 10 times the time to accumulate data (say reductions) will look like huge consumers when they’re not one.22</p>
 							
 							<p>The function, once running gives results like follows:</p>
 <pre><code class="erlang">
@@ -1146,12 +1153,12 @@ Attaching to /tmp/erl_pipe (^D to exit)
 							<a id="5_2_2_otp_processes"><h4>5.2.2 OTP Processes </h4></a>
 							
 							<p>When processes in question are OTP processes (most of the processes in a production system should definitely be OTP processes), you instantly win more tools to inspect them.</p>
-							<p>In general the sys module23 is what you want to look into. Read the documentation on it and you’ll discover why it’s so useful. It contains the following features for any OTP process: </p>
+							<p>In general the <span class="code">sys</span> module23 is what you want to look into. Read the documentation on it and you’ll discover why it’s so useful. It contains the following features for any OTP process: </p>
 							<ul>
 								<li> logging of all messages and state transitions, both to the shell or to a file, or even in an internal buffer to be queried;</li>
 								<li>statistics (reductions, message counts, time, and so on);</li>
 								<li> fetching the status of a process (metadata including the state);</li>
-								<li> fetching the state of a process (as in the #state{} record);</li>
+								<li> fetching the state of a process (as in the <span class="code">#state{}</span> record);</li>
 								<li>replacing that state</li>
 								<li>custom debugging functions to be used as callbacks</li>
 							</ul>
@@ -1163,35 +1170,51 @@ Attaching to /tmp/erl_pipe (^D to exit)
 							
 							<br/>23 http://www.erlang.org/doc/man/sys.html
 							</sub>
+							
 							<a id="5_2_3_ports"><h4>5.2.3 Ports</h4></a>
-							<p>Similarly to processes, Erlang ports allow a lot of introspection. The info can be accessed by calling erlang:port_info(Port, Key), and more info is available through the inet module. Most of it has been regrouped by the recon:port_info/1-2 functions, which work using a somewhat similar interface to their process-related counterparts. </p>
+
+							<p>Similarly to processes, Erlang ports allow a lot of introspection. The info can be accessed by calling <span class="code">erlang:port_info(Port, Key)</span>, and more info is available through the <span class="code">inet</span> module. Most of it has been regrouped by the <span class="code">recon:port_info/1-2</span> functions, which work using a somewhat similar interface to their process-related counterparts. </p>
+
 							<h5>Meta</h5>
-							<p>id internal index of a port. Of no particular use except to differentiate ports.</p>
-							<p>name type of the port — with names such as "tcp_inet", "udp_inet", or "efile", for example.</p>
 							
-							<p>os_pid if the port is not an inet socket, but rather represents an external process or program, this value contains the os pid related to the said external program.</p>
+							<p><span class="code">id</span> internal index of a port. Of no particular use except to differentiate ports.</p>
+							
+							<p><span class="code">name</span> type of the port — with names such as <span class="code">"tcp_inet"</span>, <span class="code">"udp_inet"</span>, or <span class="code">"efile"</span>, for example.</p>
+							
+							<p><span class="code">os_pid</span> if the port is not an inet socket, but rather represents an external process or program, this value contains the os pid related to the said external program.</p>
+							
 							<h5>Signals</h5>
-							<p>connected Each port has a controlling process in charge of it, and this process’ pid is the connected one. </p>
 							
-							<p>links ports can be linked with processes, much like other processes can be. The list of linked processes is contained here. Unless the process has been owned by or manually linked to a lot of processes, this should be safe to use.</p>
+							<p><span class="code">connected</span> Each port has a controlling process in charge of it, and this process’ pid is the <span class="code">connected</span> one. </p>
 							
-							<p>monitors ports that represent external programs can have these programs end up monitoring Erlang processes. These processes are listed here.</p>
+							<p><span class="code">links</span> ports can be linked with processes, much like other processes can be. The list of linked processes is contained here. Unless the process has been owned by or manually linked to a lot of processes, this should be safe to use.</p>
+							
+							<p><span class="code">monitors</span> ports that represent external programs can have these programs end up monitoring Erlang processes. These processes are listed here.</p>
 							
 							<h5>IO</h5>
-							<p>input the number of bytes read from the port.</p>
-							<p>output the number of bytes written to the port.</p>
+							
+							<p><span class="code">input</span> the number of bytes read from the port.</p>
+							
+							<p><span class="code">output</span> the number of bytes written to the port.</p>
+							
 							<h5>Memory Used</h5>
-							<p>memory this is the memory (in bytes) allocated by the runtime system for the port. This number tends to be small-ish and excludes space allocated by the port itself.</p>
-							<p>queue_size Port programs have a specific queue, called the driver queue24. This return the size of this queue, in bytes.</p>
+							
+							<p><span class="code">memory</span> this is the memory (in bytes) allocated by the runtime system for the port. This number tends to be small-ish and excludes space allocated by the port itself.</p>
+							
+							<p><span class="code">queue_size</span> Port programs have a specific queue, called the driver queue24. This return the size of this queue, in bytes.</p>
+							
 							<h5>Type-Specific</h5>
-							<p>Inet Ports Returns inet-specific data, including statistics25, the local address and port number for the socket (sockname), and the inet options used26</p>
+							
+							<p><span class="code">Inet Ports</span> Returns inet-specific data, including statistics25, the local address and port number for the socket (<span class="code">sockname</span>), and the inet options used26</p>
 							
 							<sub>
 							24The driver queue is available to queue output from the emulator to the driver (data from the driver to the emulator is queued by the emulator in normal Erlang message queues). This can be useful if the driver has to wait for slow devices etc, and wants to yield back to the emulator.
 							<br/>25http://www.erlang.org/doc/man/inet.html#getstat-1
 							<br/>26http://www.erlang.org/doc/man/inet.html#setopts-2
 							</sub>
-							<p>Others currently no other form than inet ports are supported in recon, and an empty list is returned.</p>
+
+							<p><span class="code">Others</span> currently no other form than inet ports are supported in recon, and an empty list is returned.</p>
+							
 							<p>The list can be obtained as follows:</p>
 <pre><code class="erlang">1> recon:port_info("#Port<0.818>").
 [{meta,[{id,6544},{name,"tcp_inet"},{os_pid,undefined}]},
@@ -1214,7 +1237,8 @@ Attaching to /tmp/erl_pipe (^D to exit)
            {delay_send,...},
            {...}|...]}]}]
 </code></pre>
-							<p>On top of this, functions to find out specific problematic ports exist the way they do for processes. The gotcha is that so far, recon only supports them for inet ports and with restricted attributes: the number of octets (bytes) sent, received, or both (send_oct, recv_oct, oct, respectively), or the number of packets sent, received, or both (send_cnt, recv_cnt, cnt, respectively).</p>
+							<p>On top of this, functions to find out specific problematic ports exist the way they do for processes. The gotcha is that so far, recon only supports them for inet ports and with restricted attributes: the number of octets (bytes) sent, received, or both (<span class="code">send_oct</span>, <span class="code">recv_oct</span>, <span class="code">oct</span>, respectively), or the number of packets sent, received, or both (<span class="code">send_cnt</span>, <span class="code">recv_cnt</span>, <span class="code">cnt</span>, respectively).</p>
+							
 							<p>So for the cumulative total, which can help find out who is slowly but surely eating up all your bandwidth:</p>
 <pre>
 <code class="erlang">2> recon:inet_count(oct, 3).
@@ -1226,9 +1250,9 @@ Attaching to /tmp/erl_pipe (^D to exit)
   [{recv_oct,15630954707},{send_oct,0}]}]
 </code></pre>
 							
-							<p>Which suggest some ports are doing only input and eating lots of bytes. You can then use recon:port_info("#Port<0.6821166>") to dig in and find who owns that socket, and what is going on with it.</p>
+							<p>Which suggest some ports are doing only input and eating lots of bytes. You can then use <span class="code">recon:port_info("#Port<0.6821166>") </span>to dig in and find who owns that socket, and what is going on with it.</p>
 							
-							<p>Or in any other case, we can look at what is sending the most data within any time window27 with the recon:inet_window(Attribute, Count, Milliseconds) function:</p>
+							<p>Or in any other case, we can look at what is sending the most data within any time window27 with the <span class="code">recon:inet_window(Attribute, Count, Milliseconds)</span> function:</p>
 <pre>
 <code class="erlang">3> recon:inet_window(send_oct, 3, 5000).
 [{#Port<0.11976746>,2986216,[{send_oct,4421857688}]},
@@ -1244,7 +1268,7 @@ Attaching to /tmp/erl_pipe (^D to exit)
 								<li>What kind of values are reported for Erlang’s memory?</li>
 								<li>What’s a valuable process-related metric for a global view?</li>
 								<li>What’s a port, and how should it be monitored globally?</li>
-								<li>Why can’t you trust top or htop for CPU usage with Erlang systems? What’s the
+								<li>Why can’t you trust <span class="code">top</span> or <span class="code">htop</span> for CPU usage with Erlang systems? What’s the
 								alternative?</li>
 								<li>Name two types of signal-related information available for processes</li>
 								<li>How can you find what code a specific process is running?</li>
@@ -1256,11 +1280,11 @@ Attaching to /tmp/erl_pipe (^D to exit)
 								<li>What kind of values are available when inspecting inet ports?</li>
 								<li>How can you find the type of a port (Files, TCP, UDP)?</li>
 							</ol>
-							<sub>27See the explanations for the recon:proc_window/3 in the preceding subsection</sub>
+							<sub>27See the explanations for the<span class="code">recon:proc_window/3</span> in the preceding subsection</sub>
 							<h4>Open-ended Questions</h4>
 							<ol>
 								<li>Why do you want a long time window available on global metrics?</li>
-								<li>Which would be more appropriate between recon:proc_count/2 and recon:proc_window/3 to find issues with:
+								<li>Which would be more appropriate between <span class="code">recon:proc_count/2</span> and <span class="code">recon:proc_window/3</span> to find issues with:
 									<ol>
 										<li>Reductions</li>
 										<li>Memory</li>
@@ -1268,7 +1292,7 @@ Attaching to /tmp/erl_pipe (^D to exit)
 									</ol>
 								</li>
 								<li>How can you find information about who is the supervisor of a given process?</li>
-								<li>When should you use recon:inet_count/2? recon:inet_window/3?</li>
+								<li>When should you use <span class="code">recon:inet_count/2</span>? <span class="code">recon:inet_window/3</span>?</li>
 								<li>What could explain the difference in memory reported by the operating system and the memory functions in Erlang?</li>
 								<li>Why is it that Erlang can sometimes look very busy even when it isn’t?</li>
 								<li>How can you find what proportion of processes on a node are ready to run, but can’t be scheduled right away?</li>
@@ -1279,20 +1303,27 @@ Attaching to /tmp/erl_pipe (^D to exit)
 								<li>What’s the system memory?</li>
 								<li>Is the node using a lot of CPU resources?</li>
 								<li>Is any process mailbox overflowing?</li>
-								<li>Which chatty process (council_member) takes the most memory?</li>
+								<li>Which chatty process (<span class="code">council_member</span>) takes the most memory?</li>
 								<li>Which chatty process is eating the most CPU?</li>
 								<li>Which chatty process is consuming the most bandwidth?</li>
 								<li>Which chatty process sends the most messages over TCP? The least?</li>
 								<li>Can you find out if a specific process tends to hold multiple connections or file descriptors open at the same time on a node?</li>
 								<li>Can you find out which function is being called by the most processes at once on the node right now?</li>
 							</ol>
+							
 							<a id="chapter_6"><h2>Chapter 6</h2></a>
 							<h2>Reading Crash Dumps</h2>
+							
 							<p>Whenever an Erlang node crashes, it will generate a crash dump1.</p>
+							
 							<p>The format is mostly documented in Erlang’s official documentation2, and anyone willing to dig deeper inside of it will likely be able to figure out what data means by looking at that documentation. There will be specific data that is hard to understand without also understanding the part of the VM they refer to, but that might be too complex for this document</p>
+							
 							<p>The crash dump is going to be named erl_crash.dump and be located wherever the Erlang process was running by default. This behaviour (and the file name) can be overridden by specifying the ERL_CRASH_DUMP environment variable3.</p>
+							
 							<a id="6_1_general_view"><h3>6.1 General View</h3></a>
+							
 							<p>Reading the crash dump will be useful to figure out possible reasons for a node to die a posteriori. One way to get a quick look at things is to use recon’s erl_crashdump_analyzer.sh4 and run it on a crash dump:</p>
+							
 <pre><code class="erlang">$ ./recon/script/erl_crashdump_analyzer.sh erl_crash.dump
 analyzing erl_crash.dump, generated on: Thu Apr 17 18:34:53 2014
 Slogan: eheap_alloc: Cannot allocate 2733560184 bytes of memory

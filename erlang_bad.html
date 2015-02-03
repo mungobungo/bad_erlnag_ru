@@ -215,25 +215,33 @@
 			<p>This book is divided in two parts.</p>
 			<p><a href="#part_i">Part I</a> focuses on how to write applications. It includes how to dive into a code base
 			<a href="#chapter_1">(Chapter 1)</a>, general tips on writing open source Erlang software <a href="#chapter_2">(Chapter 2)</a>, and how to	plan for overload in your system design <a href="chapter_3">(Chapter 3)</a>.</p>
-			<p><a href="#part_ii">Part II</a> focuses on being an Erlang medic and concerns existing, living systems. It contains instructions on how to connect to a running node <a href="#chapter_4">(Chapter 4)</a>, and the basic runtime metrics available <a href="#chapter_5">(Chapter 5)</a>. It also explains how to perform a system autopsy using a crash dump <a href="#chapter_6">(Chapter 6)</a>, how to identify and fix memory leaks <a href="#chapter_7">(Chapter 7)</a>, and how to find runaway CPU usage <a href="#chapter_8">(Chapter 8)</a>. The final chapter contains instructions on how to trace Erlang function calls in production using recon <a href="#1_sup6">6</a> to understand issues before	they bring the system down <a href="#chapter_9">(Chapter 9)</a>.</p>
+
+			<p><a href="#part_ii">Part II</a> focuses on being an Erlang medic and concerns existing, living systems. It contains instructions on how to connect to a running node <a href="#chapter_4">(Chapter 4)</a>, and the basic runtime metrics available <a href="#chapter_5">(Chapter 5)</a>. It also explains how to perform a system autopsy using a crash dump <a href="#chapter_6">(Chapter 6)</a>, how to identify and fix memory leaks <a href="#chapter_7">(Chapter 7)</a>, and how to find runaway CPU usage <a href="#chapter_8">(Chapter 8)</a>. The final chapter contains instructions on how to trace Erlang function calls in production using recon <sup><a href="#1_sup6">6</a></sup> to understand issues before	they bring the system down <a href="#chapter_9">(Chapter 9)</a>.</p>
 			<p>Each chapter is followed up by a few optional exercises in the form of questions or hands-on things to try if you feel like making sure you understood everything, or if you want to push things further.</p>
 			<sub>
-				<br/><a id="1_sup4">4</a> <!todo>I do recommend visiting Learn You Some Erlang or the regular <!todo>Erlang Documentation if a free resource is required
-				<br/><a id="1_sup5">5</a> Running Erlang in a screen or tmux session is not a deployment strategy.
-				<a id="1_sup6">6</a> <a href="http://ferd.github.io/recon/">http://ferd.github.io/recon/</a> — a library used to make the text lighter, and with generally productionsafe functions.
+				<p><a id="1_sup4">4</a> I do recommend visiting <a href="http://learnyousomeerlang.com/">Learn You Some Erlang</a> or the regular <a href="http://www.erlang.org/doc.html">Erlang Documentation</a> if a free resource is required</p>
+				<p><a id="1_sup5">5</a> Running Erlang in a screen or tmux session is not a deployment strategy.</p>
+				<p>
+				<a id="1_sup6">6</a> <a href="http://ferd.github.io/recon/">http://ferd.github.io/recon/</a> — a library used to make the text lighter, and with generally productionsafe functions.</p>
 			</sub>
 			<hr/>
 			<a id="part_i"><h1> Part I </h1></a>
 			<a id="i_writing_application"><h1> Writing Applications </h1></a>
 			<a id="chapter_1"><h2> Chapter 1 </h2></a>
 			<a id="how_to_dive_into_a_code_base"><h2> How to Dive into a Code Base </h2></a>
+			
 			<p>"Read the source" is one of the most annoying things to be told, but dealing with Erlang programmers, you’ll have to do it often. Either the documentation for a library will be incomplete, outdated, or just not there. In other cases, Erlang programmers are a bit similar to Lispers in that they will tend to write libraries that will solve their problems and not really test or try them in other circumstances, leaving it to you to extend or fix issues that arise in new contexts.</p>
+			
 			<p>It’s thus pretty much guaranteed you’ll have to go dive in some code base you know nothing about, either because you inherited it at work, or because you need to fix it or understand it to be able to move forward with your own system. This is in fact true of most languages whenever the project you work on is not one you designed yourself.</p>
 			<p>There are three main types of Erlang code bases you’ll encounter in the wild: raw Erlang code bases, OTP applications, and OTP releases. In this chapter, we’ll look at each of these and try to provide helpful tips on navigating them.</p>
+			
 			<a id="raw_erlang"><h3>1.1. Raw Erlang</h3></a>
+			
 			<p>If you encounter a raw Erlang code base, you’re pretty much on your own. These rarely follow any specific standard, and you have to dive in the old way to figure out whatever happens in there.</p>
+			
 			<p>This means hoping for a <span class="code">README.md</span> file or something similar that can point to an entry point in the application, and going from there, or hoping for some contact information that can be used to ask questions to the author(s) of the library.</p>
-			<p>Fortunately, you should rarely encounter raw Erlang in the wild, and they are often beginner projects, or awesome projects that were once built by Erlang beginners and now need a serious rewrite. In general, the advent of tools such as <a href="https://github.com/rebar/rebar/"><span class="code">rebar</span></a> <a href="#sub_1_1">1</a> made it so most people use OTP Applications.</p>
+			
+			<p>Fortunately, you should rarely encounter raw Erlang in the wild, and they are often beginner projects, or awesome projects that were once built by Erlang beginners and now need a serious rewrite. In general, the advent of tools such as <a href="https://github.com/rebar/rebar/"><span class="code">rebar</span></a><sup><a href="#sub_1_1">1</a></sup> made it so most people use OTP Applications.</p>
 			<sub>
 			  <a id="sub_1_1">1</a> <a href="https://github.com/rebar/rebar/">https://github.com/rebar/rebar/</a> — a build tool briefly introduced in <a href="#chapter_2">Chapter 2</a>
 			</sub>
@@ -249,7 +257,7 @@ README.md
 rebar.config</code>
 </pre>
 			<p>There might be slight differences, but the general structure will be the same.</p>
-			<p>Each OTP application should contain an <span class="it">app file</span>, either <span class="code">ebin/&ltAppName&gt.app</span> or more often, <span class="code">src/&ltAppName&gt.app.src</span> <a href="#sub_1_2">2</a>. There are two main varieties of <span class="code">app</span> files:</p>
+			<p>Each OTP application should contain an <span class="it">app file</span>, either <span class="code">ebin/&ltAppName&gt.app</span> or more often, <span class="code">src/&ltAppName&gt.app.src</span> <sup><a href="#sub_1_2">2</a></sup>. There are two main varieties of <span class="code">app</span> files:</p>
 <pre>
 <code class="erlang">{application, useragent, [
 {description, "Identify browsers & OSes from useragent strings"},
@@ -280,42 +288,59 @@ dispcount_supersup, dispcount_watcher, watchers_sup]}
 					</sub>
 					<a id="1_2_1_library_applications"><h4>1.2.1 Library Applications</h4></a>
 						<p>Library applications will usually have modules named <span class="it">appname</span> <span class="code">_something</span>, and one module named <span class="it">appname</span> . This will usually be the interface module that’s central to the library and contains a quick way into most of the functionality provided.</p>
+
 						<p>	By looking at the source of the module, you can figure out how it works with little effort: If the module adheres to any given behaviour (<span class="code">gen_server</span>, <span class="code">gen_fsm</span>, etc.), you’re most likely expected to start a process under one of your own supervisors and call it that way. If no behaviour is included, then you probably have a functional, stateless library on your hands. For this case, the module’s exported functions should give you a quick way to understand its purpose.</p>
 					<a id="1_2_2_regular_applications"><h4>1.2.2 Regular Applications</h4></a>
 						<p>For a regular OTP application, there are two potential modules that act as the entry point:</p>
+
 						<ol>
 							<li><span class="it">appname</span></li>
 							<li><span class="it">appname</span> <span class="code">_app</span></li>
 						</ol>
+
 						<p>The first file should be similar in use to what we had in a library application (an entry point), while the second one will implement the application behaviour, and will represent the top of the application’s process hierarchy. In some cases the first file will play both roles at once.</p>
+
 						<p>If you plan on simply adding the application as a dependency to your own app, then look inside <span class="it">appname</span> for details and information. If you need to maintain and/or fix the application, go for <span class="it">appname</span> <span class="code">_app</span> instead.</p>
-						<p>The application will start a top-level supervisor and return its <span class="code">pid</span>. This top-level supervisor will then contain the specifications of all the child processes it will start on its own <a href="#sub_1_3">3</a>.</p>
+						
+						<p>The application will start a top-level supervisor and return its <span class="code">pid</span>. This top-level supervisor will then contain the specifications of all the child processes it will start on its own <sup><a href="#sub_1_3">3</a></sup>.</p>
+						
 						<p>The higher a process resides in the tree, the more likely it is to be vital to the survival of the application. You can also estimate how important a process is by the order it is started (all children in the supervision tree are started in order, depth-first). If a process is started later in the supervision tree, it probably depends on processes that were started earlier.</p>
+
 						<p>Moreover, worker processes that depend on each other within the same application (say, a process that buffers socket communications and relays them to a finite-state machine in charge of understanding the protocol) are likely to be regrouped under the same supervisor and to fail together when something goes wrong. This is a deliberate choice, as it is usually simpler to start from a blank slate, restarting both processes, rather than trying to figure out how to recuperate when one or the other loses or corrupts its state.</p>
+
 						<sub>
 							<a id="sub_1_3">3</a> In some cases, the supervisor specifies no children: they will either be started dynamically by some function of the API or in a start phase of the application, or the supervisor is only there to allow OTP environment variables (in the <span class="code">env</span> tuple of the app file) to be loaded.
 						</sub>
+
 						<p>The supervisor restart strategy reflects the relationship between processes under a supervisor:</p>
+
 						<ul>
 							<li>
-								<span class="code">one_for_one</span> and <span class="code">simple_one_for_one </span> are used for processes that are not dependent upon each other directly, although their failures will collectively be counted towards total application shutdown <a href="#sub_1_4">4</a>.
+								<span class="code">one_for_one</span> and <span class="code">simple_one_for_one </span> are used for processes that are not dependent upon each other directly, although their failures will collectively be counted towards total application shutdown <sup><a href="#sub_1_4">4</a></sup>.
 							</li>
 							<li><span class="code">rest_for_one</span> will be used to represent processes that depend on each other in a linear manner.</li>
 							<li><span class="code">one_for_all</span> is used for processes that entirely depend on each other.</li>
 						</ul>
+						
 						<p>This structure means it is easiest to navigate OTP applications in a top-down manner by exploring supervision subtrees.</p>
 						<p>For each worker process supervised, the behaviour it implements will give a good clue about its purpose:</p>
+						
 						<ul>
 							<li>a <span class="code">gen_server</span> holds resources and tends to follow client/server patterns (or more generally, request/response patterns)</li>
 							<li>a <span class="code">gen_fsm</span> will deal with a sequence of events or inputs and react depending on them, as a Finite State Machine. It will often be used to implement protocols.</li>
 							<li>a <span class="code">gen_event</span> will act as an event hub for callbacks, or as a way to deal with notifications of some sort.</li>
 						</ul>
+						
 						<p>All of these modules will contain the same kind of structure: exported functions that
 						represent the user-facing interface, exported functions for the callback module, and private functions, usually in that order.</p>
+						
 						<p>Based on their supervision relationship and the typical role of each behaviour, looking at the interface to be used by other modules and the behaviours implemented should reveal a lot of information about the program you’re diving into.</p>
+						
 						<a id="1_2_3_dependencies"><h4>1.2.3 Dependencies</h4></a>
-						<p>All applications have dependencies <a href="#sub_1_5">5</a>, and these dependencies will have their own dependencies. OTP applications usually share no state between them, so it’s possible to know what bits of code depend on what other bits of code by looking at the app file only, assuming the developer wrote them in a mostly correct manner. <a href="#figure_1_1"> Figure 1.1 </a> shows a diagram that can be generated from looking at app files to help understand the structure of OTP applications.</p>
-						<p>Using such a hierarchy and looking at each application’s short description might be helpful to draw a rough, general map of where everything is located. To generate a similar diagram, find <span class="code">recon</span>’s script directory and call <span class="code">escript script/app_deps.erl</span> <a href="#sub_1_6">6</a>. Similar hierarchies can be found using the observer <a href="#sub_1_7">7</a> application, but for individual supervision trees. Put together, you may get an easy way to find out what does what in the code base.</p>
+						<p>All applications have dependencies <sup><a href="#sub_1_5">5</a></sup>, and these dependencies will have their own dependencies. OTP applications usually share no state between them, so it’s possible to know what bits of code depend on what other bits of code by looking at the app file only, assuming the developer wrote them in a mostly correct manner. <a href="#figure_1_1"> Figure 1.1 </a> shows a diagram that can be generated from looking at app files to help understand the structure of OTP applications.</p>
+						
+						<p>Using such a hierarchy and looking at each application’s short description might be helpful to draw a rough, general map of where everything is located. To generate a similar diagram, find <span class="code">recon</span>’s script directory and call <span class="code">escript script/app_deps.erl</span> <sup><a href="#sub_1_6">6</a></sup>. Similar hierarchies can be found using the observer <sup><a href="#sub_1_7">7</a></sup> application, but for individual supervision trees. Put together, you may get an easy way to find out what does what in the code base.</p>
+
 						<sub>
 							<p><a id="sub_1_4">4</a> Some developers will use <span class="code">one_for_one</span> supervisors when <span class="code">rest_for_one</span> is more appropriate. They require strict ordering to boot correctly, but forget about said order when restarting or if a predecessor dies.</p>
 							<p><a id="sub_1_5">5</a> At the very least on the <span class="code">kernel</span> and <span class="code">stdlib</span> applications</p>
@@ -324,9 +349,12 @@ dispcount_supersup, dispcount_watcher, watchers_sup]}
 						</sub>
 						<a id="figure_1_1"><img src="images/riak_arc.png"></a>
 						<p>Figure 1.1: Dependency graph of riak_cs, Basho’s open source cloud library. The graph ignores dependencies on common applications like kernel and stdlib. Ovals are applications, rectangles are library applications.</p>
+						
 						<a id="1_3_otp_releases"><h3>1.3 OTP Releases</h3></a>
+
 						<p>OTP releases are not a lot harder to understand than most OTP applications you’ll encounter in the wild. A release is a set of OTP applications packaged in a production-ready manner so it boots and shuts down without needing to manually call <span class="code">application:start/2</span> for any app. Of course there’s a bit more to releases than that, but generally, the same discovery process used for individual OTP applications will be applicable here.</p>
-						<p>You’ll usually have a file similar to the configuration files used by <span class="code">systools</span> or <span class="code">reltool</span>, which will state all applications part of the release and a few <a href="#sub_1_8">8</a> options regarding their packaging. To understand them, I recommend reading existing documentation on them. If you’re lucky, the project may be using <span class="code">relx</span><a href="#sub_1_9">9</a>, an easier tool that was officially released in early 2014.</p>
+						
+						<p>You’ll usually have a file similar to the configuration files used by <span class="code">systools</span> or <span class="code">reltool</span>, which will state all applications part of the release and a few <sup><a href="#sub_1_8">8</a></sup> options regarding their packaging. To understand them, I recommend reading existing documentation on them. If you’re lucky, the project may be using <span class="code">relx</span><sup><a href="#sub_1_9">9</a></sup>, an easier tool that was officially released in early 2014.</p>
 						<sub>
 							<p><a id="sub_1_8">8</a> A lot</p>
 							<p><a id="sub_1_9">9</a> <a href="https://github.com/erlware/relx/wiki">https://github.com/erlware/relx/wiki</a></p>
@@ -352,9 +380,13 @@ dispcount_supersup, dispcount_watcher, watchers_sup]}
 						
 						<a id="chapter_2"><h2>Chapter 2</h2></a>
 						<h2>Building Open Source Erlang	Software</h2>
+						
 						<p>Most Erlang books tend to explain how to build Erlang/OTP applications, but few of them go very much in depth about how to integrate with the Erlang community doing Open Source work. Some of them even avoid the topic on purpose. This chapter dedicates itself to doing a quick tour of the state of affairs in Erlang.</p>
+						
 						<p>OTP applications are the vast majority of the open source code people will encounter. In fact, many people who would need to build an OTP release would do so as one umbrella OTP application.</p>
-						<p>If what you’re writing is a stand-alone piece of code that could be used by someone building a product, it’s likely an OTP application. If what you’re building is a product that stands on its own and should be deployed by users as-is (or with a little  configuration), what you should be building is an OTP release. <a href="#sub_2_1">1</a></p>
+						
+						<p>If what you’re writing is a stand-alone piece of code that could be used by someone building a product, it’s likely an OTP application. If what you’re building is a product that stands on its own and should be deployed by users as-is (or with a little  configuration), what you should be building is an OTP release. <sup><a href="#sub_2_1">1</a></sup></p>
+						
 						<p>The main build tools supported are <span class="code">rebar</span> and <span class="code">erlang.mk</span>. The former is a portable Erlang script that will be used to wrap around a lot of standard functionality and add its own, while the latter is a very fancy makefile that does a bit less, but tends to be faster when it comes to compiling. In this chapter, I’ll mostly focus on using <span class="code">rebar</span> to build things, given it’s the ad-hoc standard, is well-established, and <span class="code">erlang.mk</span> applications tend to also be supported by <span class="code">rebar</span> as dependencies.</p>
 						<sub>
 							<p><a id="sub_2_1">1</a> The details of how to build an OTP application or release is left up to the Erlang introduction book you have at hand.</p>
@@ -372,7 +404,7 @@ dispcount_supersup, dispcount_watcher, watchers_sup]}
 7 README.md
 8 rebar.config</code></pre>
 						<p>What’s new in this one is the <span class="code">deps/</span> directory, which is fairly useful to have, but that
-						will be generated automatically by <span class="code">rebar</span> <a href="#sub_2_2">2</a>  if necessary. That’s because there is no canonical package management in Erlang. People instead adopted <span class="code">rebar</span>, which fetches dependencies locally, on a per-project basis. This is fine and removes a truckload of conflicts, but means that each project you have may have to download its own set of dependencies</p>
+						will be generated automatically by <span class="code">rebar</span> <sup><a href="#sub_2_2">2</a></sup>  if necessary. That’s because there is no canonical package management in Erlang. People instead adopted <span class="code">rebar</span>, which fetches dependencies locally, on a per-project basis. This is fine and removes a truckload of conflicts, but means that each project you have may have to download its own set of dependencies</p>
 						<p>This is accomplished with <span class="code">rebar</span> by adding a few config lines to <span class="code">rebar.config</span>:</p>
 						
 <pre><code class="erlang">1 {deps,
@@ -388,11 +420,11 @@ dispcount_supersup, dispcount_watcher, watchers_sup]}
 							<a id="sub_2_2">2</a> A lot of people package <span class="code">rebar</span> directly in their application. This was initially done to help people who had never used rebar before use libraries and projects in a boostrapped manner. Feel free to install rebar globally on your system, or keep a local copy if you require a specific version to build your system.
 						</sub>
 						<p>Applications are fetched directly from a <span class="code">git</span> (or <span class="code">hg</span>, or <span class="code">svn</span>) source, recursively. They can then be compiled, and specific compile options can be added with the <span class="code">{erl_opts, List}</span>.
-						option in the config file <a href="#sub_2_3">3</a>.</p>
+						option in the config file <sup><a href="#sub_2_3">3</a></sup>.</p>
 						<p>Within these directories, you can do your regular development of an OTP application. To compile them, call <span class="code">rebar get-deps compile</span>, which will download all dependencies, and then build them and your app at once.</p>
 						<p>When making your application public to the world, distribute it <span class="it">without</span> the dependencies. It’s quite possible that other developers’ applications depend on the same applications yours do, and it’s no use shipping them all multiple times. The build system in place (in this case, <span class="code">rebar</span>) should be able to figure out duplicated entries and fetch everything necessary only once.</p>
 						<a id="2_1_2_otp_releases4"><h4>2.1.2 OTP Releases</h4></a>
-						<p>For releases, the structure should be a bit different <a href="#sub2_4">4</a>. Releases are collections of applications, and their structures should reflect that</p>
+						<p>For releases, the structure should be a bit different <sup><a href="#sub2_4">4</a></sup>. Releases are collections of applications, and their structures should reflect that</p>
 						<p>Instead of having a top-level app, applications should be nested one level deeper and  divided into two categories: apps and deps. The apps directory contains your applications’ source code (say, internal business code), and the deps directory contains independently managed dependency applications.</p>
 <pre><code class="erlang">apps/
 doc/
@@ -401,7 +433,7 @@ LICENSE.txt
 README.md
 rebar.config
 </code></pre>
-						<p>This structure lends itself to generating releases. Tools such as Systool and Reltool have been covered before <a href="#sub_2_5">5</a>, and can allow the user plenty of power. An easier tool that recently appeared is <span class="code">relx</span> <a href="#sub_2_6">6</a>.</p>
+						<p>This structure lends itself to generating releases. Tools such as Systool and Reltool have been covered before <sup><a href="#sub_2_5">5</a></sup>, and can allow the user plenty of power. An easier tool that recently appeared is <span class="code">relx</span> <sup><a href="#sub_2_6">6</a></sup>.</p>
 						<p>A <span class="code">relx</span> configuration file for the directory structure above would look like:</p>
 <pre>
 <code class="erlang">1 {paths, ["apps", "deps"]}.
@@ -425,7 +457,7 @@ rebar.config
 						And every time <span class="code">rebar compile</span> will be called, the release will be generated.
 						</p>
 						<a id="2_2_supervisors_and_start_link_semantics"><h3>2.2 Supervisors and start_link Semantics</h3></a>
-							<p>In complex production systems, most faults and errors are transient, and retrying an operation is a good way to do things — Jim Gray’s paper <a href="#sub_2_7">7</a> quotes <span class="it">Mean Times Between Failures</span> (MTBF) of systems handling transient bugs being better by a factor of 4 when doing this. Still, supervisors aren’t just about restarting.</p>
+							<p>In complex production systems, most faults and errors are transient, and retrying an operation is a good way to do things — Jim Gray’s paper <sup><a href="#sub_2_7">7</a></sup> quotes <span class="it">Mean Times Between Failures</span> (MTBF) of systems handling transient bugs being better by a factor of 4 when doing this. Still, supervisors aren’t just about restarting.</p>
 							<p>One very important part of Erlang supervisors and their supervision trees is that <span class="it">their start phases are synchronous</span>. Each OTP process has the potential to prevent its siblings and cousins from booting. If the process dies, it’s retried again, and again, until it works, or fails too often.</p>
 							<p>That’s where people make a very common mistake. There isn’t a backoff or cooldown period before a supervisor restarts a crashed child. When a network-based application tries to set up a connection during its initialization phase and the remote service is down, the application fails to boot after too many fruitless restarts. Then the system may shut down.</p>
 							<p>Many Erlang developers end up arguing in favor of a supervisor that has a cooldown period. I strongly oppose the sentiment for one simple reason: <span class="it">it’s all about the guarantees</span>.</p>
@@ -437,7 +469,7 @@ rebar.config
 							<p>If you don’t provide that stable state, or if you were to start the entire system asynchronously, you would get very little benefit from this structure that a <span class="code">try ... catch</span> in a loop wouldn’t provide.</p>
 							<p>Supervised processes <span class="it">provide guarantees</span> in their initialization phase, not a <span class="it">best effort</span>. This means that when you’re writing a client for a database or service, you shouldn’t need a connection to be established as part of the initialization phase unless you’re ready to say it will always be available no matter what happens.</p>
 							<p>You could force a connection during initialization if you know the database is on the same host and should be booted before your Erlang system, for example. Then a restart should work. In case of something incomprehensible and unexpected that breaks these guarantees, the node will end up crashing, which is desirable: a pre-condition to starting your system hasn’t been met. It’s a system-wide assertion that failed.</p>
-							<p>If, on the other hand, your database is on a remote host, you should expect the connection to fail. It’s just a reality of distributed systems that things go down.<a href="#sub_2_8">8</a> In this case, the only guarantee you can make in the client process is that your client will be able to handle requests, but not that it will communicate to the database. It could return <span class="code">{error, not_connected}</span> on all calls during a net split, for example.</p>
+							<p>If, on the other hand, your database is on a remote host, you should expect the connection to fail. It’s just a reality of distributed systems that things go down.<sup><a href="#sub_2_8">8</a></sup> In this case, the only guarantee you can make in the client process is that your client will be able to handle requests, but not that it will communicate to the database. It could return <span class="code">{error, not_connected}</span> on all calls during a net split, for example.</p>
 							<p>The reconnection to the database can then be done using whatever cooldown or backoff strategy you believe is optimal, without impacting the stability of the system. It can be attempted in the initialization phase as an optimization, but the process should be able to reconnect later on if anything ever disconnects.</p>
 							<p>If you expect failure to happen on an external service, do not make its presence a guarantee of your system. We’re dealing with the real world here, and failure of external dependencies is always an option.</p>
 						<a id="2_2_2_side_effects"><h4>2.2.2 Side Effects</h4></a>
@@ -507,7 +539,7 @@ rebar.config
 						</ol>
 						<a href="chapter_3"> <h2>Chapter 3</h2></a>
 						<h2>Planning for Overload</h2>
-						<p>By far, the most common cause of failure I’ve encountered in real-world scenarios is due	to the node running out of memory. Furthermore, it is usually related to message queues going out of bounds. <a href="#sub_3_1">1</a> There are plenty of ways to deal with this, but knowing which one to use will require a decent understanding of the system you’re working on.</p>
+						<p>By far, the most common cause of failure I’ve encountered in real-world scenarios is due	to the node running out of memory. Furthermore, it is usually related to message queues going out of bounds. <sup><a href="#sub_3_1">1</a></sup> There are plenty of ways to deal with this, but knowing which one to use will require a decent understanding of the system you’re working on.</p>
 						<p>To oversimplify things, most of the projects I end up working on can be visualized as a very large bathroom sink. User and data input are flowing from the faucet. The Erlang system itself is the sink and the pipes, and wherever the output goes (whether it’s a database, an external API or service, and so on) is the sewer system.</p>
 						<img src="images/sink.png">
 						<p>When an Erlang node dies because of a queue overflowing, figuring out who to blame is crucial. Did someone put too much water in the sink? Are the sewer systems backing up ? Did you just design too small a pipe?</p>
@@ -525,7 +557,7 @@ rebar.config
 						<a id="3_1_common_overload_sources"><h3>3.1 Common Overload Sources</h3></a>
 						<p>There are a few common causes of queues blowing up and overload in Erlang systems that most people will encounter sooner or later, no matter how they approach their system. They’re usually symptomatic of having your system grow up and require some help scaling up, or of an unexpected type of failure that ends up cascading much harder than it should have.</p>
 						<a id="3_1_1_error_logger_explodes"></a> <h4>3.1.1. error_logger Explodes</h4>
-						<p>Ironically, the process in charge of error logging is one of the most fragile ones. In a defaultErlang install, the <span class="code">error_logger</span> <a href="#sub_3_2">2</a> process will take its sweet time to log things to disk orover the network, and will do so much more slowly than errors can be generated.</p>
+						<p>Ironically, the process in charge of error logging is one of the most fragile ones. In a defaultErlang install, the <span class="code">error_logger</span> <sup><a href="#sub_3_2">2</a><sup> process will take its sweet time to log things to disk orover the network, and will do so much more slowly than errors can be generated.</p>
 						<p>This is especially true of user-generated log messages (not for errors), and for crashes in large processes. For the former, this is because <span class="code">error_logger</span> doesn’t really expect arbitrary levels of messages coming in continually. It’s for exceptional cases only and doesn’t expect lots of traffic. For the latter, it’s because the entire state of processes (including their mailboxes) gets copied over to be logged. It only takes a few messages to cause memory to bubble up a lot, and if that’s not enough to cause the node to run Out Of Memory (OOM), it may slow the logger enough that additional messages will.</p>
 						<p>The best solution for this at the time of writing is to use <span class="code">lager</span> as a substitute logging library.</p>
 						<p>While <span class="code">lager</span> will not solve all your problems, it will truncate voluminous log messages, optionally drop OTP-generated error messages when they go over a certain threshold, and will automatically switch between asynchronous and synchronous modes for user-submitted messages in order to self-regulate.</p>
@@ -534,7 +566,7 @@ rebar.config
 						
 						<p>Locking and blocking operations will often be problematic when they’re taking unexpectedly long to execute in a process that’s constantly receiving new tasks.</p>
 						<p>One of the most common examples I’ve seen is a process blocking while accepting a connection or waiting for messages with TCP sockets. During blocking operations of this kind, messages are free to pile up in the message queue.</p>
-						<p>One particularly bad example was in a pool manager for HTTP connections that I had written in a fork of the <span class="code">lhttpc</span> library. It worked fine in most test cases we had, and we even had a connection timeout set to 10 milliseconds to be sure it never took too long <a href="#sub_3_3">3</a>. After a few weeks of perfect uptime, the HTTP client pool caused an outage when one of the remote servers went down.</p>
+						<p>One particularly bad example was in a pool manager for HTTP connections that I had written in a fork of the <span class="code">lhttpc</span> library. It worked fine in most test cases we had, and we even had a connection timeout set to 10 milliseconds to be sure it never took too long <sup><a href="#sub_3_3">3</a></sup>. After a few weeks of perfect uptime, the HTTP client pool caused an outage when one of the remote servers went down.</p>
 						<p>The reason behind this degradation was that when the remote server would go down, all of a sudden, all connecting operations would take at least 10 milliseconds, the time before which the connection attempt is given up on. With around 9,000 messages per second to the central process, each usually taking under 5 milliseconds, the impact became similar to roughly 18,000 messages a second and things got out of hand.</p>
 						<sub>
 						<p><a id="sub_3_2">2</a> Defined at <a href="http://www.erlang.org/doc/man/error_logger.html">http://www.erlang.org/doc/man/error_logger.html</a></p>
@@ -542,13 +574,13 @@ rebar.config
 						<p><a id="sub_3_3">3</a> 10 milliseconds is very short, but was fine for collocated servers used for real-time bidding.</p>
 						</sub>
 						<p>The solution we came up with was to leave the task of connecting to the caller process, and enforce the limits as if the manager had done it on its own. The blocking operations were now distributed to all users of the library, and even less work was required to be done by the manager, now free to accept more requests.</p>
-						<p>When there is <span class="it">any</span> point of your program that ends up being a central hub for receiving messages, lengthy tasks should be moved out of there if possible. Handling predictable overload <a href="#sub_3_4">4</a> situations by adding more processes — which either handle the blocking operations or instead act as a buffer while the "main" process blocks — is often a good idea.</p>
+						<p>When there is <span class="it">any</span> point of your program that ends up being a central hub for receiving messages, lengthy tasks should be moved out of there if possible. Handling predictable overload <sup><a href="#sub_3_4">4</a></sup> situations by adding more processes — which either handle the blocking operations or instead act as a buffer while the "main" process blocks — is often a good idea.</p>
 						<p>There will be increased complexity in managing more processes for activities that aren’t intrinsically concurrent, so make sure you need them before programming defensively.</p>
-						<p>Another option is to transform the blocking task into an asynchronous one. If the type of work allows it, start the long-running job and keep a token that identifies it uniquely, along with the original requester you’re doing work for. When the resource is available, have it send a message back to the server with the aforementioned token. The server will eventually get the message, match the token to the requester, and answer back, without being blocked by other requests in the mean time.<a href="#sub_3_5">5</a></p>
+						<p>Another option is to transform the blocking task into an asynchronous one. If the type of work allows it, start the long-running job and keep a token that identifies it uniquely, along with the original requester you’re doing work for. When the resource is available, have it send a message back to the server with the aforementioned token. The server will eventually get the message, match the token to the requester, and answer back, without being blocked by other requests in the mean time.<sup><a href="#sub_3_5">5</a></sup></p>
 						<p>This option tends to be more obscure than using many processes and can quickly devolve into callback hell, but may use fewer resources.</p>
 						<a id="3_1_3_unexpected_messages"> <h4>3.1.3 Unexpected Messages</h4></a>
 						<p>Messages you didn’t know about tend to be rather rare when using OTP applications. Because OTP behaviours pretty much expect you to handle anything with some clause in <span class="code">handle_info/2</span>, unexpected messages will not accumulate much.</p>
-						<p>However, all kinds of OTP-compliant systems end up having processes that may not implement a behaviour, or processes that go in a non-behaviour stretch where it overtakes message handling. If you’re lucky enough, monitoring tools <a href="#sub_3_6">6</a> will show a constant memory increase, and inspecting for large queue sizes <a href="#sub_3_6">7</a> will let you find which process is at fault. You can then fix the problem by handling the messages as required.</p>
+						<p>However, all kinds of OTP-compliant systems end up having processes that may not implement a behaviour, or processes that go in a non-behaviour stretch where it overtakes message handling. If you’re lucky enough, monitoring tools <sup><a href="#sub_3_6">6</a></sup> will show a constant memory increase, and inspecting for large queue sizes <sup><a href="#sub_3_7">7</a></sup> will let you find which process is at fault. You can then fix the problem by handling the messages as required.</p>
 						<sub>
 						<p><a id="sub_3_4">4</a> Something you know for a fact gets overloaded in production</p>
 						<p><a id="sub_3_5">5</a> The <span class="code">redo</span> application is an example of a library doing this, in its <span class="code">redo_block</span> module. The [underdocumented] module turns a pipelined connection into a blocking one, but does so while maintaining pipeline aspects to the caller — this allows the caller to know that only one call failed when a timeout occurs, not all of the in-transit ones, without having the server stop accepting requests.</p>
@@ -561,11 +593,11 @@ rebar.config
 						<p>The most common way to restrict data input is to make calls to a process whose queue would grow in uncontrollable ways synchronously. By requiring a response before moving on to the next request, you will generally ensure that the direct source of the problem will be slowed down.</p>
 						<p>The difficult part for this approach is that the bottleneck causing the queue to grow is usually not at the edge of the system, but deep inside it, which you find after optimizing nearly everything that came before. Such bottlenecks will often be database operations, disk operations, or some service over the network.</p>
 						
-						<p>This means that when you introduce synchronous behaviour deep in the system, you’ll possibly need to handle back-pressure, level by level, until you end up at the system’s edges and can tell the user, "please slow down." Developers that see this pattern will often try to put API limits per user <a href="#sub_3_8">8</a> on the system entry points. This is a valid approach, especially since it can guarantee a basic quality of service (QoS) to the system and allows one to allocate resources as fairly (or unfairly) as desired. </p>
+						<p>This means that when you introduce synchronous behaviour deep in the system, you’ll possibly need to handle back-pressure, level by level, until you end up at the system’s edges and can tell the user, "please slow down." Developers that see this pattern will often try to put API limits per user <sup><a href="#sub_3_8">8</a></sup> on the system entry points. This is a valid approach, especially since it can guarantee a basic quality of service (QoS) to the system and allows one to allocate resources as fairly (or unfairly) as desired. </p>
 						<a id="3_2_1_how_long_should_timeout_be"><h4>3.2.1 How Long Should a Time Out Be</h4></a>
 						<p>What’s particularly tricky about applying back-pressure to handle overload via synchronous calls is having to determine what the typical operation should be taking in terms of time, or rather, at what point the system should time out. </p>
 						<p>The best way to express the problem is that the first timer to be started will be at the edge of the system, but the critical operations will be happening deep within it. This means that the timer at the edge of the system will need to have a longer wait time that those within, unless you plan on having operations reported as timing out at the edge even though they succeeded internally. </p>
-						<p>An easy way out of this is to go for infinite timeouts. Pat Helland <a href="#sub_3_9">9</a> has an interesting answer to this: </p>
+						<p>An easy way out of this is to go for infinite timeouts. Pat Helland <sup><a href="#sub_3_9">9</a><sup> has an interesting answer to this: </p>
 						
 						<div>Some application developers may push for no timeout and argue it is OK to wait indefinitely. I typically propose they set the timeout to 30 years. That, in turn, generates a response that I need to be reasonable and not silly. <span class="it">Why is 30 years silly but infinity is reasonable?</span> I have yet to see a messaging application that really wants to wait for an unbounded period of time. . . </div>
 						
@@ -573,12 +605,12 @@ rebar.config
 						<p><a id="sub_3_8">8</a> There’s a tradeoff between slowing down all requests equally or using rate-limiting, both of which are valid. Rate-limiting per user would mean you’d still need to increase capacity or lower the limits of all users when more new users hammer your system, whereas a synchronous system that indiscriminately blocks should adapt to any load with more ease, but possibly unfairly.</p>
 						<p><a id="sub_3_9">9</a> Idempotence is Not a Medical Condition, April 14, 2012</p>
 						</sub>
-						<p>This is, ultimately, a case-by-case issue. In many cases, it may be more practical to use a different mechanism for that flow control.<a href="#sub_3_10">10</a> </p>
+						<p>This is, ultimately, a case-by-case issue. In many cases, it may be more practical to use a different mechanism for that flow control.<sup><a href="#sub_3_10">10</a></sup> </p>
 						<a id="3_2_2_asking_for_permission"><h4>3.2.2 Asking For Permission</h4></a>
 						<p>A somewhat simpler approach to back-pressure is to identify the resources we want to block on, those that cannot be made faster and are critical to your business and users. Lock these resources behind a module or procedure where a caller must ask for the right to make a request and use them. There’s plenty of variables that can be used: memory, CPU, overall load, a bounded number of calls, concurrency, response times, a combination of them, and so on.</p>
 						
-						<p>The <span class="it">SafetyValve</span> <a href="sub_3_11">11</a> application is a system-wide framework that can be used when you know back-pressure is what you’ll need. </p>
-						<p>For more specific use cases having to do with service or system failures, there are plenty of circuit breaker applications available. Examples include <span class="code">breaky</span><a href="sub_3_12">12</a> , <span class="code">fuse</span> <a href="sub_3_13">13</a>, or Klarna’s <span class="code">circuit_breaker</span> <a href="sub_3_14">14</a>.</p>
+						<p>The <span class="it">SafetyValve</span> <sup><a href="sub_3_11">11</a></sup> application is a system-wide framework that can be used when you know back-pressure is what you’ll need. </p>
+						<p>For more specific use cases having to do with service or system failures, there are plenty of circuit breaker applications available. Examples include <span class="code">breaky</span><sup><a href="sub_3_12">12</a></sup> , <span class="code">fuse</span> <sup><a href="sub_3_13">13</a></sup>, or Klarna’s <span class="code">circuit_breaker</span> <sup><a href="sub_3_14">14</a></sup>.</p>
 						<p>Otherwise, ad-hoc solutions can be written using processes, ETS, or any other tool available. The important part is that the edge of the system (or subsystem) may block and ask for the right to process data, but the critical bottleneck in code is the one to determine whether that right can be granted or not. </p>
 						<p>The advantage of proceeding that way is that you may just avoid all the tricky stuff about timers and making every single layer of abstraction synchronous. You’ll instead put guards at the bottleneck and at a given edge or control point, and everything in between can be expressed in the most readable way possible.</p>
 						<a id="3_2_3_what_users_see"> <h4>3.2.2 What Users See</h4></a>
@@ -626,7 +658,7 @@ end.</code></pre>
 						<p>There is one ‘gotcha’ to this method, though: the random drop must ideally be done at the producer level rather than at the queue (the receiver) level. The best way to avoid overloading a queue is to not send data its way in the first place. Because there are no bounded mailboxes in Erlang, dropping in the receiving process only guarantees that this process will be spinning wildly, trying to get rid of messages, and fighting the schedulers to do actual work.</p>
 						<p>On the other hand, dropping at the producer level is guaranteed to distribute the work equally across all processes.</p>
 						
-						<p>This can give place to interesting optimizations where the working process or a given monitor process <a href="#sub_3_15">15</a> uses values in an ETS table or <span class="code">application:set_env/3</span> to dynamically increase and decrease the threshold to be used with the random number. This allows control over how many messages are dropped based on overload, and the configuration data can be fetched by any process rather efficiently by using <span class="code">application:get_env/2</span>.</p>
+						<p>This can give place to interesting optimizations where the working process or a given monitor process <sup><a href="#sub_3_15">15</a></sup> uses values in an ETS table or <span class="code">application:set_env/3</span> to dynamically increase and decrease the threshold to be used with the random number. This allows control over how many messages are dropped based on overload, and the configuration data can be fetched by any process rather efficiently by using <span class="code">application:get_env/2</span>.</p>
 						
 						<p>Similar techniques could also be used to implement different drop ratios for different message priorities, rather than trying to sort it all out at the consumer level.</p>
 						
@@ -642,18 +674,18 @@ end.</code></pre>
 							<li>A new process that will do nothing but buffer the messages. Messages from the outside should go to this process.</li>
 						</ul>
 						
-						<p>To make things work, the buffer process only has to remove all the messages it can from its mail box and put them in a queue data structure <a href="#sub_3_16">16</a> it manages on its own. Whenever the server is ready to do more work, it can ask the buffer process to send it a given number of messages that it can work on. The buffer process picks them from its queue, forwards them to the server, and goes back to accumulating data. </p>
+						<p>To make things work, the buffer process only has to remove all the messages it can from its mail box and put them in a queue data structure <sup><a href="#sub_3_16">16</a></sup> it manages on its own. Whenever the server is ready to do more work, it can ask the buffer process to send it a given number of messages that it can work on. The buffer process picks them from its queue, forwards them to the server, and goes back to accumulating data. </p>
 						
-						<p>Whenever the queue grows beyond a certain size <a href="#sub_3_17">17</a> and you receive a new message, you can then pop the oldest one and push the new one in there, dropping the oldest elements as you go. <a href="#sub_3_18">18</a> </p>
+						<p>Whenever the queue grows beyond a certain size <sup><a href="#sub_3_17">17</a></sup> and you receive a new message, you can then pop the oldest one and push the new one in there, dropping the oldest elements as you go. <sup><a href="#sub_3_18">18</a></sup> </p>
 						
 						<p>This should keep the entire number of messages received to a rather stable size and provide a good amount of resistance to overload, somewhat similar to the functional version of a ring buffer.</p>
 						
-						<p>The <span class="code">PO Box</span> <a href="#sub_3_19">19</a> library implements such a queue buffer.</p>
+						<p>The <span class="code">PO Box</span> <sup><a href="#sub_3_19">19</a></sup> library implements such a queue buffer.</p>
 						
 						<a id="3_3_3_stack_buffers"> <h4>3.3.3 Stack Buffers </h4></a>
 						<p>Stack buffers are ideal when you want the amount of control offered by queue buffers, but you have an important requirement for low latency.</p>
 						
-						<p>To use a stack as a buffer, you’ll need two processes, just like you would with queue buffers, but a list <a href="#sub_3_20">20</a> will be used instead of a queue data structure.</p>
+						<p>To use a stack as a buffer, you’ll need two processes, just like you would with queue buffers, but a list <sup><a href="#sub_3_20">20</a></sup> will be used instead of a queue data structure.</p>
 						
 						<sub>
 						<p><a id="sub_3_16">16</a>	The <span class="code">queue</span> module in Erlang provides a purely functional queue data structure that can work fine for such a buffer.</p>
@@ -662,7 +694,7 @@ end.</code></pre>
 						<p><a id="sub_3_19">19</a> Available at: <a href="https://github.com/ferd/pobox">https://github.com/ferd/pobox</a>, the library has been used in production for a long time in large scale products at Heroku and is considered mature</p>
 						<p><a id="sub_3_20">20</a> Erlang lists <span class="it">are stacks</span>, for all we care. They provide push and pop operations that take O(1) complexity and are very fast</p>
 						</sub>
-						<p>The reason the stack buffer is particularly good for low latency is related to issues similar to bufferbloat <a href="#sub_3_21">21</a>. If you get behind on a few messages being buffered in a queue, all the messages in the queue get to be slowed down and acquire milliseconds of wait time. Eventually, they all get to be too old and the entire buffer needs to be discarded.</p>
+						<p>The reason the stack buffer is particularly good for low latency is related to issues similar to bufferbloat <sup><a href="#sub_3_21">21</a></sup>. If you get behind on a few messages being buffered in a queue, all the messages in the queue get to be slowed down and acquire milliseconds of wait time. Eventually, they all get to be too old and the entire buffer needs to be discarded.</p>
 						
 						<p>On the other hand, a stack will make it so only a restricted number of elements are kept waiting while the newer ones keep making it to the server to be processed in a timely manner.</p>
 						
@@ -693,14 +725,14 @@ end.</code></pre>
 						
 						<p>In practice, though, we want to avoid atoms generated dynamically, so I tend to prefer to register workers in an ETS table with <span class="code">read_concurrency</span> set to <span class="code">true</span>. It’s a bit more work, but it gives more flexibility when it comes to updating the number of workers later on.</p>
 						
-						<p>An approach similar to this one is used in the <span class="code">lhttpc</span> <a href="#sub_3_22">22</a> library mentioned earlier, to split load balancers on a per-domain basis. </p>
+						<p>An approach similar to this one is used in the <span class="code">lhttpc</span> <sup><a href="#sub_3_22">22</a></sup> library mentioned earlier, to split load balancers on a per-domain basis. </p>
 						
-						<p>For the second approach, using counters and locks, the same basic structure still remains (pick one of many options, send it a message), but before actually sending a message, you must atomically update an ETS counter <a href="#sub_3_23">23</a> . There is a known limit shared across all clients (either through their supervisor, or any other config or ETS value) and each request that can be made to a process needs to clear this limit first.</p>
+						<p>For the second approach, using counters and locks, the same basic structure still remains (pick one of many options, send it a message), but before actually sending a message, you must atomically update an ETS counter <sup><a href="#sub_3_23">23</a></sup> . There is a known limit shared across all clients (either through their supervisor, or any other config or ETS value) and each request that can be made to a process needs to clear this limit first.</p>
 						
-						<p>This approach has been used in <span class="code">dispcount</span> <a href="#sub_3_24">24</a> to avoid message queues, and to guarantee low-latency responses to any message that won’t be handled so that you do not need to wait to know your request was denied. It is then up to the user of the library whether to give up as soon as possible, or to keep retrying with different workers. </p>
+						<p>This approach has been used in <span class="code">dispcount</span> <sup><a href="#sub_3_24">24</a></sup> to avoid message queues, and to guarantee low-latency responses to any message that won’t be handled so that you do not need to wait to know your request was denied. It is then up to the user of the library whether to give up as soon as possible, or to keep retrying with different workers. </p>
 						<a id="3_3_6_how_to_drop"><h4>3.3.6 How Do You Drop</h4></a>
 						<p>Most of the solutions outlined here work based on message quantity, but it’s also possible to try and do it based on message size, or expected complexity, if you can predict it. When using a queue or stack buffer, instead of counting entries, all you may need to do is count their size or assign them a given load as a limit. </p>
-						<p>I’ve found that in practice, dropping without regard to the specifics of the message works rather well, but each application has its share of unique compromises that can be acceptable or not <a href="#sub_3_25">25</a>. </p>
+						<p>I’ve found that in practice, dropping without regard to the specifics of the message works rather well, but each application has its share of unique compromises that can be acceptable or not <sup><a href="#sub_3_25">25</a></sup>. </p>
 						<sub>
 						<p><a id="sub_3_22">22</a> The <a href="https://github.com/ferd/lhttpc/blob/master/src/lhttpc_lb.erl">lhttpc_lb</a> module in this library implements it.</p>
 						
@@ -743,8 +775,8 @@ end.</code></pre>
 						
 				<p>Erlang uses something closer to an "interactor" than a REPL. Basically, a regular Erlang virtual machine does not need a REPL, and will happily run byte code and stick with that, no shell needed. However, because of how it works with concurrency and multiprocessing, and good support for distribution, it is possible to have in-software REPLs that run as arbitrary Erlang processes.</p>
 						
-				<p>This means that, unlike a single screen session with a single shell, it’s possible to have as many Erlang shells connected and interacting with one virtual machine as you want at a time <a href="#sub_4_1">1</a>.</p>
-				<p>Most common usages will depend on a cookie being present on the two nodes you want to connect together <a href="#sub_4_2">2</a>, but there are ways to do it that do not include it. Most usages will also require the use of named nodes, and all of them will require <span class="it">a priori</span> measures to make sure you can contact the node.</p>
+				<p>This means that, unlike a single screen session with a single shell, it’s possible to have as many Erlang shells connected and interacting with one virtual machine as you want at a time <sup><a href="#sub_4_1">1</a></sup>.</p>
+				<p>Most common usages will depend on a cookie being present on the two nodes you want to connect together <sup><a href="#sub_4_2">2</a></sup>, but there are ways to do it that do not include it. Most usages will also require the use of named nodes, and all of them will require <span class="it">a priori</span> measures to make sure you can contact the node.</p>
 				<sub>
 					<p><a id="sub_4_1">1</a> More details on the mechanisms at <a href="http://ferd.ca/repl-a-bit-more-and-less-than-that.html">http://ferd.ca/repl-a-bit-more-and-less-than-that.html</a></p>
 					<p><a id="sub_4_2">2</a> More details at  <a href="http://learnyousomeerlang.com/distribunomicon#cookies">http://learnyousomeerlang.com/distribunomicon#cookies</a> <a href="http://www.erlang.org/doc/reference_manual/distributed.html#id83619">http://www.erlang.org/doc/reference_manual/distributed.html#id83619</a></p>
@@ -800,7 +832,7 @@ $ erl
 2>  {user_dir, "/home/ferd/.ssh"}]).
 {ok,<0.52.0>}
 </code></pre>
-					<p>I’ve only set a few options here, namely system_dir, which is where the host files are, and <span class="code">user_dir</span>, which contains SSH configuration files. There are plenty of other options available to allow for specific passwords, customize handling of public keys, and so on <a href="#sub_4_3">3</a>.</p>
+					<p>I’ve only set a few options here, namely system_dir, which is where the host files are, and <span class="code">user_dir</span>, which contains SSH configuration files. There are plenty of other options available to allow for specific passwords, customize handling of public keys, and so on <sup><a href="#sub_4_3">3</a></sup>.</p>
 						
 					<p>To connect to the daemon, any SSH client will do:</p>
 <pre>
@@ -815,15 +847,15 @@ Eshell Vx.x.x (abort with ^G)
 							<a href="http://www.erlang.org/doc/man/ssh.html#daemon-3">http://www.erlang.org/doc/man/ssh.html#daemon-3</a>.</p>
 					</sub>
 						
-					<p>And with this you can interact with an Erlang installation without having it installed on the current machine. Just disconnecting from the SSH session (closing the terminal) will be enough to leave. <span class="it">Do not run</span> functions such as <span class="code">q()</span> or <span class="code">init:stop()</span>, which will terminate the remote host.<a href="#sub_4_4">4</a> </p>
+					<p>And with this you can interact with an Erlang installation without having it installed on the current machine. Just disconnecting from the SSH session (closing the terminal) will be enough to leave. <span class="it">Do not run</span> functions such as <span class="code">q()</span> or <span class="code">init:stop()</span>, which will terminate the remote host.<sup><a href="#sub_4_4">4</a></sup> </p>
 						
 					<p>If you have trouble connecting, you can add the <span class="code">-oLogLevel=DEBUG</span> option to <span class="code">ssh</span> to get debug output.</p>
 				<a id="4_4_named_pipes"><h3>4.4. Named Pipes</h3></a>
 					
-					<p>A little known way to connect with an Erlang node that requires no explicit distribution is through named pipes. This can be done by starting Erlang with <span class="code">run_erl</span>, which wraps Erlang in a named pipe <a href="#sub_4_5">5</a> : </p>
+					<p>A little known way to connect with an Erlang node that requires no explicit distribution is through named pipes. This can be done by starting Erlang with <span class="code">run_erl</span>, which wraps Erlang in a named pipe <sup><a href="#sub_4_5">5</a></sup> : </p>
 <pre><code class="erlang">$ run_erl /tmp/erl_pipe /tmp/log_dir "erl"
 </code></pre>
-					<p>The first argument is the name of the file that will act as the named pipe. The second one is where logs will be saved <a href="#sub_4_6">6</a> .</p>
+					<p>The first argument is the name of the file that will act as the named pipe. The second one is where logs will be saved <sup><a href="#sub_4_6">6</a></sup> .</p>
 					<p>To connect to the node, you use the <span class="code">to_erl</span> program:</p>
 <pre><code class="erlang">$ to_erl /tmp/erl_pipe
 Attaching to /tmp/erl_pipe (^D to exit)

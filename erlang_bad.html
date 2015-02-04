@@ -717,7 +717,7 @@ end.</code></pre>
 						
 						<p>ETS tables are generally able to handle a ton more requests per second than a process, but the operations they support are a lot more basic. A single read, or adding or removing from a counter atomically is as fancy as you should expect things to get for the general case.</p>
 						
-						<sub><a id="sub_3_21">21</a> http://queue.acm.org/detail.cfm?id=2071893</sub>
+						<sub><a id="sub_3_21">21</a> <a href="http://queue.acm.org/detail.cfm?id=2071893">http://queue.acm.org/detail.cfm?id=2071893</a></sub>
 						
 						<p>ETS tables will be required for both approaches.</p>
 						
@@ -896,7 +896,7 @@ Attaching to /tmp/erl_pipe (^D to exit)
 						
 						<sub>
 						<a id="sub_5_1">1</a> Making sure your automated processes don’t run away and go overboard with whatever corrective actions they take is more complex
-						<a id="sub_5_2">2</a> http://ferd.github.io/recon/
+						<a id="sub_5_2">2</a> <a href="http://ferd.github.io/recon/">http://ferd.github.io/recon/</a>
 						</sub>
 						<a id="5_1_global_view"><h3>5.1 Global View</h3></a>
 						<p>For a view of the VM in the large, it’s useful to track statistics and metrics general to the VM, regardless of the code running on it. Moreover, you should aim for a solution that allows long-term views of each metric — some problems show up as a very long accumulation over weeks that couldn’t be detected over small time windows.</p>
@@ -929,13 +929,13 @@ Attaching to /tmp/erl_pipe (^D to exit)
  {ets,305920}]
 </code></pre>
 						<sub>
-						<p><a id="sub_5_3">3</a> https://github.com/boundary/folsom</p>
-						<p><a id="sub_5_4">4</a> https://github.com/ferd/vmstats</p>
-						<p><a id="sub_5_5">5</a> https://github.com/lpgauth/statsderl</p>
-						<p><a id="sub_5_6">6</a> https://github.com/etsy/statsd/</p>
-						<p><a id="sub_5_7">7</a> https://github.com/Feuerlabs/exometer</p>
-						<p><a id="sub_5_8">8</a> https://github.com/heroku/ehmon</p>
-						<p><a id="sub_5_9">9</a> Common patterns may fit the <span class="code">ectr</span> application, at https://github.com/heroku/ectr</p>
+						<p><a id="sub_5_3">3</a> <a href="https://github.com/boundary/folsom">https://github.com/boundary/folsom</a></p>
+						<p><a id="sub_5_4">4</a> <a href="https://github.com/ferd/vmstats">https://github.com/ferd/vmstats</a></p>
+						<p><a id="sub_5_5">5</a> <a href="https://github.com/lpgauth/statsderl">https://github.com/lpgauth/statsderl</a></p>
+						<p><a id="sub_5_6">6</a> <a href="https://github.com/etsy/statsd/">https://github.com/etsy/statsd/</a></p>
+						<p><a id="sub_5_7">7</a> <a href="https://github.com/Feuerlabs/exometer">https://github.com/Feuerlabs/exometer</a></p>
+						<p><a id="sub_5_8">8</a> <a href="https://github.com/heroku/ehmon">https://github.com/heroku/ehmon</a></p>
+						<p><a id="sub_5_9">9</a> Common patterns may fit the <span class="code">ectr</span> application, at <a href="https://github.com/heroku/ectr">https://github.com/heroku/ectr</a></p>
 						<p><a id="sub_5_10">10</a> The <span class="code">recon</span> application has the function <span class="code">recon:node_stats_print/2</span> to do this if you’re in a pinch</p>
 						</sub>
 						
@@ -992,7 +992,7 @@ Attaching to /tmp/erl_pipe (^D to exit)
 4 [||||||||||||||||          40.2%]
 </code></pre>
 						<sub>
-						<p><a id="sub_5_13">13</a> http://www.erlang.org/doc/man/erlang.html#statistics_scheduler_wall_time</p>
+						<p><a id="sub_5_13">13</a> <a href="http://www.erlang.org/doc/man/erlang.html#statistics_scheduler_wall_time">http://www.erlang.org/doc/man/erlang.html#statistics_scheduler_wall_time</a></p>
 						</sub>
 						
 						<p>The result being that there is a decent chunk of CPU usage that would be mostly free for scheduling actual Erlang work (assuming the schedulers are busy waiting more than trying to select tasks to run), but is being reported as busy by the OS.</p>
@@ -1039,8 +1039,8 @@ Attaching to /tmp/erl_pipe (^D to exit)
 							<p>By all means, processes are an important part of a running Erlang system. And becausethey’re so central to everything that goes on, there’s a lot to want to know about them. Fortunately, the VM makes a lot of information available, some of which is safe to use, and some of which is unsafe to use in production (because they can return data sets large enough that the amount of memory copied to the shell process and used to print it can kill the node).</p>
 							
 							<sub>
-							<p><a id="sub_5_14">14</a> http://www.erlang.org/doc/tutorial/c_port.html</p>
-							<p><a id="sub_5_15">15</a> http://www.erlang.org/doc/tutorial/c_portdriver.html</p>
+							<p><a id="sub_5_14">14</a> <a href="http://www.erlang.org/doc/tutorial/c_port.html">http://www.erlang.org/doc/tutorial/c_port.html</a></p>
+							<p><a id="sub_5_15">15</a> <a href="http://www.erlang.org/doc/tutorial/c_portdriver.html">http://www.erlang.org/doc/tutorial/c_portdriver.html</a></p>
 							<p><a id="sub_5_16">16</a> See <a href="#chapter_9">Chapter 9</a></p>
 							</sub>
 							
@@ -1073,11 +1073,11 @@ Attaching to /tmp/erl_pipe (^D to exit)
 							<sub>
 							<p> <a id="sub_5_17">17</a> In cases where processes contain sensitive information, data can be forced to be kept private by calling <span class="code">process_flag(sensitive, true)</span></p>
 							
-							<p><a id="sub_5_18">18</a> For <span class="it">all</span> options, look at http://www.erlang.org/doc/man/erlang.html#process_info-2</p>
+							<p><a id="sub_5_18">18</a> For <span class="it">all</span> options, look at <a href="http://www.erlang.org/doc/man/erlang.html#process_info-2">http://www.erlang.org/doc/man/erlang.html#process_info-2</a></p>
 							
-							<p><a id="sub_5_19">19</a> See http://www.erlang.org/course/advanced.html#dict and http://ferd.ca/on-the-use-of-the-process-dictionary-in-erlang.html</p>
+							<p><a id="sub_5_19">19</a> See <a href="http://www.erlang.org/course/advanced.html#dict">http://www.erlang.org/course/advanced.html#dict</a> and <a href="http://ferd.ca/on-the-use-of-the-process-dictionary-in-erlang.html">http://ferd.ca/on-the-use-of-the-process-dictionary-in-erlang.html</a></p>
 							
-							<p><a id="sub_5_20">20</a> See http://learnyousomeerlang.com/building-otp-applications#the-application-behaviour and http://erlang.org/doc/apps/stdlib/io_protocol.html for more details.</p>
+							<p><a id="sub_5_20">20</a> See <a href="http://learnyousomeerlang.com/building-otp-applications#the-application-behaviour">http://learnyousomeerlang.com/building-otp-applications#the-application-behaviour</a> and <a href="http://erlang.org/doc/apps/stdlib/io_protocol.html">http://erlang.org/doc/apps/stdlib/io_protocol.html</a> for more details.</p>
 							</sub>
 							<h5>Location</h5>
 							
@@ -1222,7 +1222,7 @@ Attaching to /tmp/erl_pipe (^D to exit)
 							<sub>
 							<p><a id="sub_5_22">22</a> Warning: this function depends on data gathered at two snapshots, and then building a dictionary with entries to differentiate them. This can take a heavy toll on memory when you have many tens of thousands of processes, and a little bit of time.</p>
 							
-							<p><a id="sub_5_23">23</a> http://www.erlang.org/doc/man/sys.html</p>
+							<p><a id="sub_5_23">23</a> <a href="http://www.erlang.org/doc/man/sys.html">http://www.erlang.org/doc/man/sys.html</a></p>
 							</sub>
 							
 							<a id="5_2_3_ports"><h4>5.2.3 Ports</h4></a>
@@ -1263,8 +1263,8 @@ Attaching to /tmp/erl_pipe (^D to exit)
 							
 							<sub>
 							<a id="sub_5_24">24</a> The driver queue is available to queue output from the emulator to the driver (data from the driver to the emulator is queued by the emulator in normal Erlang message queues). This can be useful if the driver has to wait for slow devices etc, and wants to yield back to the emulator.
-							<a id="sub_5_25">25</a> http://www.erlang.org/doc/man/inet.html#getstat-1
-							<a id="sub_5_26">26</a> http://www.erlang.org/doc/man/inet.html#setopts-2
+							<a id="sub_5_25">25</a> <a href="http://www.erlang.org/doc/man/inet.html#getstat-1">http://www.erlang.org/doc/man/inet.html#getstat-1</a>
+							<a id="sub_5_26">26</a> <a href="http://www.erlang.org/doc/man/inet.html#setopts-2">http://www.erlang.org/doc/man/inet.html#setopts-2</a>
 							</sub>
 
 							<p><span class="code">Others</span> currently no other form than inet ports are supported in recon, and an empty list is returned.</p>
@@ -1357,7 +1357,7 @@ Attaching to /tmp/erl_pipe (^D to exit)
 								<li>How can you find what proportion of processes on a node are ready to run, but can’t be scheduled right away?</li>
 							</ol>
 							<h4>Hands-On</h4>
-							<p>Using the code at https://github.com/ferd/recon_demo:</p>
+							<p>Using the code at <a href="https://github.com/ferd/recon_demo">https://github.com/ferd/recon_demo</a>:</p>
 							<ol>
 								<li>What’s the system memory?</li>
 								<li>Is the node using a lot of CPU resources?</li>
@@ -1443,9 +1443,9 @@ Process States when crashing (sum):
 </code></pre>
 							<sub>
 								<p><a id="sub_6_1">1</a> If it isn’t killed by the OS for violating ulimits while dumping or didn’t segfault.</p>
-								<p><a id="sub_6_2">2</a> http://www.erlang.org/doc/apps/erts/crash_dump.html</p>
+								<p><a id="sub_6_2">2</a> <a href="http://www.erlang.org/doc/apps/erts/crash_dump.html">http://www.erlang.org/doc/apps/erts/crash_dump.html</a></p>
 								<p><a id="sub_6_3">3</a> Heroku’s Routing and Telemetry teams use the heroku_crashdumps app to set the path and name of the crash dumps. It can be added to a project to name the dumps by boot time and put them in a pre-set location</p>
-								<p><a id="sub_6_4">4</a> https://github.com/ferd/recon/blob/master/script/erl_crashdump_analyzer.sh</p>
+								<p><a id="sub_6_4">4</a> <a href="https://github.com/ferd/recon/blob/master/script/erl_crashdump_analyzer.sh">https://github.com/ferd/recon/blob/master/script/erl_crashdump_analyzer.sh</a></p>
 							</sub>
 							<p>This data dump won’t point out a problem directly to your face, but will be a good clue as to where to look. For example, the node here ran out of memory and had 11079 Mb out of 15 Gb used (I know this because that’s the max instance size we were using!) This can be a symptom of:</p>
 							
@@ -1577,7 +1577,7 @@ Process States when crashing (sum):
 				<sub>
 					<p><a id="sub_7_1">1</a> See <a href="#chapter_4">Chapter 4</a> if you need help to connect to a running node </p>
 					<p><a id="sub_7_2">2</a> I don’t dislike <span class="code">exml</span> or <span class="code">erlsom</span></p>
-					<p><a id="sub_7_3">3</a> See Ulf Wiger at http://erlang.org/pipermail/erlang-questions/2013-July/074901.html</p>
+					<p><a id="sub_7_3">3</a> See Ulf Wiger at <a href="http://erlang.org/pipermail/erlang-questions/2013-July/074901.html">http://erlang.org/pipermail/erlang-questions/2013-July/074901.html</a></p>
 					<p><a id="sub_7_4">4</a> This is a common approach to figuring out how to connect nodes together: have one or two central nodes with fixed names, and have every other one log to them. Connections will then propagate automatically.</p>
 				</sub>
 				
@@ -1604,7 +1604,7 @@ Process States when crashing (sum):
 []==Ls, []==Ms].</code></pre>
 
 					<sub>
-						<p><a id="sub_7_5">5</a> http://www.erlang.org/doc/man/HiPE_app.html</p>
+						<p><a id="sub_7_5">5</a> <a href="http://www.erlang.org/doc/man/HiPE_app.html">http://www.erlang.org/doc/man/HiPE_app.html</a></p>
 						<p><a id="sub_7_6">6</a> See the <span class="code">compressed</span> option for <span class="code">ets:new/2</span></p>
 					</sub>
 					
@@ -1641,7 +1641,7 @@ Process States when crashing (sum):
 					<p>Erlang’s system monitor will allow you to track information such as long garbage collection periods and large process heaps, among other things. A monitor can temporarily be set up as follows:</p>
 									
 					<sub>
-						<p><a id="sub_7_7">7</a> http://www.erlang.org/doc/man/erlang.html#system_monitor-2</p>
+						<p><a id="sub_7_7">7</a> <a href="http://www.erlang.org/doc/man/erlang.html#system_monitor-2">http://www.erlang.org/doc/man/erlang.html#system_monitor-2</a></p>
 					</sub>
 <pre><code class="erlang">1> erlang:system_monitor().
 undefined
@@ -1705,7 +1705,7 @@ undefined</code></pre>
 </code></pre>
 			
 			<sub>
-				<p><a id="sub_7_8">8</a> http://www.erlang.org/doc/efficiency_guide/binaryhandling.html#id65798</p>
+				<p><a id="sub_7_8">8</a> <a href="http://www.erlang.org/doc/efficiency_guide/binaryhandling.html#id65798">http://www.erlang.org/doc/efficiency_guide/binaryhandling.html#id65798</a></p>
 			</sub>
 			
 			<p>This will show how many individual binaries were held and then freed by each process as a delta. The value <span class="code">-5580</span> means there were 5580 fewer refc binaries after the call than before.</p>
@@ -1764,7 +1764,7 @@ undefined</code></pre>
 				<p>The <span class="code">recon_alloc</span> module was developed specifically to detect and help point towards the resolution of such issues.</p>
 				
 				<sub>
-					<p><a id="sub_7_10">10</a> http://www.erlang.org/doc/man/binary.html#copy-1</p>
+					<p><a id="sub_7_10">10</a> <a href="http://www.erlang.org/doc/man/binary.html#copy-1">http://www.erlang.org/doc/man/binary.html#copy-1</a></p>
 					<p><a id="sub_7_11">11</a> It might be worth copying even a larger fragment of a refc binary. For example, copying 10 megabytes off a 2 gigabytes binary should be worth the short-term overhead if it allows the 2 gigabytes binary to be garbage-collected while keeping the smaller fragment longer.</p>
 				</sub>
 				
@@ -1796,7 +1796,7 @@ undefined</code></pre>
 						
 						<sub>
 							<p><a id="sub_7_12">12</a> You can call <span class="code">recon_alloc:set_unit(Type)</span> to set the values reported by <span class="code">recon_alloc</span> in bytes, kilobytes, megabytes, or gigabytes</p>
-							<p><a id="sub_7_13">13</a> More information is available at http://ferd.github.io/recon/recon_alloc.html</p>
+							<p><a id="sub_7_13">13</a> More information is available at <a href="http://ferd.github.io/recon/recon_alloc.html">http://ferd.github.io/recon/recon_alloc.html</a></p>
 						</sub>
 						
 						<img src="images/memory_allocators.png">
@@ -1829,8 +1829,8 @@ undefined</code></pre>
 						<p>So looking at something such as the binary allocator, we may end up with something similar to Figure 7.2</p>
 
 						<sub>
-							<p><a id="sub_7_15">15</a> http://erlang.org/doc/man/erts_alloc.html#M_sbct</p>
-							<p><a id="sub_7_16">16</a> http://erlang.org/doc/man/erts_alloc.html#M_mmsbc</p>
+							<p><a id="sub_7_15">15</a> <a href="http://erlang.org/doc/man/erts_alloc.html#M_sbct">http://erlang.org/doc/man/erts_alloc.html#M_sbct</a></p>
+							<p><a id="sub_7_16">16</a> <a href="http://erlang.org/doc/man/erts_alloc.html#M_mmsbc">http://erlang.org/doc/man/erts_alloc.html#M_mmsbc</a></p>
 						</sub>
 						
 						<img src="images/memory_allocators3.png">
@@ -1855,8 +1855,8 @@ undefined</code></pre>
 						<p>For <span class="it">best fit</span> (<span class="code">bf</span>), the VM builds a balanced binary tree of all the free blocks’ sizes, and will try to find the smallest one that will accommodate the piece of data and allocate it there. In Figure 7.3, having a piece of data that requires three blocks would likely end in area 3.</p>
 						
 						<sub>
-							<p><a id="sub_7_17">17</a> http://erlang.org/doc/man/erts_alloc.html#M_mmsbc</p>
-							<p><a id="sub_7_18">18</a> http://erlang.org/doc/man/erts_alloc.html#M_as</p>
+							<p><a id="sub_7_17">17</a> <a href="http://erlang.org/doc/man/erts_alloc.html#M_mmsbc">http://erlang.org/doc/man/erts_alloc.html#M_mmsbc</a></p>
+							<p><a id="sub_7_18">18</a> <a href="http://erlang.org/doc/man/erts_alloc.html#M_as">http://erlang.org/doc/man/erts_alloc.html#M_as</a></p>
 						</sub>
 						
 						<img src="images/memory_allocators4.png">
@@ -1896,9 +1896,9 @@ undefined</code></pre>
 <pre><code class="erlang">[heap     ||      stack]</code></pre>
 						
 						<sub>
-							<p><a id="sub_7_19">19</a> http://www.erlang.org/doc/man/erts_alloc.html#M_mbsd
+							<p><a id="sub_7_19">19</a> <a href="http://www.erlang.org/doc/man/erts_alloc.html#M_mbsd">http://www.erlang.org/doc/man/erts_alloc.html#M_mbsd</a>
 							</p>
-							<p><a id="sub_7_20">20</a> The threshold is configurable through http://www.erlang.org/doc/man/erts_alloc.html#M_acul</p>
+							<p><a id="sub_7_20">20</a> The threshold is configurable through <a href="http://www.erlang.org/doc/man/erts_alloc.html#M_acul">http://www.erlang.org/doc/man/erts_alloc.html#M_acul</a></p>
 							<p><a id="sub_7_21">21</a> In cases this consumes too much memory, the feature can be disabled with the options <span class="code">+MBacul 0</span>.</p>
 						</sub>
 						
@@ -1929,7 +1929,7 @@ undefined</code></pre>
 				<li>How can you find out if garbage collections are taking too long to run?</li>
 			</ol>
 		<sub>
-			<p><a id="sub_7_22">22</a> http://ferd.github.io/recon/recon_alloc.html</p>
+			<p><a id="sub_7_22">22</a> <a href="http://ferd.github.io/recon/recon_alloc.html">http://ferd.github.io/recon/recon_alloc.html</a></p>
 		</sub>
 		<h4>Open-ended Questions</h4>
 			<ol>
@@ -2006,9 +2006,9 @@ undefined</code></pre>
 	<a id="8_2_system_monitors"><h3>8.2 System Monitors</h3></a>
 		<p>If nothing seems to stand out through either profiling or checking reduction counts, it’s possible some of your work ends up being done by NIFs, garbage collections, and so on.</p>
 		<sub>
-			<p><a id="sub_8_3">3</a> http://www.erlang.org/doc/man/eprof.html</p>
-			<p><a id="sub_8_4">4</a> http://www.erlang.org/doc/man/fprof.html</p>
-			<p><a id="sub_8_5">5</a> https://github.com/proger/eflame</p>
+			<p><a id="sub_8_3">3</a> <a href="http://www.erlang.org/doc/man/eprof.html">http://www.erlang.org/doc/man/eprof.html</a></p>
+			<p><a id="sub_8_4">4</a> <a href="http://www.erlang.org/doc/man/fprof.html">http://www.erlang.org/doc/man/fprof.html</a></p>
+			<p><a id="sub_8_5">5</a> <a href="https://github.com/proger/eflame">https://github.com/proger/eflame</a></p>
 			<p><a id="sub_8_5">6 See <a href="#5_1_2_cpu">Subsection 5.1.2 CPU</a></p>
 			<p><a id="sub_8_7">7</a> Call <span class="code">recon:info(PidTerm, location)</span> or <span class="code">process_info(Pid, current_stacktrace)</span> to get this information.</p>
 			
@@ -2094,8 +2094,8 @@ monitor=long_schedule pid=<0.54.0> info=[{timeout,1102},
 		
 		<sub>
 			<p><a id="sub_9_1">1</a> Tne common issue with debuggers that let you insert break points and step through a program is that they are incompatible with many Erlang programs: put a break point in one process and the ones around keep going. In practice, this turns debugging into a very limited activity because as soon as a process needs to interact with the one you’re debugging, its calls start timing out and crashing, possibly taking down the entire node with it. Tracing, on the other hand, doesn’t interfere with program execution, but still gives you all the data you need.</p>
-			<p><a id="sub_9_2">2</a> http://www.erlang.org/doc/man/sys.html</p>
-			<p>3http://www.erlang.org/doc/man/dbg.html</p>
+			<p><a id="sub_9_2">2</a> <a href="http://www.erlang.org/doc/man/sys.html">http://www.erlang.org/doc/man/sys.html</a></p>
+			<p><a id="sub_9_3">3</a> <a href="http://www.erlang.org/doc/man/dbg.html">http://www.erlang.org/doc/man/dbg.html</a></p>
 		</sub>
 		
 		<a id="9_1_tracing_principles"><h3>9.1 Tracing Principles</h3></a>
@@ -2115,12 +2115,12 @@ monitor=long_schedule pid=<0.54.0> info=[{timeout,1102},
 			<p>Tools like <span class="code">redbug</span> and <span class="code">recon_trace</span>, on the other hand, abstract this away.</p>
 			
 			<sub>
-				<p><a id="sub_9_4">4</a> https://github.com/massemanet/eper/blob/master/doc/redbug.txt</p>
-				<p><a id="sub_9_5">5</a> https://github.com/massemanet/eper</p>
-				<p><a id="sub_9_6">6</a> http://ferd.github.io/recon/recon_trace.html</p>
+				<p><a id="sub_9_4">4</a> <a href="https://github.com/massemanet/eper/blob/master/doc/redbug.txt">https://github.com/massemanet/eper/blob/master/doc/redbug.txt</a></p>
+				<p><a id="sub_9_5">5</a> <a href="https://github.com/massemanet/eper">https://github.com/massemanet/eper</a></p>
+				<p><a id="sub_9_6">6</a> <a href="http://ferd.github.io/recon/recon_trace.html">http://ferd.github.io/recon/recon_trace.html</a></p>
 				<p><a id="sub_9_7">7</a> Messages may be supported in future iterations of the library. In practice, the author hasn’t found the need when using OTP, given behaviours and matching on specific arguments allows the user to get something roughly equivalent.</p>
 				<p><a id="sub_9_8">8</a> In cases where processes contain sensitive information, data can be forced to be kept private by calling <span class="code">process_flag(sensitive, true)</span></p>
-				<p><a id="sub_9_9">9</a> http://www.erlang.org/doc/apps/erts/match_spec.html</p>
+				<p><a id="sub_9_9">9</a> <a href="http://www.erlang.org/doc/apps/erts/match_spec.html">http://www.erlang.org/doc/apps/erts/match_spec.html</a></p>
 			</sub>
 			
 			<img src="images/trace.png">
@@ -2137,7 +2137,7 @@ monitor=long_schedule pid=<0.54.0> info=[{timeout,1102},
 				<p>It will also be possible to rate limit based on two manners: a static count, or a number of matches per time interval.</p>
 			
 				<sub>
-				<p><a id="sub_9_10">10</a>	http://www.erlang.org/doc/man/ets.html#fun2ms-1</p>
+				<p><a id="sub_9_10">10</a>	<a href="http://www.erlang.org/doc/man/ets.html#fun2ms-1">http://www.erlang.org/doc/man/ets.html#fun2ms-1</a></p>
 				</sub>
 					<p>Rather than going more in details, here’s a list of examples and how to trace for them.</p>
 <pre><code class="erlang">%% All calls from the queue module, with 10 calls printed at most:
@@ -2255,7 +2255,7 @@ ok
 					<il>Imagine that traffic sent out of a node does so over SSL, over a multi-tenant system.However, due to wanting to validate data sent (following a customer complain), youneed to be able to inspect what was seen clear text. Can you think up a plan to be able to snoop in the data sent to their end through the <span class="code">ssl</span> socket, without snooping on the data sent to any other customer?</il>
 				</ol>
 			<h4>Hands-On</h4>
-				<p>Using the code at https://github.com/ferd/recon_demo (these may require a decent understanding of the code there):</p>
+				<p>Using the code at <a href="https://github.com/ferd/recon_demo">https://github.com/ferd/recon_demo</a> (these may require a decent understanding of the code there):</p>
 				<ol>
 					<il>Can chatty processes (<span class="code">council_member</span>) message themselves? (<span class="it">hint: can this work with registered names? Do you need to check the chattiest process and see if it messages itself?</span>)</il>
 					<il>Can you estimate the overall frequency at which messages are sent globally?</il>

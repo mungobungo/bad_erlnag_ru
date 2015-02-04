@@ -117,7 +117,11 @@ textarea {
     font-style: italic !important;
     
 }
+.trans {
 
+    background: none repeat scroll 0% 0% #999 !important;
+    border-bottom: 1px dotted #AD9 !important;
+}
 
 sub {
 

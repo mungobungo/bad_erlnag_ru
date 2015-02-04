@@ -186,13 +186,18 @@
 			There’s something rather unique in Erlang in how it approaches failure compared to most other programming languages. There’s this common way of thinking where the language, programming environment, and methodology do everything possible to prevent errors. Something going wrong at run-time is something that needs to be prevented, and if it cannot be prevented, then it’s out of scope for whatever solution people have been thinking about.
 			</p>
 			
-			<p class="trans">
-			There’s something rather unique in Erlang in how it approaches failure compared to most other programming languages. There’s this common way of thinking where the language, programming environment, and methodology do everything possible to prevent errors. Something going wrong at run-time is something that needs to be prevented, and if it cannot be prevented, then it’s out of scope for whatever solution people have been thinking about.
+			<p>
+			Есть что-то уникальное в подходе Эрланга к обработке ошибок, по сравнению с другими языками программирования. Существует распространненный подход, в котором язык программирования, окрожения и методология делают все возможное для избежания ошибок. Что-то идет не так во время выполнения программы, и это что-то надо предотвратить, и если это нельзя предотввратить, то оно находится за рамками решения.
 			</p>
 			
 			<p class="trans">
 			The program is written once, and after that, it’s off to production, whatever may happen there. If there are errors, new versions will need to be shipped.
 			</p>
+
+			<p class="ans">
+			The program is written once, and after that, it’s off to production, whatever may happen there. If there are errors, new versions will need to be shipped.
+			</p>
+			
 			<p class="trans">Erlang, on the other hand, takes the approach that failures will happen no matter what, whether they’re developer-, operator-, or hardware-related. It is rarely practical or even possible to get rid of all errors in a program or a system.<sup><a href="#1_sup1">1</a></sup> If you can deal with some errors rather than preventing them at all cost, then most undefined behaviours of a program can
 			go in that "deal with it" approach.</p>
 			<p class="trans">This is where the "Let it Crash" <sup><a href="#1_sup2">2</a></sup> idea comes from: Because you can now deal with failure, and because the cost of weeding out all of the complex bugs from a system before it hits production is often prohibitive, programmers should only deal with the errors they know how to handle, and leave the rest for another process (a supervisor) or the virtual machine to deal with.
